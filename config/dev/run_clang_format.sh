@@ -5,7 +5,7 @@
 #   config/dev/run_clang_format.sh <source_file_name>
 # Or use the following command to reformat the entire repository
 #   git ls-tree --name-only HEAD -r |  grep "cpp\|hpp" | xargs config/dev/run_clang_format.sh
-#
+#   git ls-tree --name-only HEAD -r |  grep "\.c$" | xargs config/dev/run_clang_format.sh
 CLANGFORMAT_EXE=`which clang-format`
 SEDWITHOPTIONS="sed -i.bak"
 

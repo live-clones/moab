@@ -59,7 +59,7 @@ class MESQUITE_EXPORT SymMatrix3D
 
     inline static Term term( unsigned r, unsigned c )
     {
-        return ( Term )( r <= c ? 3 * r - r * ( r + 1 ) / 2 + c : 3 * c - c * ( c + 1 ) / 2 + r );
+        return (Term)( r <= c ? 3 * r - r * ( r + 1 ) / 2 + c : 3 * c - c * ( c + 1 ) / 2 + r );
     }
 
     SymMatrix3D() {}

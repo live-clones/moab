@@ -103,15 +103,20 @@ ReadSmf::~ReadSmf()
     }
 }
 
-ErrorCode ReadSmf::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                    const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
+ErrorCode ReadSmf::read_tag_values( const char* /* file_name */,
+                                    const char* /* tag_name */,
+                                    const FileOptions& /* opts */,
+                                    std::vector< int >& /* tag_values_out */,
                                     const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode ReadSmf::load_file( const char* filename, const EntityHandle* /* file_set */, const FileOptions& opts,
-                              const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
+ErrorCode ReadSmf::load_file( const char* filename,
+                              const EntityHandle* /* file_set */,
+                              const FileOptions& opts,
+                              const ReaderIface::SubsetList* subset_list,
+                              const Tag* file_id_tag )
 {
     ErrorCode result;
     lineNo       = 0;
@@ -119,7 +124,10 @@ ErrorCode ReadSmf::load_file( const char* filename, const EntityHandle* /* file_
     versionMajor = 0;
     versionMinor = 0;
 
-    if( subset_list ) { MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for VTK" ); }
+    if( subset_list )
+    {
+        MB_SET_ERR( MB_UNSUPPORTED_OPERATION, "Reading subset of files not supported for VTK" );
+    }
 
     // Does the caller want a field to be used for partitioning the entities?
     // If not, we'll assume any scalar integer field named MATERIAL_SET specifies partitions.
@@ -206,7 +214,10 @@ ErrorCode ReadSmf::annotation( char* cmd, std::vector< std::string >& argv )
     {
         // If SMF version is specified, it must be the first
         // thing specified in the file.
-        if( commandNo > 1 ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "SMF file version specified at line " << lineNo ); }
+        if( commandNo > 1 )
+        {
+            MB_SET_ERR( MB_FILE_WRITE_ERROR, "SMF file version specified at line " << lineNo );
+        }
 
         if( 2 == sscanf( argv[0].c_str(), "%d.%d", &versionMajor, &versionMinor ) )
         {
@@ -346,7 +357,10 @@ ErrorCode ReadSmf::parse_doubles( int count, const std::vector< std::string >& a
     for( int i = 0; i < count; i++ )
     {
         results[i] = strtod( argv[i].c_str(), &endptr );
-        if( *endptr ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Invalid vertex coordinates at line " << lineNo ); }
+        if( *endptr )
+        {
+            MB_SET_ERR( MB_FILE_WRITE_ERROR, "Invalid vertex coordinates at line " << lineNo );
+        }
     }
 
     return MB_SUCCESS;
@@ -392,7 +406,10 @@ ErrorCode ReadSmf::face( std::vector< std::string >& argv )
     for( unsigned int i = 0; i < argv.size(); i++ )
     {
         vert[i] = strtol( argv[i].c_str(), &endptr, 0 );
-        if( *endptr ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Invalid face spec at line " << lineNo ); }
+        if( *endptr )
+        {
+            MB_SET_ERR( MB_FILE_WRITE_ERROR, "Invalid face spec at line " << lineNo );
+        }
     }
 
     state.back().face( vert, ivar );
@@ -416,7 +433,10 @@ ErrorCode ReadSmf::end( std::vector< std::string >& /*argv*/ )
     // There must always be at least one state on the stack.
     // Don't let mismatched begin/end statements cause us
     // to read from an empty vector.
-    if( state.size() == 1 ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "End w/out Begin at line " << lineNo ); }
+    if( state.size() == 1 )
+    {
+        MB_SET_ERR( MB_FILE_WRITE_ERROR, "End w/out Begin at line " << lineNo );
+    }
 
     state.pop_back();
 
@@ -429,7 +449,10 @@ ErrorCode ReadSmf::set( std::vector< std::string >& argv )
 
     char* endptr;
     int val = strtol( argv[1].c_str(), &endptr, 0 );
-    if( *endptr ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Invalid value at line " << lineNo ); }
+    if( *endptr )
+    {
+        MB_SET_ERR( MB_FILE_WRITE_ERROR, "Invalid value at line " << lineNo );
+    }
 
     state.back().set_vertex_correction( val );
 
@@ -482,7 +505,10 @@ ErrorCode ReadSmf::rot( std::vector< std::string >& argv )
     double axis[3]       = { 0., 0., 0. };
     std::string axisname = argv.front();
     argv.erase( argv.begin() );
-    if( axisname.size() != 1 ) { MB_SET_ERR( MB_FILE_WRITE_ERROR, "Malformed rotation command at line " << lineNo ); }
+    if( axisname.size() != 1 )
+    {
+        MB_SET_ERR( MB_FILE_WRITE_ERROR, "Malformed rotation command at line " << lineNo );
+    }
     switch( axisname[0] )
     {
         case 'x':

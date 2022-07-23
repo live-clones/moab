@@ -24,8 +24,14 @@
 namespace moab
 {
 
-StructuredElementSeq::StructuredElementSeq( EntityHandle shandle, const int imin, const int jmin, const int kmin,
-                                            const int imax, const int jmax, const int kmax, int* is_per )
+StructuredElementSeq::StructuredElementSeq( EntityHandle shandle,
+                                            const int imin,
+                                            const int jmin,
+                                            const int kmin,
+                                            const int imax,
+                                            const int jmax,
+                                            const int kmax,
+                                            int* is_per )
     : ElementSequence( shandle,
                        ScdElementData::calc_num_entities( shandle, imax - imin, jmax - jmin, kmax - kmin, is_per ),
                        CN::VerticesPerEntity( TYPE_FROM_HANDLE( shandle ) ),
@@ -35,7 +41,8 @@ StructuredElementSeq::StructuredElementSeq( EntityHandle shandle, const int imin
 
 StructuredElementSeq::~StructuredElementSeq() {}
 
-ErrorCode StructuredElementSeq::get_connectivity( EntityHandle handle, std::vector< EntityHandle >& connect,
+ErrorCode StructuredElementSeq::get_connectivity( EntityHandle handle,
+                                                  std::vector< EntityHandle >& connect,
                                                   bool /*topological*/ ) const
 {
     int i, j, k;
@@ -44,8 +51,10 @@ ErrorCode StructuredElementSeq::get_connectivity( EntityHandle handle, std::vect
     return rval;
 }
 
-ErrorCode StructuredElementSeq::get_connectivity( EntityHandle handle, EntityHandle const*& connect,
-                                                  int& connect_length, bool topo,
+ErrorCode StructuredElementSeq::get_connectivity( EntityHandle handle,
+                                                  EntityHandle const*& connect,
+                                                  int& connect_length,
+                                                  bool topo,
                                                   std::vector< EntityHandle >* storage ) const
 {
     if( !storage )

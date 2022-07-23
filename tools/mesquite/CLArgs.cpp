@@ -147,7 +147,10 @@ void CLArgImpl::print_brief_help( std::ostream& stream )
     for( unsigned i = 0; i < mFlags.size(); ++i )
     {
         std::string str = mFlags[i]->callback()->brief();
-        if( !str.empty() ) { stream << "[-" << mFlags[i]->flag() << ' ' << str << "]"; }
+        if( !str.empty() )
+        {
+            stream << "[-" << mFlags[i]->flag() << ' ' << str << "]";
+        }
         else
         {
             str = mFlags[i]->brief();
@@ -421,7 +424,10 @@ bool CLArgs::KeyWordArg::value( const std::string& val )
 {
     std::vector< std::string >::const_iterator i;
     for( i = mKeyWords.begin(); i != mKeyWords.end(); ++i )
-        if( compare_no_case( i->c_str(), val.c_str() ) ) { return value( *i ); }
+        if( compare_no_case( i->c_str(), val.c_str() ) )
+        {
+            return value( *i );
+        }
 
     return false;
 }

@@ -706,7 +706,10 @@ C_FUNC_DEF double v_tet_shape( int /*num_nodes*/, double coordinates[][3] )
                coordinates[3][2] - coordinates[0][2] );
 
     double jacobian = edge3 % ( edge2 * edge0 );
-    if( jacobian < VERDICT_DBL_MIN ) { return (double)0.0; }
+    if( jacobian < VERDICT_DBL_MIN )
+    {
+        return (double)0.0;
+    }
     double num = 3 * pow( root_of_2 * jacobian, two_thirds );
     double den =
         1.5 * ( edge0 % edge0 + edge2 % edge2 + edge3 % edge3 ) - ( edge0 % -edge2 + -edge2 % edge3 + edge3 % edge0 );
@@ -856,7 +859,9 @@ C_FUNC_DEF double v_tet_distortion( int num_nodes, double coordinates[][3] )
 /*!
   the quality metrics of a tet
 */
-C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][3], unsigned int metrics_request_flag,
+C_FUNC_DEF void v_tet_quality( int num_nodes,
+                               double coordinates[][3],
+                               unsigned int metrics_request_flag,
                                TetMetricVals* metric_vals )
 {
 
@@ -909,10 +914,16 @@ C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][3], unsigned 
     static const int do_jacobian = V_TET_JACOBIAN | V_TET_VOLUME | V_TET_ASPECT_BETA | V_TET_ASPECT_GAMMA |
                                    V_TET_SHAPE | V_TET_RELATIVE_SIZE_SQUARED | V_TET_SHAPE_AND_SIZE |
                                    V_TET_SCALED_JACOBIAN | V_TET_CONDITION;
-    if( metrics_request_flag & do_jacobian ) { metric_vals->jacobian = (double)( edges[3] % ( edges[2] * edges[0] ) ); }
+    if( metrics_request_flag & do_jacobian )
+    {
+        metric_vals->jacobian = (double)( edges[3] % ( edges[2] * edges[0] ) );
+    }
 
     // calculate the volume
-    if( metrics_request_flag & V_TET_VOLUME ) { metric_vals->volume = (double)( metric_vals->jacobian / 6.0 ); }
+    if( metrics_request_flag & V_TET_VOLUME )
+    {
+        metric_vals->volume = (double)( metric_vals->jacobian / 6.0 );
+    }
 
     // calculate aspect ratio
     if( metrics_request_flag & V_TET_ASPECT_BETA )
@@ -955,7 +966,10 @@ C_FUNC_DEF void v_tet_quality( int num_nodes, double coordinates[][3], unsigned 
     if( metrics_request_flag & ( V_TET_SHAPE | V_TET_SHAPE_AND_SIZE ) )
     {
         // if the jacobian is non-positive, the shape is 0
-        if( metric_vals->jacobian < VERDICT_DBL_MIN ) { metric_vals->shape = (double)0.0; }
+        if( metric_vals->jacobian < VERDICT_DBL_MIN )
+        {
+            metric_vals->shape = (double)0.0;
+        }
         else
         {
             static const double two_thirds = 2.0 / 3.0;

@@ -30,8 +30,12 @@ HomCoord& HomCoord::getUnitv( int c )
 int dum[] = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 HomXform HomXform::IDENTITY( dum );
 
-void HomXform::three_pt_xform( const HomCoord& p1, const HomCoord& q1, const HomCoord& p2, const HomCoord& q2,
-                               const HomCoord& p3, const HomCoord& q3 )
+void HomXform::three_pt_xform( const HomCoord& p1,
+                               const HomCoord& q1,
+                               const HomCoord& p2,
+                               const HomCoord& q2,
+                               const HomCoord& p3,
+                               const HomCoord& q3 )
 {
     // pmin and pmax are min and max bounding box corners which are mapped to
     // qmin and qmax, resp.  qmin and qmax are not necessarily min/max corners,

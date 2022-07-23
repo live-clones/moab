@@ -149,14 +149,19 @@ class MESQUITE_EXPORT TagVertexMesh : public MeshDecorator, public Instruction
      */
     void clear( MsqError& err );
 
-    virtual void vertices_get_coordinates( const VertexHandle vert_array[], MsqVertex* coordinates, size_t num_vtx,
+    virtual void vertices_get_coordinates( const VertexHandle vert_array[],
+                                           MsqVertex* coordinates,
+                                           size_t num_vtx,
                                            MsqError& err );
 
     virtual void vertex_set_coordinates( VertexHandle vertex, const Vector3D& coordinates, MsqError& err );
 
     //***************  Tags  ***********
 
-    virtual TagHandle tag_create( const std::string& tag_name, TagType type, unsigned length, const void* default_value,
+    virtual TagHandle tag_create( const std::string& tag_name,
+                                  TagType type,
+                                  unsigned length,
+                                  const void* default_value,
                                   MsqError& err );
 
     virtual TagHandle tag_get( const std::string& name, MsqError& err );

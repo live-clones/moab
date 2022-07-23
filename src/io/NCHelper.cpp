@@ -64,7 +64,7 @@ NCHelper* NCHelper::get_nc_helper( ReadNC* readNC, int fileId, const FileOptions
     }
     // SCRIP can be CF or non CF, if it comes from MPAS :)
     if( NCHelperScrip::can_read_file( readNC, fileId ) )
-                 return new( std::nothrow ) NCHelperScrip( readNC, fileId, opts, fileSet );
+        return new( std::nothrow ) NCHelperScrip( readNC, fileId, opts, fileSet );
 
     // Unknown NetCDF grid (will fill this in later for POP, CICE and CLM)
     return NULL;
@@ -112,7 +112,7 @@ ErrorCode NCHelper::create_conventional_tags( const std::vector< int >& tstep_nu
     }
     int dimnamesSz = dimnames.size();
     rval           = mbImpl->tag_get_handle( tag_name.c_str(), 0, MB_TYPE_OPAQUE, dimNamesTag,
-                                   MB_TAG_CREAT | MB_TAG_SPARSE | MB_TAG_VARLEN );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+                                             MB_TAG_CREAT | MB_TAG_SPARSE | MB_TAG_VARLEN );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
     const void* ptr = dimnames.c_str();
     rval            = mbImpl->tag_set_by_ptr( dimNamesTag, &_fileSet, 1, &ptr, &dimnamesSz );MB_CHK_SET_ERR( rval, "Trouble setting data to conventional tag " << tag_name );
     dbgOut.tprintf( 2, "Conventional tag %s created\n", tag_name.c_str() );
@@ -122,7 +122,7 @@ ErrorCode NCHelper::create_conventional_tags( const std::vector< int >& tstep_nu
     tag_name       = "__DIM_LENS";
     int dimLensSz  = dimLens.size();
     rval           = mbImpl->tag_get_handle( tag_name.c_str(), 0, MB_TYPE_INTEGER, dimLensTag,
-                                   MB_TAG_CREAT | MB_TAG_SPARSE | MB_TAG_VARLEN );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+                                             MB_TAG_CREAT | MB_TAG_SPARSE | MB_TAG_VARLEN );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
     ptr  = &( dimLens[0] );
     rval = mbImpl->tag_set_by_ptr( dimLensTag, &_fileSet, 1, &ptr, &dimLensSz );MB_CHK_SET_ERR( rval, "Trouble setting data to conventional tag " << tag_name );
     dbgOut.tprintf( 2, "Conventional tag %s created\n", tag_name.c_str() );
@@ -139,7 +139,7 @@ ErrorCode NCHelper::create_conventional_tags( const std::vector< int >& tstep_nu
     }
     int varnamesSz = varnames.size();
     rval           = mbImpl->tag_get_handle( tag_name.c_str(), 0, MB_TYPE_OPAQUE, varNamesTag,
-                                   MB_TAG_CREAT | MB_TAG_SPARSE | MB_TAG_VARLEN );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+                                             MB_TAG_CREAT | MB_TAG_SPARSE | MB_TAG_VARLEN );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
     ptr  = varnames.c_str();
     rval = mbImpl->tag_set_by_ptr( varNamesTag, &_fileSet, 1, &ptr, &varnamesSz );MB_CHK_SET_ERR( rval, "Trouble setting data to conventional tag " << tag_name );
     dbgOut.tprintf( 2, "Conventional tag %s created\n", tag_name.c_str() );
@@ -187,7 +187,7 @@ ErrorCode NCHelper::create_conventional_tags( const std::vector< int >& tstep_nu
             ss_tag_name << "__" << dimNames[i] << "_LOC_VALS";
             tag_name = ss_tag_name.str();
             rval     = mbImpl->tag_get_handle( tag_name.c_str(), val.size(), MB_TYPE_INTEGER, tagh,
-                                           MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+                                               MB_TAG_SPARSE | MB_TAG_CREAT );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
             rval = mbImpl->tag_set_data( tagh, &_fileSet, 1, &val[0] );MB_CHK_SET_ERR( rval, "Trouble setting data to conventional tag " << tag_name );
             dbgOut.tprintf( 2, "Conventional tag %s created\n", tag_name.c_str() );
         }
@@ -231,7 +231,7 @@ ErrorCode NCHelper::create_conventional_tags( const std::vector< int >& tstep_nu
     tag_name         = "__GLOBAL_ATTRIBS";
     Tag globalAttTag = 0;
     rval             = mbImpl->tag_get_handle( tag_name.c_str(), 0, MB_TYPE_OPAQUE, globalAttTag,
-                                   MB_TAG_CREAT | MB_TAG_SPARSE | MB_TAG_VARLEN );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+                                               MB_TAG_CREAT | MB_TAG_SPARSE | MB_TAG_VARLEN );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
     std::string gattVal;
     std::vector< int > gattLen;
     rval = create_attrib_string( globalAtts, gattVal, gattLen );MB_CHK_SET_ERR( rval, "Trouble creating global attribute string" );
@@ -257,7 +257,7 @@ ErrorCode NCHelper::create_conventional_tags( const std::vector< int >& tstep_nu
         tag_name      = ssTagName.str();
         Tag varAttTag = 0;
         rval          = mbImpl->tag_get_handle( tag_name.c_str(), 0, MB_TYPE_OPAQUE, varAttTag,
-                                       MB_TAG_CREAT | MB_TAG_SPARSE | MB_TAG_VARLEN );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
+                                                MB_TAG_CREAT | MB_TAG_SPARSE | MB_TAG_VARLEN );MB_CHK_SET_ERR( rval, "Trouble creating conventional tag " << tag_name );
 
         std::string varAttVal;
         std::vector< int > varAttLen;
@@ -371,7 +371,8 @@ ErrorCode NCHelper::update_time_tag_vals()
     return MB_SUCCESS;
 }
 
-ErrorCode NCHelper::read_variables_setup( std::vector< std::string >& var_names, std::vector< int >& tstep_nums,
+ErrorCode NCHelper::read_variables_setup( std::vector< std::string >& var_names,
+                                          std::vector< int >& tstep_nums,
                                           std::vector< ReadNC::VarData >& vdatas,
                                           std::vector< ReadNC::VarData >& vsetdatas )
 {
@@ -672,7 +673,8 @@ ErrorCode NCHelper::get_tag_to_nonset( ReadNC::VarData& var_data, int tstep_num,
     return rval;
 }
 
-ErrorCode NCHelper::create_attrib_string( const std::map< std::string, ReadNC::AttData >& attMap, std::string& attVal,
+ErrorCode NCHelper::create_attrib_string( const std::map< std::string, ReadNC::AttData >& attMap,
+                                          std::string& attVal,
                                           std::vector< int >& attLen )
 {
     int success;
@@ -1350,17 +1352,17 @@ static double tolerance = 1.e-12;
 // Used to put points in an STL tree-based container
 bool NCHelper::Node3D::operator<( const NCHelper::Node3D& other ) const
 {
-    if (coords[0] <= other.coords[0] - tolerance)
+    if( coords[0] <= other.coords[0] - tolerance )
         return true;
-    else if (coords[0] >= other.coords[0] + tolerance)
+    else if( coords[0] >= other.coords[0] + tolerance )
         return false;
-    if (coords[1] <= other.coords[1] - tolerance)
+    if( coords[1] <= other.coords[1] - tolerance )
         return true;
-    else if (coords[1] >= other.coords[1] + tolerance)
+    else if( coords[1] >= other.coords[1] + tolerance )
         return false;
-    if (coords[2] <= other.coords[2] - tolerance)
+    if( coords[2] <= other.coords[2] - tolerance )
         return true;
-    else if (coords[0] >= other.coords[0] + tolerance)
+    else if( coords[0] >= other.coords[0] + tolerance )
         return false;
 
     return false;

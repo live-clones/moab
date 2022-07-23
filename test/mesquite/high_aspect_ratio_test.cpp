@@ -139,8 +139,14 @@ void usage( const char* argv0, bool brief = true )
  */
 void create_input_mesh( const MeshParams& params, bool all_fixed, MeshImpl& mesh, MsqError& err );
 
-void parse_options( char* argv[], int argc, MeshParams& mesh, MeshParams& ref, std::string& output_file,
-                    bool& fixed_boundary, TerminationCriterion::TimeStepFileType& write_timesteps, bool& use_feas_newt,
+void parse_options( char* argv[],
+                    int argc,
+                    MeshParams& mesh,
+                    MeshParams& ref,
+                    std::string& output_file,
+                    bool& fixed_boundary,
+                    TerminationCriterion::TimeStepFileType& write_timesteps,
+                    bool& use_feas_newt,
                     int& num_iterations );
 
 std::string base_name( std::string filename );
@@ -289,9 +295,15 @@ enum ParseState
     EXPECTING_O,
     EXPECTING_I
 };
-void parse_options( char* argv[], int argc, MeshParams& mesh, MeshParams& ref, std::string& output_file,
-                    bool& fixed_boundary, TerminationCriterion::TimeStepFileType& write_timesteps,
-                    bool& feas_newt_solver, int& num_iterations )
+void parse_options( char* argv[],
+                    int argc,
+                    MeshParams& mesh,
+                    MeshParams& ref,
+                    std::string& output_file,
+                    bool& fixed_boundary,
+                    TerminationCriterion::TimeStepFileType& write_timesteps,
+                    bool& feas_newt_solver,
+                    int& num_iterations )
 {
     // begin with defaults
     mesh             = default_mesh;

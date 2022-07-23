@@ -89,9 +89,14 @@ class WriteNC : public WriterIface
     virtual ~WriteNC();
 
     //! Writes out a file
-    ErrorCode write_file( const char* file_name, const bool overwrite, const FileOptions& opts,
-                          const EntityHandle* output_list, const int num_sets,
-                          const std::vector< std::string >& qa_list, const Tag* tag_list = NULL, int num_tags = 0,
+    ErrorCode write_file( const char* file_name,
+                          const bool overwrite,
+                          const FileOptions& opts,
+                          const EntityHandle* output_list,
+                          const int num_sets,
+                          const std::vector< std::string >& qa_list,
+                          const Tag* tag_list  = NULL,
+                          int num_tags         = 0,
                           int export_dimension = 3 );
 
   private:
@@ -158,8 +163,10 @@ class WriteNC : public WriterIface
     //! Variable info
     std::map< std::string, VarData > varInfo;
 
-    ErrorCode parse_options( const FileOptions& opts, std::vector< std::string >& var_names,
-                             std::vector< std::string >& desired_names, std::vector< int >& tstep_nums,
+    ErrorCode parse_options( const FileOptions& opts,
+                             std::vector< std::string >& var_names,
+                             std::vector< std::string >& desired_names,
+                             std::vector< int >& tstep_nums,
                              std::vector< double >& tstep_vals );
     /*
      * Map out the header, from tags on file set; it is the inverse process from
@@ -167,7 +174,9 @@ class WriteNC : public WriterIface
      */
     ErrorCode process_conventional_tags( EntityHandle fileSet );
 
-    ErrorCode process_concatenated_attribute( const void* attPtr, int attSz, std::vector< int >& attLen,
+    ErrorCode process_concatenated_attribute( const void* attPtr,
+                                              int attSz,
+                                              std::vector< int >& attLen,
                                               std::map< std::string, AttData >& attributes );
 
     //! Interface instance

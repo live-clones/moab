@@ -85,10 +85,16 @@ ErrorCode SpectralMeshTool::convert_to_coarse( int order, EntityHandle spectral_
     ents = tmp_ents.subset_by_dimension( 3 );
     if( ents.empty() ) ents = tmp_ents.subset_by_dimension( 2 );
     if( ents.empty() ) ents = tmp_ents.subset_by_dimension( 1 );
-    if( ents.empty() ) { MB_SET_ERR( MB_FAILURE, "Can't find any entities for conversion" ); }
+    if( ents.empty() )
+    {
+        MB_SET_ERR( MB_FAILURE, "Can't find any entities for conversion" );
+    }
 
     // get a ptr to connectivity
-    if( ents.psize() != 1 ) { MB_SET_ERR( MB_FAILURE, "Entities must be in one chunk for conversion" ); }
+    if( ents.psize() != 1 )
+    {
+        MB_SET_ERR( MB_FAILURE, "Entities must be in one chunk for conversion" );
+    }
     EntityHandle* conn;
     int count, verts_per_e;
     rval = mbImpl->connect_iterate( ents.begin(), ents.end(), conn, verts_per_e, count );
@@ -99,8 +105,12 @@ ErrorCode SpectralMeshTool::convert_to_coarse( int order, EntityHandle spectral_
 }
 
 template < class T >
-ErrorCode SpectralMeshTool::create_spectral_elems( const T* conn, int num_fine_elems, int dim, Range& output_range,
-                                                   int start_idx, Range* local_gids )
+ErrorCode SpectralMeshTool::create_spectral_elems( const T* conn,
+                                                   int num_fine_elems,
+                                                   int dim,
+                                                   Range& output_range,
+                                                   int start_idx,
+                                                   Range* local_gids )
 {
     assert( spectralOrder && num_fine_elems );
 
@@ -153,11 +163,16 @@ ErrorCode SpectralMeshTool::create_spectral_elems( const T* conn, int num_fine_e
 }
 
 // force instantiation of a few specific types
-template ErrorCode SpectralMeshTool::create_spectral_elems< int >( const int* conn, int num_fine_elems, int dim,
-                                                                   Range& output_range, int start_idx,
+template ErrorCode SpectralMeshTool::create_spectral_elems< int >( const int* conn,
+                                                                   int num_fine_elems,
+                                                                   int dim,
+                                                                   Range& output_range,
+                                                                   int start_idx,
                                                                    Range* local_gids );
 template ErrorCode SpectralMeshTool::create_spectral_elems< EntityHandle >( const EntityHandle* conn,
-                                                                            int num_fine_elems, int dim,
-                                                                            Range& output_range, int start_idx,
+                                                                            int num_fine_elems,
+                                                                            int dim,
+                                                                            Range& output_range,
+                                                                            int start_idx,
                                                                             Range* local_gids );
 }  // namespace moab

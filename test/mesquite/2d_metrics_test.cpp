@@ -490,7 +490,10 @@ int main( int argc, char* argv[] )
     if( exp > 5 ) usage();
 
     int lower, upper;
-    if( exp > 0 ) { lower = upper = exp - 1; }
+    if( exp > 0 )
+    {
+        lower = upper = exp - 1;
+    }
     else
     {
         lower = 0;

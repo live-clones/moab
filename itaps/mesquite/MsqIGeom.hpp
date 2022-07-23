@@ -85,7 +85,9 @@ class MsqCommonIGeom : public MeshDomain
      *  the geometric entity closest to the input position, and
      *  the surface normal at that position.
      */
-    int closest_and_normal( iBase_EntityHandle geom_handle, const Vector3D& position, Vector3D& closest,
+    int closest_and_normal( iBase_EntityHandle geom_handle,
+                            const Vector3D& position,
+                            Vector3D& closest,
                             Vector3D& normal ) const;
 
     int get_dimension( iBase_EntityHandle const* geom_handle, unsigned short* dof_out, size_t count ) const;
@@ -117,13 +119,20 @@ class MsqIGeom : public MsqCommonIGeom
 
     void element_normal_at( Mesh::ElementHandle entity_handle, Vector3D& coordinate ) const;
 
-    void vertex_normal_at( const Mesh::VertexHandle* handles, Vector3D coordinates[], unsigned count,
+    void vertex_normal_at( const Mesh::VertexHandle* handles,
+                           Vector3D coordinates[],
+                           unsigned count,
                            MsqError& err ) const;
 
-    void closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest, Vector3D& normal,
+    void closest_point( Mesh::VertexHandle handle,
+                        const Vector3D& position,
+                        Vector3D& closest,
+                        Vector3D& normal,
                         MsqError& err ) const;
 
-    void domain_DoF( const Mesh::VertexHandle* handle_array, unsigned short* dof_array, size_t num_vertices,
+    void domain_DoF( const Mesh::VertexHandle* handle_array,
+                     unsigned short* dof_array,
+                     size_t num_vertices,
                      MsqError& err ) const;
 
   private:

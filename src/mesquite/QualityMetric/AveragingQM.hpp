@@ -114,8 +114,12 @@ class AveragingQM
      *\param vertex_grads   Output.  Gradient at each vertex.
      *\return average metric value for element
      */
-    double average_corner_gradients( EntityTopology element_type, uint32_t fixed_vertices, unsigned num_corners,
-                                     double corner_values[], const Vector3D corner_grads[], Vector3D vertex_grads[],
+    double average_corner_gradients( EntityTopology element_type,
+                                     uint32_t fixed_vertices,
+                                     unsigned num_corners,
+                                     double corner_values[],
+                                     const Vector3D corner_grads[],
+                                     Vector3D vertex_grads[],
                                      MsqError& err );
 
     /** \brief Average metric values, gradients, and Hessian diagonal
@@ -131,10 +135,15 @@ class AveragingQM
      *\param vertex_hessians Output.  Hessian diagonal block for each vertex.
      *\return average metric value for element
      */
-    double average_corner_hessian_diagonals( EntityTopology element_type, uint32_t fixed_vertices, unsigned num_corners,
-                                             const double corner_values[], const Vector3D corner_grads[],
-                                             const Matrix3D corner_hessians[], Vector3D vertex_grads[],
-                                             SymMatrix3D vertex_hessians[], MsqError& err );
+    double average_corner_hessian_diagonals( EntityTopology element_type,
+                                             uint32_t fixed_vertices,
+                                             unsigned num_corners,
+                                             const double corner_values[],
+                                             const Vector3D corner_grads[],
+                                             const Matrix3D corner_hessians[],
+                                             Vector3D vertex_grads[],
+                                             SymMatrix3D vertex_hessians[],
+                                             MsqError& err );
 
     /** \brief Average metric values, gradients, and Hessian diagonal
      *         blocks for per-corner evaluation
@@ -149,10 +158,15 @@ class AveragingQM
      *\param vertex_hessians Output.  Hessian diagonal block for each vertex.
      *\return average metric value for element
      */
-    double average_corner_hessian_diagonals( EntityTopology element_type, uint32_t fixed_vertices, unsigned num_corners,
-                                             const double corner_values[], const Vector3D corner_grads[],
-                                             const SymMatrix3D corner_hess_diag[], Vector3D vertex_grads[],
-                                             SymMatrix3D vertex_hessians[], MsqError& err );
+    double average_corner_hessian_diagonals( EntityTopology element_type,
+                                             uint32_t fixed_vertices,
+                                             unsigned num_corners,
+                                             const double corner_values[],
+                                             const Vector3D corner_grads[],
+                                             const SymMatrix3D corner_hess_diag[],
+                                             Vector3D vertex_grads[],
+                                             SymMatrix3D vertex_hessians[],
+                                             MsqError& err );
 
     /** \brief Average metric values, gradients, and Hessians for
      *         per-corner evaluation
@@ -168,10 +182,15 @@ class AveragingQM
      *                       where n is the number of vertices in the element.
      *\return average metric value for element
      */
-    double average_corner_hessians( EntityTopology element_type, uint32_t fixed_vertices, unsigned num_corners,
-                                    const double corner_values[], const Vector3D corner_grads[],
-                                    const Matrix3D corner_hessians[], Vector3D vertex_grads[],
-                                    Matrix3D vertex_hessians[], MsqError& err );
+    double average_corner_hessians( EntityTopology element_type,
+                                    uint32_t fixed_vertices,
+                                    unsigned num_corners,
+                                    const double corner_values[],
+                                    const Vector3D corner_grads[],
+                                    const Matrix3D corner_hessians[],
+                                    Vector3D vertex_grads[],
+                                    Matrix3D vertex_hessians[],
+                                    MsqError& err );
 
   private:
     QualityMetric::AveragingMethod avgMethod;

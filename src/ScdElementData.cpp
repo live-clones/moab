@@ -24,29 +24,43 @@
 namespace moab
 {
 
-EntityID ScdElementData::calc_num_entities( EntityHandle start_handle, int irange, int jrange, int krange,
+EntityID ScdElementData::calc_num_entities( EntityHandle start_handle,
+                                            int irange,
+                                            int jrange,
+                                            int krange,
                                             int* is_periodic )
 {
     size_t result = 1;
-    switch( CN::Dimension( TYPE_FROM_HANDLE( start_handle ) ) )
+    auto dim      = CN::Dimension( TYPE_FROM_HANDLE( start_handle ) );
+    switch( dim )
     {
+        case 3:
+            result *= krange;
+            // fall through
+        case 2:
+            result *= ( is_periodic && is_periodic[1] ? ( jrange + 1 ) : jrange );
+            // fall through
+        case 1:
+            result *= ( is_periodic && is_periodic[0] ? ( irange + 1 ) : irange );
+            break;
         default:
             result = 0;
             assert( false );
             break;
-        case 3:
-            result *= krange;
-        case 2:
-            result *= ( is_periodic && is_periodic[1] ? ( jrange + 1 ) : jrange );
-        case 1:
-            result *= ( is_periodic && is_periodic[0] ? ( irange + 1 ) : irange );
     }
     return result;
 }
 
-ScdElementData::ScdElementData( EntityHandle shandle, const int imin, const int jmin, const int kmin, const int imax,
-                                const int jmax, const int kmax, int* is_p )
-    : SequenceData( 0, shandle,
+ScdElementData::ScdElementData( EntityHandle shandle,
+                                const int imin,
+                                const int jmin,
+                                const int kmin,
+                                const int imax,
+                                const int jmax,
+                                const int kmax,
+                                int* is_p )
+    : SequenceData( 0,
+                    shandle,
                     shandle + calc_num_entities( shandle, imax - imin, jmax - jmin, kmax - kmin, is_p ) - 1 )
 {
     // need to have meaningful parameters
@@ -144,7 +158,9 @@ bool ScdElementData::boundary_complete() const
     return false;
 }
 
-SequenceData* ScdElementData::subset( EntityHandle /*start*/, EntityHandle /*end*/, const int* /*sequence_data_sizes*/,
+SequenceData* ScdElementData::subset( EntityHandle /*start*/,
+                                      EntityHandle /*end*/,
+                                      const int* /*sequence_data_sizes*/,
                                       const int* /*tag_data_sizes*/ ) const
 {
     return 0;

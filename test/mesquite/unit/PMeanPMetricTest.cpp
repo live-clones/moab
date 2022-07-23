@@ -102,10 +102,19 @@ class FauxMetric : public ElemSampleQM
     void get_element_evaluations( PatchData&, size_t, std::vector< size_t >&, MsqError& );
     bool evaluate( PatchData& pd, size_t h, double& v, MsqError& err );
     bool evaluate_with_indices( PatchData& pd, size_t h, double& v, std::vector< size_t >& indices, MsqError& err );
-    bool evaluate_with_gradient( PatchData& pd, size_t h, double& v, std::vector< size_t >& indices,
-                                 std::vector< Vector3D >& grads, MsqError& err );
-    bool evaluate_with_Hessian( PatchData& pd, size_t h, double& v, std::vector< size_t >& indices,
-                                std::vector< Vector3D >& grad, std::vector< Matrix3D >& Hess, MsqError& err );
+    bool evaluate_with_gradient( PatchData& pd,
+                                 size_t h,
+                                 double& v,
+                                 std::vector< size_t >& indices,
+                                 std::vector< Vector3D >& grads,
+                                 MsqError& err );
+    bool evaluate_with_Hessian( PatchData& pd,
+                                size_t h,
+                                double& v,
+                                std::vector< size_t >& indices,
+                                std::vector< Vector3D >& grad,
+                                std::vector< Matrix3D >& Hess,
+                                MsqError& err );
 };
 
 void FauxMetric::get_evaluations( PatchData& pd, std::vector< size_t >& h, bool free, MsqError& err )
@@ -132,7 +141,10 @@ bool FauxMetric::evaluate( PatchData& pd, size_t h, double& v, MsqError& )
     return true;
 }
 
-bool FauxMetric::evaluate_with_indices( PatchData& pd, size_t h, double& v, std::vector< size_t >& indices,
+bool FauxMetric::evaluate_with_indices( PatchData& pd,
+                                        size_t h,
+                                        double& v,
+                                        std::vector< size_t >& indices,
                                         MsqError& err )
 {
     evaluate( pd, h, v, err );
@@ -148,8 +160,12 @@ bool FauxMetric::evaluate_with_indices( PatchData& pd, size_t h, double& v, std:
     return true;
 }
 
-bool FauxMetric::evaluate_with_gradient( PatchData& pd, size_t h, double& v, std::vector< size_t >& indices,
-                                         std::vector< Vector3D >& grads, MsqError& err )
+bool FauxMetric::evaluate_with_gradient( PatchData& pd,
+                                         size_t h,
+                                         double& v,
+                                         std::vector< size_t >& indices,
+                                         std::vector< Vector3D >& grads,
+                                         MsqError& err )
 {
     evaluate_with_indices( pd, h, v, indices, err );
     grads.clear();
@@ -158,8 +174,13 @@ bool FauxMetric::evaluate_with_gradient( PatchData& pd, size_t h, double& v, std
     return true;
 }
 
-bool FauxMetric::evaluate_with_Hessian( PatchData& pd, size_t h, double& v, std::vector< size_t >& indices,
-                                        std::vector< Vector3D >& grad, std::vector< Matrix3D >& hess, MsqError& err )
+bool FauxMetric::evaluate_with_Hessian( PatchData& pd,
+                                        size_t h,
+                                        double& v,
+                                        std::vector< size_t >& indices,
+                                        std::vector< Vector3D >& grad,
+                                        std::vector< Matrix3D >& hess,
+                                        MsqError& err )
 {
     evaluate_with_gradient( pd, h, v, indices, grad, err );
     hess.clear();

@@ -47,8 +47,13 @@ class ScdVertexData : public SequenceData
 
   public:
     //! constructor
-    ScdVertexData( const EntityHandle start_vertex, const int imin, const int jmin, const int kmin, const int imax,
-                   const int jmax, const int kmax );
+    ScdVertexData( const EntityHandle start_vertex,
+                   const int imin,
+                   const int jmin,
+                   const int kmin,
+                   const int imax,
+                   const int jmax,
+                   const int kmax );
 
     virtual ~ScdVertexData() {}
 
@@ -107,7 +112,9 @@ class ScdVertexData : public SequenceData
     bool contains( const HomCoord& coords ) const;
     bool contains( const int i, const int j, const int k ) const;
 
-    SequenceData* subset( EntityHandle start, EntityHandle end, const int* sequence_data_sizes,
+    SequenceData* subset( EntityHandle start,
+                          EntityHandle end,
+                          const int* sequence_data_sizes,
                           const int* tag_data_sizes ) const;
 };
 

@@ -61,7 +61,10 @@ void usage( const char* argv0 )
     exit( 1 );
 }
 
-int check_slaved_coords( Mesh& mesh, Settings::HigherOrderSlaveMode mode, std::string name, bool have_slaved_flag,
+int check_slaved_coords( Mesh& mesh,
+                         Settings::HigherOrderSlaveMode mode,
+                         std::string& name,
+                         bool have_slaved_flag,
                          MsqError& err );
 
 // compare vertex coodinates between two topologically equivalent meshes
@@ -139,7 +142,10 @@ int main( int argc, char* argv[] )
         meshes[i].read_vtk( input_file, err );
         if( err ) return 1;
 
-        if( modes[i] == Settings::SLAVE_CALCULATED ) { q.add_vertex_slaver( &slaver, err ); }
+        if( modes[i] == Settings::SLAVE_CALCULATED )
+        {
+            q.add_vertex_slaver( &slaver, err );
+        }
         else if( modes[i] == Settings::SLAVE_FLAG )
         {
             std::vector< Mesh::VertexHandle > verts;
@@ -170,7 +176,10 @@ int main( int argc, char* argv[] )
         q.run_instructions( &meshes_and_domains[i], err );
         if( err ) return 1;
 
-        if( modes[i] == Settings::SLAVE_CALCULATED ) { q.remove_vertex_slaver( &slaver, err ); }
+        if( modes[i] == Settings::SLAVE_CALCULATED )
+        {
+            q.remove_vertex_slaver( &slaver, err );
+        }
 
         if( output_file_base )
         {
@@ -253,7 +262,10 @@ Vector3D get_slaved_coords( Mesh& mesh, Mesh::VertexHandle vertex, MsqError& err
     return sum / n;
 }
 
-int check_slaved_coords( Mesh& mesh, Settings::HigherOrderSlaveMode mode, std::string name, bool have_slaved_flag,
+int check_slaved_coords( Mesh& mesh,
+                         Settings::HigherOrderSlaveMode mode,
+                         std::string& name,
+                         bool have_slaved_flag,
                          MsqError& err )
 {
     const double EPSILON = 1e-4;
@@ -295,9 +307,15 @@ int check_slaved_coords( Mesh& mesh, Settings::HigherOrderSlaveMode mode, std::s
     // the optimization
     std::vector< bool > fixed, slaved;
     mesh.vertices_get_fixed_flag( arrptr( verts ), fixed, verts.size(), err );
-    if( MSQ_CHKERR( err ) ) { return 1; }
+    if( MSQ_CHKERR( err ) )
+    {
+        return 1;
+    }
     mesh.vertices_get_slaved_flag( arrptr( verts ), slaved, verts.size(), err );
-    if( MSQ_CHKERR( err ) ) { return 1; }
+    if( MSQ_CHKERR( err ) )
+    {
+        return 1;
+    }
     std::vector< Mesh::VertexHandle > free, slave;
     for( size_t i = 0; i < verts.size(); ++i )
     {
@@ -343,7 +361,10 @@ int check_slaved_coords( Mesh& mesh, Settings::HigherOrderSlaveMode mode, std::s
             Vector3D exp = get_slaved_coords( mesh, free[i], err );
             MSQ_ERRZERO( err );
             exp -= free_coords[i];
-            if( exp.length() > EPSILON ) { ++not_at_slaved_count; }
+            if( exp.length() > EPSILON )
+            {
+                ++not_at_slaved_count;
+            }
         }
 
         if( 0 == not_at_slaved_count )

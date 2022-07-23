@@ -51,8 +51,15 @@ ErrorCode create_linear_mesh( Interface* mbImpl, int N, int M, int& nshared );
 
 ErrorCode create_scd_mesh( Interface* mbImpl, int IJK, int& nshared );
 
-ErrorCode read_file( Interface* mbImpl, std::vector< std::string >& filenames, const char* tag_name, int tag_val,
-                     int distrib, int parallel_option, int resolve_shared, int with_ghosts, int use_mpio,
+ErrorCode read_file( Interface* mbImpl,
+                     std::vector< std::string >& filenames,
+                     const char* tag_name,
+                     int tag_val,
+                     int distrib,
+                     int parallel_option,
+                     int resolve_shared,
+                     int with_ghosts,
+                     int use_mpio,
                      bool print_parallel );
 
 ErrorCode test_packing( Interface* mbImpl, const char* filename );
@@ -321,8 +328,15 @@ ErrorCode report_nsets( Interface* mbImpl )
     return MB_SUCCESS;
 }
 
-ErrorCode read_file( Interface* mbImpl, std::vector< std::string >& filenames, const char* tag_name, int tag_val,
-                     int distrib, int parallel_option, int resolve_shared, int with_ghosts, int use_mpio,
+ErrorCode read_file( Interface* mbImpl,
+                     std::vector< std::string >& filenames,
+                     const char* tag_name,
+                     int tag_val,
+                     int distrib,
+                     int parallel_option,
+                     int resolve_shared,
+                     int with_ghosts,
+                     int use_mpio,
                      bool print_parallel )
 {
     std::ostringstream options;

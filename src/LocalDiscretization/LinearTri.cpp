@@ -16,13 +16,21 @@ ErrorCode LinearTri::initFcn( const double* verts, const int nverts, double*& wo
     // work[9..17] = Tinv
     // work[18] = detT
     // work[19] = detTinv
-    assert( nverts == 3 && verts );
-    if( !work ) work = new double[20];
+    if( nverts != 3 )
+    {
+        std::cout << "Invalid Triangle. Expected 3 vertices.\n";
+        return MB_FAILURE;
+    }
+
+    assert( verts );
 
     Matrix3 J( verts[1 * 3 + 0] - verts[0 * 3 + 0], verts[2 * 3 + 0] - verts[0 * 3 + 0], 0.0,
                verts[1 * 3 + 1] - verts[0 * 3 + 1], verts[2 * 3 + 1] - verts[0 * 3 + 1], 0.0,
                verts[1 * 3 + 2] - verts[0 * 3 + 2], verts[2 * 3 + 2] - verts[0 * 3 + 2], 1.0 );
     J *= 0.5;
+
+    // Update the work array
+    if( !work ) work = new double[20];
 
     J.copyto( work );
     J.inverse().copyto( work + Matrix3::size );
@@ -32,8 +40,12 @@ ErrorCode LinearTri::initFcn( const double* verts, const int nverts, double*& wo
     return MB_SUCCESS;
 }
 
-ErrorCode LinearTri::evalFcn( const double* params, const double* field, const int /*ndim*/, const int num_tuples,
-                              double* /*work*/, double* result )
+ErrorCode LinearTri::evalFcn( const double* params,
+                              const double* field,
+                              const int /*ndim*/,
+                              const int num_tuples,
+                              double* /*work*/,
+                              double* result )
 {
     assert( params && field && num_tuples > 0 );
     // convert to [0,1]
@@ -45,8 +57,13 @@ ErrorCode LinearTri::evalFcn( const double* params, const double* field, const i
     return MB_SUCCESS;
 }
 
-ErrorCode LinearTri::integrateFcn( const double* field, const double* /*verts*/, const int nverts, const int /*ndim*/,
-                                   const int num_tuples, double* work, double* result )
+ErrorCode LinearTri::integrateFcn( const double* field,
+                                   const double* /*verts*/,
+                                   const int nverts,
+                                   const int /*ndim*/,
+                                   const int num_tuples,
+                                   double* work,
+                                   double* result )
 {
     assert( field && num_tuples > 0 );
     std::fill( result, result + num_tuples, 0.0 );
@@ -70,9 +87,18 @@ ErrorCode LinearTri::jacobianFcn( const double*, const double*, const int, const
     return MB_SUCCESS;
 }
 
-ErrorCode LinearTri::reverseEvalFcn( EvalFcn eval, JacobianFcn jacob, InsideFcn ins, const double* posn,
-                                     const double* verts, const int nverts, const int ndim, const double iter_tol,
-                                     const double inside_tol, double* work, double* params, int* is_inside )
+ErrorCode LinearTri::reverseEvalFcn( EvalFcn eval,
+                                     JacobianFcn jacob,
+                                     InsideFcn ins,
+                                     const double* posn,
+                                     const double* verts,
+                                     const int nverts,
+                                     const int ndim,
+                                     const double iter_tol,
+                                     const double inside_tol,
+                                     double* work,
+                                     double* params,
+                                     int* is_inside )
 {
     assert( posn && verts );
     return evaluate_reverse( eval, jacob, ins, posn, verts, nverts, ndim, iter_tol, inside_tol, work, params,
@@ -84,9 +110,18 @@ int LinearTri::insideFcn( const double* params, const int, const double tol )
     return ( params[0] >= -1.0 - tol && params[1] >= -1.0 - tol && params[0] + params[1] <= 1.0 + tol );
 }
 
-ErrorCode LinearTri::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFcn inside_f, const double* posn,
-                                       const double* verts, const int nverts, const int ndim, const double iter_tol,
-                                       const double inside_tol, double* work, double* params, int* inside )
+ErrorCode LinearTri::evaluate_reverse( EvalFcn eval,
+                                       JacobianFcn jacob,
+                                       InsideFcn inside_f,
+                                       const double* posn,
+                                       const double* verts,
+                                       const int nverts,
+                                       const int ndim,
+                                       const double iter_tol,
+                                       const double inside_tol,
+                                       double* work,
+                                       double* params,
+                                       int* inside )
 {
     // TODO: should differentiate between epsilons used for
     // Newton Raphson iteration, and epsilons used for curved boundary geometry errors
@@ -156,7 +191,10 @@ ErrorCode LinearTri::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFc
 
   }*/
 
-ErrorCode LinearTri::normalFcn( const int ientDim, const int facet, const int nverts, const double* verts,
+ErrorCode LinearTri::normalFcn( const int ientDim,
+                                const int facet,
+                                const int nverts,
+                                const double* verts,
                                 double normal[3] )
 {
     // assert(facet < 3 && ientDim == 1 && nverts==3);

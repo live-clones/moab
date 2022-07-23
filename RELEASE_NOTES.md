@@ -1,27 +1,52 @@
 # MOAB Library Release Notes
 
+## Version 5.4.0
+
+### Features
+
+- *PR #557, #572, #573, #576, #580, #584*: Significant updates to the iMOAB API for Fortran compatibility based on 2003 ISO\_C\_BINDING specifications
+- *PR #562*: Parallel SCRIP NetCDF file reader for climate meshes and data
+
+### Enhancements
+
+- *PR #567*: Use source or target DoF decomposition-aware parallel read of remap files
+- *PR #578*: Improve comparemaps tool
+- *PR #590*: PyMOAB is now installed with pip instead of setup.py
+- *PR #587*: Read masks from SCRIP file and propagate to final remap operator
+- *PR #586*: Reduce memory allocation for vertex tags defined on sequences (16\*1024 instead of 512\*1024) 
+- *PR #592*: Fix several compiler warnings, documentation, updated autotools support (autoconf<=2.71), updated CMake/PyMOAB support, parallel build with module dependency (iMOAB), Codacy issues
+
+### Fixes
+
+- *PR #575*: Address TempestRemap downstream API changes
+- *PR #577*: Autotools configuration updates
+- *PR #585*: Python3 compatibility updates
+- *PR #579*: Prism connectivity bug
+- *PR #582*: Fix several inconsistencies in offline map generation tool, mbtempest
+- *PR #589*: Removing unnecessary error message in GeomTopoTool
+
 ## Version 5.3.1
 
 ### Features
 
-- PR #563: A new tool to visualize maps (mbvisumap) to display DoF coupling between source and target component meshes with a given linear map file. 
+- *PR #563*: A new tool to visualize maps (mbvisumap) to display DoF coupling between source and target component meshes with a given linear map file. 
 
 ### Enhancements
 
-- PR #549: Performance improvement for Eigen3 SparseMatrix insertion
-- PR #554: Read map in parallel and apply it on existing field
-- PR #561: Fallback to PNetCDF for reading map files in parallel, when NetCDF4/HDF5-parallel interface is unavailable
-- PR #566: Consistently decompose polygons in parallel so that the order of operations is preserved. This fix ensures results between parallel mbtempest and serial TempestRemap runs return the same map files
-- PR #568: Adding a mirror for TPL tarballs now at ANL FTP site
-- PR #569: Configuration fixes for Eigen3 (CMake) and other misc items for autotools
+- *PR #549*: Performance improvement for Eigen3 SparseMatrix insertion
+- *PR #554*: Read map in parallel and apply it on existing field
+- *PR #561*: Fallback to PNetCDF for reading map files in parallel, when NetCDF4/HDF5-parallel interface is unavailable
+- *PR #566*: Consistently decompose polygons in parallel so that the order of operations is preserved. This fix ensures results between parallel mbtempest and serial TempestRemap runs return the same map files
+- *PR #568*: Adding a mirror for TPL tarballs now at ANL FTP site
+- *PR #569*: Configuration fixes for Eigen3 (CMake) and other misc items for autotools
 
 ### Fixes
 
-- PR #553: Fix for building on MinGW64
-- PR #556: Minor fix for merging by integer tag
-- PR #558, #560: iMOAB errors on master due to rebase errors
-- PR #559: Fix for iMOAB coupler test and read map test on one task
-- PR #565: Fix for correctly computing coordinates of triangle at poles
+- *PR #553*: Fix for building on MinGW64
+- *PR #556*: Minor fix for merging by integer tag
+- *PR #558, #560*: iMOAB errors on master due to rebase errors
+- *PR #559*: Fix for iMOAB coupler test and read map test on one task
+- *PR #565*: Fix for correctly computing coordinates of triangle at poles
 
 ## Version 5.3.0
 

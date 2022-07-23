@@ -76,7 +76,10 @@ class MeshUtil
      * \NOTE Only basic mesh properties are checked, number of vertices & elements,
      * element connectivity, and coordinates (within the given relative tolerance).
      */
-    static bool meshes_are_different( Mesh& mesh1, Mesh& mesh2, MsqError& err, double tol = 1.e-5,
+    static bool meshes_are_different( Mesh& mesh1,
+                                      Mesh& mesh2,
+                                      MsqError& err,
+                                      double tol    = 1.e-5,
                                       bool do_print = false );
 };
 

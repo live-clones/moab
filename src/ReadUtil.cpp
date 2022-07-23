@@ -37,8 +37,11 @@ namespace moab
 
 ReadUtil::ReadUtil( Core* mdb, Error* /*error_handler*/ ) : ReadUtilIface(), mMB( mdb ) {}
 
-ErrorCode ReadUtil::get_node_coords( const int /*num_arrays*/, const int num_nodes, const int preferred_start_id,
-                                     EntityHandle& actual_start_handle, std::vector< double* >& arrays,
+ErrorCode ReadUtil::get_node_coords( const int /*num_arrays*/,
+                                     const int num_nodes,
+                                     const int preferred_start_id,
+                                     EntityHandle& actual_start_handle,
+                                     std::vector< double* >& arrays,
                                      int sequence_size )
 {
     ErrorCode error;
@@ -70,9 +73,13 @@ ErrorCode ReadUtil::get_node_coords( const int /*num_arrays*/, const int num_nod
     return error;
 }
 
-ErrorCode ReadUtil::get_element_connect( const int num_elements, const int verts_per_element, const EntityType mdb_type,
-                                         const int preferred_start_id, EntityHandle& actual_start_handle,
-                                         EntityHandle*& array, int sequence_size )
+ErrorCode ReadUtil::get_element_connect( const int num_elements,
+                                         const int verts_per_element,
+                                         const EntityType mdb_type,
+                                         const int preferred_start_id,
+                                         EntityHandle& actual_start_handle,
+                                         EntityHandle*& array,
+                                         int sequence_size )
 {
     ErrorCode error;
     EntitySequence* seq;
@@ -106,7 +113,9 @@ ErrorCode ReadUtil::get_element_connect( const int num_elements, const int verts
     return error;
 }
 
-ErrorCode ReadUtil::create_entity_sets( EntityID num_sets, const unsigned* flags, EntityID start_id,
+ErrorCode ReadUtil::create_entity_sets( EntityID num_sets,
+                                        const unsigned* flags,
+                                        EntityID start_id,
                                         EntityHandle& start_handle )
 {
     if( num_sets < 1 )
@@ -127,8 +136,10 @@ ErrorCode ReadUtil::create_entity_sets( EntityID num_sets, const unsigned* flags
     return MB_SUCCESS;
 }
 
-ErrorCode ReadUtil::update_adjacencies( const EntityHandle start_handle, const int number_elements,
-                                        const int number_vertices_per_element, const EntityHandle* conn_array )
+ErrorCode ReadUtil::update_adjacencies( const EntityHandle start_handle,
+                                        const int number_elements,
+                                        const int number_vertices_per_element,
+                                        const EntityHandle* conn_array )
 {
     EntityHandle tmp_hndl    = start_handle;
     AEntityFactory* adj_fact = mMB->a_entity_factory();
@@ -235,8 +246,12 @@ ErrorCode ReadUtil::gather_related_ents( Range& partition, Range& related_ents, 
     return MB_SUCCESS;
 }
 
-ErrorCode ReadUtil::get_ordered_vertices( EntityHandle* bound_ents, int* sense, int bound_size, int dim,
-                                          EntityHandle* bound_verts, EntityType& etype )
+ErrorCode ReadUtil::get_ordered_vertices( EntityHandle* bound_ents,
+                                          int* sense,
+                                          int bound_size,
+                                          int dim,
+                                          EntityHandle* bound_verts,
+                                          EntityType& etype )
 {
     // Get dimension of bounding entities
     int bound_dim = CN::Dimension( TYPE_FROM_HANDLE( bound_ents[0] ) );

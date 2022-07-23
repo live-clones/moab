@@ -97,21 +97,60 @@ extern "C" {
 // Computes all eigenvalues and, optionally, eigenvectors of a
 // real symmetric matrix A. If eigenvectors are desired, it uses a
 // divide and conquer algorithm.
-void MOAB_dsyevd( char* jobz, char* uplo, int* n, double a[], int* lda, double w[], double work[], int* lwork,
-                  int iwork[], int* liwork, int* info );
+void MOAB_dsyevd( char* jobz,
+                  char* uplo,
+                  int* n,
+                  double a[],
+                  int* lda,
+                  double w[],
+                  double work[],
+                  int* lwork,
+                  int iwork[],
+                  int* liwork,
+                  int* info );
 
 // Computes selected eigenvalues and, optionally, eigenvectors
 // of a real symmetric matrix A.  Eigenvalues and eigenvectors can be
 // selected by specifying either a range of values or a range of
 // indices for the desired eigenvalues.
-void MOAB_dsyevr( char* jobz, char* range, char* uplo, int* n, double* a, int* lda, double* vl, double* vu, int* il,
-                  int* iu, double* abstol, int* m, double* w, double* z, int* ldz, int* isuppz, double* work,
-                  int* lwork, int* iwork, int* liwork, int* info );
+void MOAB_dsyevr( char* jobz,
+                  char* range,
+                  char* uplo,
+                  int* n,
+                  double* a,
+                  int* lda,
+                  double* vl,
+                  double* vu,
+                  int* il,
+                  int* iu,
+                  double* abstol,
+                  int* m,
+                  double* w,
+                  double* z,
+                  int* ldz,
+                  int* isuppz,
+                  double* work,
+                  int* lwork,
+                  int* iwork,
+                  int* liwork,
+                  int* info );
 
 // Computes for an N-by-N real nonsymmetric matrix A, the
 // eigenvalues and, optionally, the left and/or right eigenvectors.
-void MOAB_dgeev( char* jobvl, char* jobvr, int* n, double* a, int* lda, double* wr, double* wi, double* vl, int* ldvl,
-                 double* vr, int* ldvr, double* work, int* lwork, int* info );
+void MOAB_dgeev( char* jobvl,
+                 char* jobvr,
+                 int* n,
+                 double* a,
+                 int* lda,
+                 double* wr,
+                 double* wi,
+                 double* vl,
+                 int* ldvl,
+                 double* vr,
+                 int* ldvr,
+                 double* work,
+                 int* lwork,
+                 int* info );
 
 // Computes an LU factorization of a general M-by-N matrix A
 // using partial pivoting with row interchanges.
@@ -243,7 +282,14 @@ class Matrix3
 #endif
     }
 
-    inline Matrix3( double v00, double v01, double v02, double v10, double v11, double v12, double v20, double v21,
+    inline Matrix3( double v00,
+                    double v01,
+                    double v02,
+                    double v10,
+                    double v11,
+                    double v12,
+                    double v20,
+                    double v21,
                     double v22 )
     {
 #ifndef MOAB_HAVE_LAPACK
@@ -277,7 +323,10 @@ class Matrix3
     inline Matrix3( const Vector& row0, const Vector& row1, const Vector& row2, const bool isRow )
     {
 #ifndef MOAB_HAVE_LAPACK
-        if( isRow ) { _mat << row0[0], row0[1], row0[2], row1[0], row1[1], row1[2], row2[0], row2[1], row2[2]; }
+        if( isRow )
+        {
+            _mat << row0[0], row0[1], row0[2], row1[0], row1[1], row1[2], row2[0], row2[1], row2[2];
+        }
         else
         {
             _mat << row0[0], row1[0], row2[0], row0[1], row1[1], row2[1], row0[2], row1[2], row2[2];
@@ -640,7 +689,10 @@ class Matrix3
             evecs._mat[8] = drevecs[8];
         }
 
-        if( !info ) { return MB_SUCCESS; }
+        if( !info )
+        {
+            return MB_SUCCESS;
+        }
         else
         {
             std::cout << "Failure in LAPACK_" << ( bisSymmetric ? "DSYEVD" : "DGEEV" )

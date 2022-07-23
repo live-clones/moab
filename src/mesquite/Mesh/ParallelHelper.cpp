@@ -116,7 +116,10 @@ static int vertex_map_find( const VertexIdMap& map, size_t glob_id, int proc_id 
     vid.glob_id                             = glob_id;
     vid.proc_id                             = proc_id;
     VertexIdMap::const_iterator map_element = map.find( vid );
-    if( map_element == map.end() ) { return 0; }
+    if( map_element == map.end() )
+    {
+        return 0;
+    }
     else
     {
         return map_element->second;
@@ -186,7 +189,10 @@ static double generate_random_number( int generate_random_numbers, int proc_id, 
 {
     int gid;
 
-    if( sizeof( size_t ) == sizeof( unsigned long long ) ) { gid = hash6432shift( (unsigned long long)glob_id ); }
+    if( sizeof( size_t ) == sizeof( unsigned long long ) )
+    {
+        gid = hash6432shift( (unsigned long long)glob_id );
+    }
     else
     {
         gid = (int)glob_id;
@@ -383,7 +389,10 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
         int ncull = 0;
         for( i = 0; i < num_vertex; ++i )
         {
-            if( app_fixed[i] & MsqVertex::MSQ_CULLED ) { ++ncull; }
+            if( app_fixed[i] & MsqVertex::MSQ_CULLED )
+            {
+                ++ncull;
+            }
         }
         std::cout << "P[" << rank << "] smoothing_init ncull= " << ncull << " num_vertex= " << num_vertex << std::endl;
     }
@@ -441,7 +450,10 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
             /* obviously the vertex only counts if it is not app_fixed */
             if( !app_fixed[incident_vtx] )
             {
-                if( proc_owner[incident_vtx] != rank ) { vtx_off_proc++; }
+                if( proc_owner[incident_vtx] != rank )
+                {
+                    vtx_off_proc++;
+                }
                 else
                 {
                     vtx_on_proc++;
@@ -568,7 +580,10 @@ void ParallelHelperImpl::smoothing_init( MsqError& err )
     unghost_num_vtx = 0;
     for( i = 0; i < num_vertex; i++ )
     {
-        if( vtx_in_partition_boundary[i] == -1 ) { unghost_num_vtx++; }
+        if( vtx_in_partition_boundary[i] == -1 )
+        {
+            unghost_num_vtx++;
+        }
     }
     // printf("[%d] found %d unused ghost vertices (local %d remote %d)\n",rank, unghost_num_vtx,
     // num_vtx_partition_boundary_local,num_vtx_partition_boundary_remote);
@@ -1142,7 +1157,10 @@ void ParallelHelperImpl::communicate_next_independent_set( MsqError& err )
         int i, work_remains = 0;
         for( i = 0; i < num_vtx_partition_boundary_local; i++ )
         {
-            if( part_smoothed_flag[i] == 0 ) { work_remains++; }
+            if( part_smoothed_flag[i] == 0 )
+            {
+                work_remains++;
+            }
         }
         int rval = MPI_Allreduce( &work_remains, &global_work_remains, 1, MPI_INT, MPI_SUM, (MPI_Comm)communicator );
         CHECK_MPI( rval, err );
@@ -1177,7 +1195,10 @@ void ParallelHelperImpl::smoothing_close( MsqError& err )
             int ncull = 0;
             for( i = 0; i < num_vertex; ++i )
             {
-                if( app_fixed[i] & MsqVertex::MSQ_CULLED ) { ++ncull; }
+                if( app_fixed[i] & MsqVertex::MSQ_CULLED )
+                {
+                    ++ncull;
+                }
             }
             std::cout << "P[" << rank << "] ncull= " << ncull << " num_vertex= " << num_vertex << std::endl;
         }
@@ -1192,7 +1213,10 @@ void ParallelHelperImpl::smoothing_close( MsqError& err )
         VertexIdMap temp_vid_map;
         for( j = 0; j < num_vertex; j++ )
         {
-            if( proc_owner[j] == rank && app_fixed[j] == false ) { vertex_map_insert( temp_vid_map, gid[j], rank, j ); }
+            if( proc_owner[j] == rank && app_fixed[j] == false )
+            {
+                vertex_map_insert( temp_vid_map, gid[j], rank, j );
+            }
         }
 
         /* deallocate the tags */
@@ -2096,7 +2120,10 @@ int ParallelHelperImpl::comm_smoothed_vtx_nb_no_all( MsqError& err )
     int num_neighbourProcRecvRemain = 0;
     for( j = 0; j < (long)neighbourProc.size(); j++ )
     {
-        if( neighbourProcRecvRemain[j] ) { num_neighbourProcRecvRemain++; }
+        if( neighbourProcRecvRemain[j] )
+        {
+            num_neighbourProcRecvRemain++;
+        }
     }
     for( j = 0; j < num_neighbourProcRecvRemain; j++ )
     {
@@ -2555,7 +2582,10 @@ int ParallelHelperImpl::comm_smoothed_vtx_b_no_all( MsqError& err )
     int num_neighbourProcRecvRemain = 0;
     for( j = 0; j < (long)neighbourProc.size(); j++ )
     {
-        if( neighbourProcRecvRemain[j] ) { num_neighbourProcRecvRemain++; }
+        if( neighbourProcRecvRemain[j] )
+        {
+            num_neighbourProcRecvRemain++;
+        }
     }
     for( j = 0; j < num_neighbourProcRecvRemain; j++ )
     {
@@ -2722,7 +2752,10 @@ void ParallelHelperImpl::compute_independent_set()
                         incident_vtx = vtx_off_proc_list[i][j];
                         /* if this neighbour has not yet been smoothed or covered mark it as covered
                          */
-                        if( part_smoothed_flag[incident_vtx] == 0 ) { part_smoothed_flag[incident_vtx] = 2; }
+                        if( part_smoothed_flag[incident_vtx] == 0 )
+                        {
+                            part_smoothed_flag[incident_vtx] = 2;
+                        }
                     }
                     k = num_exportVtx;
                     /* then loop over the neighbors it has on other processors */
@@ -2733,7 +2766,10 @@ void ParallelHelperImpl::compute_independent_set()
                         done = false;
                         for( l = k; l < num_exportVtx && !done; l++ )
                         {
-                            if( exportProc[l] == part_proc_owner[incident_vtx] ) { done = true; }
+                            if( exportProc[l] == part_proc_owner[incident_vtx] )
+                            {
+                                done = true;
+                            }
                         }
                         /* if it's not on the list add it */
                         if( !done )
@@ -2826,10 +2862,16 @@ void ParallelHelperImpl::communicate_min_max_to_zero( double* minimum, double* m
     }
 }
 
-void ParallelHelperImpl::communicate_sums_to_zero( size_t* freeElementCount, int* invertedElementCount,
-                                                   size_t* elementCount, int* invertedSampleCount, size_t* sampleCount,
-                                                   long unsigned int* count, long unsigned int* invalid, double* sum,
-                                                   double* sqrSum, MsqError& err ) const
+void ParallelHelperImpl::communicate_sums_to_zero( size_t* freeElementCount,
+                                                   int* invertedElementCount,
+                                                   size_t* elementCount,
+                                                   int* invertedSampleCount,
+                                                   size_t* sampleCount,
+                                                   long unsigned int* count,
+                                                   long unsigned int* invalid,
+                                                   double* sum,
+                                                   double* sqrSum,
+                                                   MsqError& err ) const
 {
     double d_sum[9];
     double d_sum_recv[9];
@@ -2875,7 +2917,10 @@ void ParallelHelperImpl::communicate_histogram_to_zero( std::vector< int >& hist
     int rval = MPI_Reduce( &( histogram[0] ), &( histogram_recv[0] ), histogram.size(), MPI_INT, MPI_SUM, 0,
                            (MPI_Comm)communicator );
     CHECK_MPI( rval, err );
-    if( rank == 0 ) { histogram.swap( histogram_recv ); }
+    if( rank == 0 )
+    {
+        histogram.swap( histogram_recv );
+    }
 }
 
 /// if any proc has a true input @param value, return true to all

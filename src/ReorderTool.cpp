@@ -112,7 +112,10 @@ void ReorderTool::get_entities( EntityType t, int vals_per_ent, Range& entities 
     }
 }
 
-ErrorCode ReorderTool::handle_order_from_int_tag( EntityType t, int vals_per_ent, Tag tag, int skip_value,
+ErrorCode ReorderTool::handle_order_from_int_tag( EntityType t,
+                                                  int vals_per_ent,
+                                                  Tag tag,
+                                                  int skip_value,
                                                   Tag new_handles )
 {
     ErrorCode rval;
@@ -155,7 +158,10 @@ ErrorCode ReorderTool::handle_order_from_int_tag( EntityType t, int vals_per_ent
     offsets.push_back( 1 );
     for( w = 0, r = 1; r < sortvals.size(); ++r )
     {
-        if( sortvals[r] == sortvals[w] ) { ++offsets.back(); }
+        if( sortvals[r] == sortvals[w] )
+        {
+            ++offsets.back();
+        }
         else
         {
             ++w;
@@ -240,7 +246,9 @@ struct CompSortedVect
     }
 };
 
-ErrorCode ReorderTool::int_order_from_sets_and_adj( const Range& sets, Tag order_tag, int skip_val,
+ErrorCode ReorderTool::int_order_from_sets_and_adj( const Range& sets,
+                                                    Tag order_tag,
+                                                    int skip_val,
                                                     std::vector< std::vector< EntityHandle >* >& revMap )
 {
     ErrorCode rval;
@@ -325,7 +333,8 @@ ErrorCode ReorderTool::int_order_from_sets_and_adj( const Range& sets, Tag order
     return MB_SUCCESS;
 }
 
-ErrorCode ReorderTool::get_reordered_handles( Tag tag, const Range& old_handles,
+ErrorCode ReorderTool::get_reordered_handles( Tag tag,
+                                              const Range& old_handles,
                                               std::vector< EntityHandle >& new_handles )
 {
     new_handles.resize( old_handles.size() );
@@ -339,14 +348,17 @@ ErrorCode ReorderTool::get_reordered_handles( Tag tag, const Range& old_handles,
     return MB_SUCCESS;
 }
 
-ErrorCode ReorderTool::get_reordered_handles( Tag tag, const std::vector< EntityHandle >& old_handles,
+ErrorCode ReorderTool::get_reordered_handles( Tag tag,
+                                              const std::vector< EntityHandle >& old_handles,
                                               std::vector< EntityHandle >& new_handles )
 {
     new_handles.resize( old_handles.size() );
     return get_reordered_handles( tag, &old_handles[0], &new_handles[0], old_handles.size() );
 }
 
-ErrorCode ReorderTool::get_reordered_handles( Tag tag, const EntityHandle* old_handles, EntityHandle* new_handles,
+ErrorCode ReorderTool::get_reordered_handles( Tag tag,
+                                              const EntityHandle* old_handles,
+                                              EntityHandle* new_handles,
                                               size_t num_handles )
 {
     ErrorCode rval = mMB->tag_get_data( tag, old_handles, num_handles, new_handles );CHKERR;

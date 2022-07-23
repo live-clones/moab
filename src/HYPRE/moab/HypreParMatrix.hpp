@@ -120,8 +120,13 @@ class HypreParMatrix
     /** Creates block-diagonal rectangular parallel matrix. Diagonal is given by
         diag which must be in CSR format (finalized). The new HypreParMatrix does
         not take ownership of any of the input arrays. */
-    HypreParMatrix( moab::ParallelComm* p_comm, HYPRE_Int global_num_rows, HYPRE_Int global_num_cols,
-                    HYPRE_Int* row_starts, HYPRE_Int* col_starts, HYPRE_Int nnz_pr_diag = 0, HYPRE_Int onz_pr_diag = 0,
+    HypreParMatrix( moab::ParallelComm* p_comm,
+                    HYPRE_Int global_num_rows,
+                    HYPRE_Int global_num_cols,
+                    HYPRE_Int* row_starts,
+                    HYPRE_Int* col_starts,
+                    HYPRE_Int nnz_pr_diag    = 0,
+                    HYPRE_Int onz_pr_diag    = 0,
                     HYPRE_Int nnz_pr_offdiag = 0 );
 
     /** Creates a general parallel matrix from a local CSR matrix on each
@@ -226,8 +231,13 @@ class HypreParMatrix
     /** Destroy and resize block-diagonal rectangular parallel matrix. Diagonal is given by
         diag which must be in CSR format (finalized). The new HypreParMatrix does
         not take ownership of any of the input arrays. */
-    void resize( HYPRE_Int global_num_rows, HYPRE_Int global_num_cols, HYPRE_Int* row_starts, HYPRE_Int* col_starts,
-                 HYPRE_Int* nnz_pr_diag = NULL, HYPRE_Int* onz_pr_diag = NULL, HYPRE_Int nnz_pr_offdiag = 0 );
+    void resize( HYPRE_Int global_num_rows,
+                 HYPRE_Int global_num_cols,
+                 HYPRE_Int* row_starts,
+                 HYPRE_Int* col_starts,
+                 HYPRE_Int* nnz_pr_diag   = NULL,
+                 HYPRE_Int* onz_pr_diag   = NULL,
+                 HYPRE_Int nnz_pr_offdiag = 0 );
 
     /// Returns the number of rows in the diagonal block of the ParCSRMatrix
     int GetNumRows() const
@@ -298,11 +308,20 @@ class HypreParMatrix
         Ae sum to the original matrix. */
     HypreParMatrix* EliminateRowsCols( const std::vector< HYPRE_Int >& rows_cols );
 
-    HYPRE_Int GetValues( const HYPRE_Int nrows, HYPRE_Int* ncols, HYPRE_Int* rows, HYPRE_Int* cols,
+    HYPRE_Int GetValues( const HYPRE_Int nrows,
+                         HYPRE_Int* ncols,
+                         HYPRE_Int* rows,
+                         HYPRE_Int* cols,
                          HYPRE_Complex* values );
-    HYPRE_Int SetValues( const HYPRE_Int nrows, HYPRE_Int* ncols, const HYPRE_Int* rows, const HYPRE_Int* cols,
+    HYPRE_Int SetValues( const HYPRE_Int nrows,
+                         HYPRE_Int* ncols,
+                         const HYPRE_Int* rows,
+                         const HYPRE_Int* cols,
                          const HYPRE_Complex* values );
-    HYPRE_Int AddToValues( const HYPRE_Int nrows, HYPRE_Int* ncols, const HYPRE_Int* rows, const HYPRE_Int* cols,
+    HYPRE_Int AddToValues( const HYPRE_Int nrows,
+                           HYPRE_Int* ncols,
+                           const HYPRE_Int* rows,
+                           const HYPRE_Int* cols,
                            const HYPRE_Complex* values );
 
     HYPRE_Int FinalizeAssembly();
@@ -331,8 +350,11 @@ class HypreParMatrix
     /** Eliminate essential BC specified by 'ess_dof_list' from the solution X to
         the r.h.s. B. Here A is a matrix with eliminated BC, while Ae is such that
         (A+Ae) is the original (Neumann) matrix before elimination. */
-    friend void EliminateBC( HypreParMatrix& A, HypreParMatrix& Ae, const std::vector< int >& ess_dof_list,
-                             const HypreParVector& X, HypreParVector& B );
+    friend void EliminateBC( HypreParMatrix& A,
+                             HypreParMatrix& Ae,
+                             const std::vector< int >& ess_dof_list,
+                             const HypreParVector& X,
+                             HypreParVector& B );
 
     friend class HypreSolver;
 };

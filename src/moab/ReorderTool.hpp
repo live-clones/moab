@@ -69,8 +69,11 @@ class ReorderTool
      *                     entity handle and must have a default value of
      *                     zero.
      */
-    ErrorCode handle_order_from_int_tag( EntityType type, int vals_per_ent, Tag ordering_tag,
-                                         int ordering_tag_skip_value, Tag new_handle_tag );
+    ErrorCode handle_order_from_int_tag( EntityType type,
+                                         int vals_per_ent,
+                                         Tag ordering_tag,
+                                         int ordering_tag_skip_value,
+                                         Tag new_handle_tag );
 
     /**\brief Calculate new handle order by set containment
      *
@@ -147,13 +150,16 @@ class ReorderTool
     /**\brief Get new handles corresponding to old handles
      *\param tag Tag containing old->new mapping
      */
-    ErrorCode get_reordered_handles( Tag tag, const std::vector< EntityHandle >& old_handles,
+    ErrorCode get_reordered_handles( Tag tag,
+                                     const std::vector< EntityHandle >& old_handles,
                                      std::vector< EntityHandle >& new_handles );
 
     /**\brief Get new handles corresponding to old handles
      *\param tag Tag containing old->new mapping
      */
-    ErrorCode get_reordered_handles( Tag tag, const EntityHandle* old_handles, EntityHandle* new_handles,
+    ErrorCode get_reordered_handles( Tag tag,
+                                     const EntityHandle* old_handles,
+                                     EntityHandle* new_handles,
                                      size_t num_handles );
 
     /**\brief Remove any non-ordered handles and return new handles for remaining
@@ -164,7 +170,9 @@ class ReorderTool
     /**\brief convert from input for \c handle_order_from_sets_and_adj to
      *        \c input for handle_order_from_int_tag
      */
-    ErrorCode int_order_from_sets_and_adj( const Range& sets, Tag order_tag, int skip_val,
+    ErrorCode int_order_from_sets_and_adj( const Range& sets,
+                                           Tag order_tag,
+                                           int skip_val,
                                            std::vector< std::vector< EntityHandle >* >& data );
 
     Core* mMB;

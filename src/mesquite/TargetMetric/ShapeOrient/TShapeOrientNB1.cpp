@@ -71,7 +71,9 @@ static inline bool grad( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatr
 }
 
 template < unsigned DIM >
-static inline bool hess( const MsqMatrix< DIM, DIM >& T, double& result, MsqMatrix< DIM, DIM >& deriv,
+static inline bool hess( const MsqMatrix< DIM, DIM >& T,
+                         double& result,
+                         MsqMatrix< DIM, DIM >& deriv,
                          MsqMatrix< DIM, DIM >* second )
 {
     const double norm    = Frobenius( T );

@@ -16,14 +16,23 @@ ErrorCode LinearTet::initFcn( const double* verts, const int nverts, double*& wo
     // work[9..17] = Tinv
     // work[18] = detT
     // work[19] = detTinv
-    assert( nverts == 4 && verts );
-    if( !work ) work = new double[20];
+    if( nverts != 4 )
+    {
+        std::cout << "Invalid Tetrahedron. Expected 4 vertices.\n";
+        return MB_FAILURE;
+    }
+
+    assert( verts );
 
     Matrix3 J( verts[1 * 3 + 0] - verts[0 * 3 + 0], verts[2 * 3 + 0] - verts[0 * 3 + 0],
                verts[3 * 3 + 0] - verts[0 * 3 + 0], verts[1 * 3 + 1] - verts[0 * 3 + 1],
                verts[2 * 3 + 1] - verts[0 * 3 + 1], verts[3 * 3 + 1] - verts[0 * 3 + 1],
                verts[1 * 3 + 2] - verts[0 * 3 + 2], verts[2 * 3 + 2] - verts[0 * 3 + 2],
                verts[3 * 3 + 2] - verts[0 * 3 + 2] );
+
+    // Update the work array
+    if( !work ) work = new double[20];
+
     J.copyto( work );
     J.inverse().copyto( work + Matrix3::size );
     work[18] = J.determinant();
@@ -32,8 +41,12 @@ ErrorCode LinearTet::initFcn( const double* verts, const int nverts, double*& wo
     return MB_SUCCESS;
 }
 
-ErrorCode LinearTet::evalFcn( const double* params, const double* field, const int /*ndim*/, const int num_tuples,
-                              double* /*work*/, double* result )
+ErrorCode LinearTet::evalFcn( const double* params,
+                              const double* field,
+                              const int /*ndim*/,
+                              const int num_tuples,
+                              double* /*work*/,
+                              double* result )
 {
     assert( params && field && num_tuples > 0 );
     std::vector< double > f0( num_tuples );
@@ -50,8 +63,13 @@ ErrorCode LinearTet::evalFcn( const double* params, const double* field, const i
     return MB_SUCCESS;
 }
 
-ErrorCode LinearTet::integrateFcn( const double* field, const double* /*verts*/, const int nverts, const int /*ndim*/,
-                                   const int num_tuples, double* work, double* result )
+ErrorCode LinearTet::integrateFcn( const double* field,
+                                   const double* /*verts*/,
+                                   const int nverts,
+                                   const int /*ndim*/,
+                                   const int num_tuples,
+                                   double* work,
+                                   double* result )
 {
     assert( field && num_tuples > 0 );
     std::fill( result, result + num_tuples, 0.0 );
@@ -75,9 +93,18 @@ ErrorCode LinearTet::jacobianFcn( const double*, const double*, const int, const
     return MB_SUCCESS;
 }
 
-ErrorCode LinearTet::reverseEvalFcn( EvalFcn eval, JacobianFcn jacob, InsideFcn ins, const double* posn,
-                                     const double* verts, const int nverts, const int ndim, const double iter_tol,
-                                     const double inside_tol, double* work, double* params, int* is_inside )
+ErrorCode LinearTet::reverseEvalFcn( EvalFcn eval,
+                                     JacobianFcn jacob,
+                                     InsideFcn ins,
+                                     const double* posn,
+                                     const double* verts,
+                                     const int nverts,
+                                     const int ndim,
+                                     const double iter_tol,
+                                     const double inside_tol,
+                                     double* work,
+                                     double* params,
+                                     int* is_inside )
 {
     assert( posn && verts );
     return evaluate_reverse( eval, jacob, ins, posn, verts, nverts, ndim, iter_tol, inside_tol, work, params,
@@ -90,9 +117,18 @@ int LinearTet::insideFcn( const double* params, const int, const double tol )
              params[0] + params[1] + params[2] <= 1.0 + tol );
 }
 
-ErrorCode LinearTet::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFcn inside_f, const double* posn,
-                                       const double* verts, const int nverts, const int ndim, const double iter_tol,
-                                       const double inside_tol, double* work, double* params, int* inside )
+ErrorCode LinearTet::evaluate_reverse( EvalFcn eval,
+                                       JacobianFcn jacob,
+                                       InsideFcn inside_f,
+                                       const double* posn,
+                                       const double* verts,
+                                       const int nverts,
+                                       const int ndim,
+                                       const double iter_tol,
+                                       const double inside_tol,
+                                       double* work,
+                                       double* params,
+                                       int* inside )
 {
     // TODO: should differentiate between epsilons used for
     // Newton Raphson iteration, and epsilons used for curved boundary geometry errors
@@ -159,7 +195,10 @@ ErrorCode LinearTet::evaluate_reverse( EvalFcn eval, JacobianFcn jacob, InsideFc
     return MB_SUCCESS;
 }  // Map::evaluate_reverse()
 
-ErrorCode LinearTet::normalFcn( const int ientDim, const int facet, const int nverts, const double* verts,
+ErrorCode LinearTet::normalFcn( const int ientDim,
+                                const int facet,
+                                const int nverts,
+                                const double* verts,
                                 double normal[3] )
 {
     // assert(facet < 4 && ientDim == 2 && nverts == 4);

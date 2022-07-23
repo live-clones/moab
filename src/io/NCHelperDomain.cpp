@@ -47,9 +47,11 @@ ErrorCode NCHelperDomain::init_mesh_vals()
     std::vector< int >& dimLens                       = _readNC->dimLens;
     std::map< std::string, ReadNC::VarData >& varInfo = _readNC->varInfo;
     DebugOutput& dbgOut                               = _readNC->dbgOut;
-    bool& isParallel                                  = _readNC->isParallel;
-    int& partMethod                                   = _readNC->partMethod;
-    ScdParData& parData                               = _readNC->parData;
+#ifdef MOAB_HAVE_MPI
+    bool& isParallel = _readNC->isParallel;
+#endif
+    int& partMethod     = _readNC->partMethod;
+    ScdParData& parData = _readNC->parData;
 
     ErrorCode rval;
 
@@ -224,7 +226,7 @@ ErrorCode NCHelperDomain::init_mesh_vals()
     Tag convTagsCreated = 0;
     int def_val         = 0;
     rval                = mbImpl->tag_get_handle( "__CONV_TAGS_CREATED", 1, MB_TYPE_INTEGER, convTagsCreated,
-                                   MB_TAG_SPARSE | MB_TAG_CREAT, &def_val );MB_CHK_SET_ERR( rval, "Trouble getting _CONV_TAGS_CREATED tag" );
+                                                  MB_TAG_SPARSE | MB_TAG_CREAT, &def_val );MB_CHK_SET_ERR( rval, "Trouble getting _CONV_TAGS_CREATED tag" );
     int create_conv_tags_flag = 1;
     rval                      = mbImpl->tag_set_data( convTagsCreated, &_fileSet, 1, &create_conv_tags_flag );MB_CHK_SET_ERR( rval, "Trouble setting _CONV_TAGS_CREATED tag" );
 
@@ -388,26 +390,25 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
             double x, y;
             if( nv > 1 )
             {
-                x                        = xv[index_v_arr];
-                y                        = yv[index_v_arr];
-                double cosphi            = cos( pideg * y );
-                double zmult             = sin( pideg * y );
-                double xmult             = cosphi * cos( x * pideg );
-                double ymult             = cosphi * sin( x * pideg );
-                Node3D pt(xmult, ymult, zmult);
+                x             = xv[index_v_arr];
+                y             = yv[index_v_arr];
+                double cosphi = cos( pideg * y );
+                double zmult  = sin( pideg * y );
+                double xmult  = cosphi * cos( x * pideg );
+                double ymult  = cosphi * sin( x * pideg );
+                Node3D pt( xmult, ymult, zmult );
                 vertex_map[pt] = 0;
             }
             else
             {
-                x                    = xc[elem_index];
-                y                    = yc[elem_index];
-                Node3D pt(x, y, 0);
+                x = xc[elem_index];
+                y = yc[elem_index];
+                Node3D pt( x, y, 0 );
                 vertex_map[pt] = 0;
             }
-
         }
     }
-    int nLocalVertices = (int) vertex_map.size();
+    int nLocalVertices = (int)vertex_map.size();
     std::vector< double* > arrays;
     EntityHandle start_vertex;
     rval = _readNC->readMeshIface->get_node_coords( 3, nLocalVertices, 0, start_vertex, arrays );MB_CHK_SET_ERR( rval, "Failed to create local vertices" );
@@ -432,7 +433,7 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
     int j              = lDims[1];
     int i              = lDims[0];  // if elem_index is getting to next row, increase j
     int local_row_size = lDims[3] - lDims[0];
-    elem_index = 0;
+    elem_index         = 0;
     int index          = 0;  // consider the mask for advancing in moab arrays;
     //printf(" map size :%ld \n", vertex_map.size());
     // create now vertex arrays, size vertex_map.size()
@@ -445,15 +446,14 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
             int index_v_arr = nv * elem_index + k;
             if( nv > 1 )
             {
-                double x                        = xv[index_v_arr];
-                double y                        = yv[index_v_arr];
-                double cosphi            = cos( pideg * y );
-                double zmult             = sin( pideg * y );
-                double xmult             = cosphi * cos( x * pideg );
-                double ymult             = cosphi * sin( x * pideg );
-                Node3D pt(xmult, ymult, zmult);
-                conn_arr[index * nv + k] =                vertex_map[pt];
-
+                double x      = xv[index_v_arr];
+                double y      = yv[index_v_arr];
+                double cosphi = cos( pideg * y );
+                double zmult  = sin( pideg * y );
+                double xmult  = cosphi * cos( x * pideg );
+                double ymult  = cosphi * sin( x * pideg );
+                Node3D pt( xmult, ymult, zmult );
+                conn_arr[index * nv + k] = vertex_map[pt];
             }
         }
         EntityHandle cell = start_vertex + index;
@@ -485,7 +485,7 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
     tagList.push_back( ycTag );
     tagList.push_back( areaTag );
     tagList.push_back( fracTag );
-    rval       = IntxUtils::remove_padded_vertices( mbImpl, _fileSet, tagList );MB_CHK_SET_ERR( rval, "Failed to remove duplicate vertices" );
+    rval = IntxUtils::remove_padded_vertices( mbImpl, _fileSet, tagList );MB_CHK_SET_ERR( rval, "Failed to remove duplicate vertices" );
 
     rval = mbImpl->get_entities_by_dimension( _fileSet, 2, faces );MB_CHK_ERR( rval );
     Range all_verts;
@@ -496,7 +496,7 @@ ErrorCode NCHelperDomain::create_mesh( Range& faces )
     ParallelComm*& myPcomm = _readNC->myPcomm;
     if( myPcomm )
     {
-        double tol = 1.e-12; // this is the same as static tolerance in NCHelper
+        double tol = 1.e-12;  // this is the same as static tolerance in NCHelper
         ParallelMergeMesh pmm( myPcomm, tol );
         rval = pmm.merge( _fileSet,
                           /* do not do local merge*/ false,

@@ -68,11 +68,19 @@ class MESQUITE_EXPORT TriLagrangeShape : public MappingFunction2D
 
     virtual NodeSet sample_points( NodeSet higher_order_nodes ) const;
 
-    virtual void coefficients( Sample location, NodeSet nodeset, double* coeff_out, size_t* indices_out,
-                               size_t& num_coeff_out, MsqError& err ) const;
+    virtual void coefficients( Sample location,
+                               NodeSet nodeset,
+                               double* coeff_out,
+                               size_t* indices_out,
+                               size_t& num_coeff_out,
+                               MsqError& err ) const;
 
-    virtual void derivatives( Sample location, NodeSet nodeset, size_t* vertex_indices_out,
-                              MsqVector< 2 >* d_coeff_d_xi_out, size_t& num_vtx, MsqError& err ) const;
+    virtual void derivatives( Sample location,
+                              NodeSet nodeset,
+                              size_t* vertex_indices_out,
+                              MsqVector< 2 >* d_coeff_d_xi_out,
+                              size_t& num_vtx,
+                              MsqError& err ) const;
 
     virtual void ideal( Sample location, MsqMatrix< 3, 2 >& jacobian_out, MsqError& err ) const;
 };

@@ -16,9 +16,15 @@
 
 int AssocPair::currId = 0;
 
-AssocPair::AssocPair( iRel_Instance p_instance, iBase_Instance iface0, iRel_RelationType ent_or_set0,
-                      iRel_IfaceType type0, iRel_RelationStatus p_status0, iBase_Instance iface1,
-                      iRel_RelationType ent_or_set1, iRel_IfaceType type1, iRel_RelationStatus p_status1 )
+AssocPair::AssocPair( iRel_Instance p_instance,
+                      iBase_Instance iface0,
+                      iRel_RelationType ent_or_set0,
+                      iRel_IfaceType type0,
+                      iRel_RelationStatus p_status0,
+                      iBase_Instance iface1,
+                      iRel_RelationType ent_or_set1,
+                      iRel_IfaceType type1,
+                      iRel_RelationStatus p_status1 )
     : instance( p_instance )
 {
     pairId = currId++;
@@ -61,7 +67,10 @@ AssocPair::~AssocPair()
         delete relSides[i];
 }
 
-int AssocPair::get_all_entities( int iface_no, int dimension, iBase_EntityHandle** entities, int* entities_alloc,
+int AssocPair::get_all_entities( int iface_no,
+                                 int dimension,
+                                 iBase_EntityHandle** entities,
+                                 int* entities_alloc,
                                  int* entities_size )
 {
     return relSides[iface_no]->get_all_entities( dimension, entities, entities_alloc, entities_size );
@@ -72,14 +81,22 @@ int AssocPair::get_all_sets( int iface_no, iBase_EntitySetHandle** sets, int* se
     return relSides[iface_no]->get_all_sets( sets, sets_alloc, sets_size );
 }
 
-int AssocPair::get_entities( int iface_no, int dimension, iBase_EntitySetHandle set_handle,
-                             iBase_EntityHandle** entities, int* entities_alloc, int* entities_size )
+int AssocPair::get_entities( int iface_no,
+                             int dimension,
+                             iBase_EntitySetHandle set_handle,
+                             iBase_EntityHandle** entities,
+                             int* entities_alloc,
+                             int* entities_size )
 {
     return relSides[iface_no]->get_entities( dimension, set_handle, entities, entities_alloc, entities_size );
 }
 
-int AssocPair::get_ents_dims( int iface_no, iBase_EntityHandle* entities, int entities_size, int** ent_types,
-                              int* ent_types_alloc, int* ent_types_size )
+int AssocPair::get_ents_dims( int iface_no,
+                              iBase_EntityHandle* entities,
+                              int entities_size,
+                              int** ent_types,
+                              int* ent_types_alloc,
+                              int* ent_types_size )
 {
     return relSides[iface_no]->get_ents_dims( entities, entities_size, ent_types, ent_types_alloc, ent_types_size );
 }
@@ -169,7 +186,9 @@ int AssocPair::set_relation( iBase_EntitySetHandle set1, iBase_EntitySetHandle s
     RETURNR( iBase_SUCCESS );
 }
 
-int AssocPair::get_relation( int iface_no, iBase_EntityHandle* entities, int num_entities,
+int AssocPair::get_relation( int iface_no,
+                             iBase_EntityHandle* entities,
+                             int num_entities,
                              iBase_EntityHandle* tag_values )
 {
     if( relStatus[iface_no] == iRel_NOTEXIST ) ERRORR( iBase_FAILURE, "Relation does not exist on this side" );
@@ -188,7 +207,9 @@ int AssocPair::get_relation( int iface_no, iBase_EntitySetHandle* sets, int num_
     return relSides[iface_no]->get_relation_side( sets, num_sets, tag_values );
 }
 
-int AssocPair::get_relation( int iface_no, iBase_EntityHandle* entities, int num_entities,
+int AssocPair::get_relation( int iface_no,
+                             iBase_EntityHandle* entities,
+                             int num_entities,
                              iBase_EntitySetHandle* tag_values )
 {
     if( relStatus[iface_no] == iRel_NOTEXIST ) ERRORR( iBase_FAILURE, "Relation does not exist on this side" );
@@ -198,7 +219,9 @@ int AssocPair::get_relation( int iface_no, iBase_EntityHandle* entities, int num
     return relSides[iface_no]->get_relation_side( entities, num_entities, tag_values );
 }
 
-int AssocPair::get_relation( int iface_no, iBase_EntitySetHandle* sets, int num_sets,
+int AssocPair::get_relation( int iface_no,
+                             iBase_EntitySetHandle* sets,
+                             int num_sets,
                              iBase_EntitySetHandle* tag_values )
 {
     if( relStatus[iface_no] == iRel_NOTEXIST ) ERRORR( iBase_FAILURE, "Relation does not exist on this side" );
@@ -208,7 +231,9 @@ int AssocPair::get_relation( int iface_no, iBase_EntitySetHandle* sets, int num_
     return relSides[iface_no]->get_relation_side( sets, num_sets, tag_values );
 }
 
-int AssocPair::get_relation( int iface_no, iBase_EntityHandle* entities, int num_entities,
+int AssocPair::get_relation( int iface_no,
+                             iBase_EntityHandle* entities,
+                             int num_entities,
                              iBase_EntityIterator* tag_values )
 {
     std::vector< iBase_EntitySetHandle > sets( num_entities );CHK_ERRORR( get_relation( iface_no, entities, num_entities, &sets[0] ) );

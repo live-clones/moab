@@ -22,7 +22,11 @@ class geomObject
         delete[] newcoords;
         return sqrt( ans );
     }
-    virtual void compute_projecterror( int dim, int nverts, double* oldcoords, double& l1err, double& l2err,
+    virtual void compute_projecterror( int dim,
+                                       int nverts,
+                                       double* oldcoords,
+                                       double& l1err,
+                                       double& l2err,
                                        double& linferr ) const
     {
         l1err = l2err = linferr = 0;
@@ -62,13 +66,19 @@ class sphere : public geomObject
     virtual ~sphere() {}
     void project_points2geom( int dim, double* oldcoords, double* newcoords, double* derivs ) const
     {
-        if( oldcoords == NULL || newcoords == NULL ) { throw std::invalid_argument( "NULL pointer" ); }
+        if( oldcoords == NULL || newcoords == NULL )
+        {
+            throw std::invalid_argument( "NULL pointer" );
+        }
 
         std::vector< double > direction;
         direction.push_back( oldcoords[0] - centerx );
         direction.push_back( oldcoords[1] - centery );
 
-        if( dim == 3 ) { direction.push_back( oldcoords[2] - centerz ); }
+        if( dim == 3 )
+        {
+            direction.push_back( oldcoords[2] - centerz );
+        }
 
         double len = geomObject::Twonorm( dim, &( direction[0] ) );
         assert( len > 0 );

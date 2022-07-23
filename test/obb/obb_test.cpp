@@ -356,8 +356,13 @@ class TreeValidator : public OrientedBoxTreeTool::Op
     int surface_depth;
     EntityHandle surface_handle;
 
-    TreeValidator( Interface* instance_ptr, OrientedBoxTreeTool* tool_ptr, bool print_errors, std::ostream& str,
-                   double tol, bool surfs, OrientedBoxTreeTool::Settings s )
+    TreeValidator( Interface* instance_ptr,
+                   OrientedBoxTreeTool* tool_ptr,
+                   bool print_errors,
+                   std::ostream& str,
+                   double tol,
+                   bool surfs,
+                   OrientedBoxTreeTool::Settings s )
         : instance( instance_ptr ), tool( tool_ptr ), printing( print_errors ), epsilon( tol ), surfaces( surfs ),
           stream( str ), settings( s ), entity_count( 0 ), loose_box_count( 0 ), child_outside_count( 0 ),
           entity_outside_count( 0 ), num_entities_outside( 0 ), non_ortho_count( 0 ), error_count( 0 ),
@@ -603,7 +608,10 @@ ErrorCode TreeValidator::visit( EntityHandle node, int depth, bool& descend )
         ++error_count;
         print( node, "Error querying connectivity of element." );
     }
-    if( duplicate_element ) { print( node, "Elements occur in multiple leaves of tree." ); }
+    if( duplicate_element )
+    {
+        print( node, "Elements occur in multiple leaves of tree." );
+    }
     if( num_outside > 0 )
     {
         ++entity_outside_count;
@@ -711,7 +719,9 @@ ErrorCode VtkWriter::visit( EntityHandle node, int, bool& descend )
     return instance->write_mesh( file_name.c_str(), &node, 1 );
 }
 
-static bool do_ray_fire_test( OrientedBoxTreeTool& tool, EntityHandle root_set, const char* filename,
+static bool do_ray_fire_test( OrientedBoxTreeTool& tool,
+                              EntityHandle root_set,
+                              const char* filename,
                               bool have_surface_tree );
 
 static bool do_closest_point_test( OrientedBoxTreeTool& tool, EntityHandle root_set, bool have_surface_tree );
@@ -831,7 +841,10 @@ static bool do_file( const char* filename )
         std::string name = filename;
         name += ".boxes.jou";
         FILE* ptr = fopen( name.c_str(), "w+" );
-        if( !ptr ) { perror( name.c_str() ); }
+        if( !ptr )
+        {
+            perror( name.c_str() );
+        }
         else
         {
             if( verbosity ) std::cout << "Writing: " << name << std::endl;
@@ -851,20 +864,12 @@ static bool do_file( const char* filename )
         tool.preorder_traverse( root, op );
     }
 
-    bool print_errors = false, print_contents = false;
-    switch( verbosity )
+    bool print_errors = ( verbosity > 2 ), print_contents = ( verbosity > 4 );
+    if( verbosity > 3 ) tool.print( root, std::cout, print_contents );
+    if( verbosity > 1 )
     {
-        default:
-            print_contents = true;
-        case 4:
-            tool.print( root, std::cout, print_contents );
-        case 3:
-            print_errors = true;
-        case 2:
-            rval = tool.stats( root, std::cout );
-            if( MB_SUCCESS != rval ) std::cout << "****** Failed to get tree statistics ******" << std::endl;
-        case 1:
-        case 0:;
+        rval = tool.stats( root, std::cout );
+        if( MB_SUCCESS != rval ) std::cout << "****** Failed to get tree statistics ******" << std::endl;
     }
 
     TreeValidator op( iface, &tool, print_errors, std::cout, tolerance, haveSurfTree, settings );
@@ -962,8 +967,12 @@ static void count_non_tol( std::vector< double > intersections, int& non_tol_cou
     }
 }
 
-static bool check_ray_intersect_tris( OrientedBoxTreeTool& tool, EntityHandle root_set, RayTest& test,
-                                      int& non_tol_count, double& non_tol_dist, OrientedBoxTreeTool::TrvStats& stats )
+static bool check_ray_intersect_tris( OrientedBoxTreeTool& tool,
+                                      EntityHandle root_set,
+                                      RayTest& test,
+                                      int& non_tol_count,
+                                      double& non_tol_dist,
+                                      OrientedBoxTreeTool::TrvStats& stats )
 {
     ErrorCode rval;
     bool result = true;
@@ -1002,8 +1011,12 @@ static bool check_ray_intersect_tris( OrientedBoxTreeTool& tool, EntityHandle ro
     return result;
 }
 
-static bool check_ray_intersect_sets( OrientedBoxTreeTool& tool, EntityHandle root_set, RayTest& test,
-                                      int& non_tol_count, double& non_tol_dist, OrientedBoxTreeTool::TrvStats& stats )
+static bool check_ray_intersect_sets( OrientedBoxTreeTool& tool,
+                                      EntityHandle root_set,
+                                      RayTest& test,
+                                      int& non_tol_count,
+                                      double& non_tol_dist,
+                                      OrientedBoxTreeTool::TrvStats& stats )
 {
 
     ErrorCode rval;
@@ -1051,7 +1064,9 @@ static bool check_ray_intersect_sets( OrientedBoxTreeTool& tool, EntityHandle ro
     return result;
 }
 
-static bool do_ray_fire_test( OrientedBoxTreeTool& tool, EntityHandle root_set, const char* filename,
+static bool do_ray_fire_test( OrientedBoxTreeTool& tool,
+                              EntityHandle root_set,
+                              const char* filename,
                               bool haveSurfTree )
 {
     if( verbosity > 1 ) std::cout << "beginning ray fire tests" << std::endl;
@@ -1313,7 +1328,9 @@ static ErrorCode tri_coords( Interface* moab, EntityHandle tri, CartVect coords[
     return rval;
 }
 
-static ErrorCode closest_point_in_triangles( Interface* moab, const CartVect& to_pos, CartVect& result_pos,
+static ErrorCode closest_point_in_triangles( Interface* moab,
+                                             const CartVect& to_pos,
+                                             CartVect& result_pos,
                                              EntityHandle& result_tri )
 {
     ErrorCode rval;

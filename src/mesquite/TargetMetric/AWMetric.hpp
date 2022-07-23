@@ -61,7 +61,9 @@ class AWMetric
      *\return false if function cannot be evaluated for given A and W
      *          (e.g. division by zero, etc.), true otherwise.
      */
-    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A,
+                                           const MsqMatrix< 2, 2 >& W,
+                                           double& result,
                                            MsqError& err );
 
     /**\brief Evaluate \f$\mu(A,W)\f$
@@ -72,7 +74,9 @@ class AWMetric
      *\return false if function cannot be evaluated for given A and W
      *          (e.g. division by zero, etc.), true otherwise.
      */
-    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A,
+                                           const MsqMatrix< 3, 3 >& W,
+                                           double& result,
                                            MsqError& err );
 
     /**\brief Gradient of \f$\mu(A,W)\f$ with respect to components of A
@@ -91,8 +95,11 @@ class AWMetric
      *\return false if function cannot be evaluated for given A and W
      *          (e.g. division by zero, etc.), true otherwise.
      */
-    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
-                                                     double& result, MsqMatrix< 2, 2 >& deriv_wrt_A, MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 2, 2 >& A,
+                                                     const MsqMatrix< 2, 2 >& W,
+                                                     double& result,
+                                                     MsqMatrix< 2, 2 >& deriv_wrt_A,
+                                                     MsqError& err );
 
     /**\brief Gradient of \f$\mu(A,W)\f$ with respect to components of A
      *
@@ -115,8 +122,11 @@ class AWMetric
      *\return false if function cannot be evaluated for given A and W
      *          (e.g. division by zero, etc.), true otherwise.
      */
-    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
-                                                     double& result, MsqMatrix< 3, 3 >& deriv_wrt_A, MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_grad( const MsqMatrix< 3, 3 >& A,
+                                                     const MsqMatrix< 3, 3 >& W,
+                                                     double& result,
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_A,
+                                                     MsqError& err );
 
     /**\brief Hessian of \f$\mu(A,W)\f$ with respect to components of A
      *
@@ -149,9 +159,12 @@ class AWMetric
      *\return false if function cannot be evaluated for given A and W
      *          (e.g. division by zero, etc.), true otherwise.
      */
-    MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W,
-                                                     double& result, MsqMatrix< 2, 2 >& deriv_wrt_A,
-                                                     MsqMatrix< 2, 2 > second_wrt_A[3], MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 2, 2 >& A,
+                                                     const MsqMatrix< 2, 2 >& W,
+                                                     double& result,
+                                                     MsqMatrix< 2, 2 >& deriv_wrt_A,
+                                                     MsqMatrix< 2, 2 > second_wrt_A[3],
+                                                     MsqError& err );
 
     /**\brief Hessian of \f$\mu(A,W)\f$ with respect to components of A
      *
@@ -230,9 +243,12 @@ class AWMetric
      *\return false if function cannot be evaluated for given A and W
      *          (e.g. division by zero, etc.), true otherwise.
      */
-    MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W,
-                                                     double& result, MsqMatrix< 3, 3 >& deriv_wrt_A,
-                                                     MsqMatrix< 3, 3 > second_wrt_A[6], MsqError& err );
+    MESQUITE_EXPORT virtual bool evaluate_with_hess( const MsqMatrix< 3, 3 >& A,
+                                                     const MsqMatrix< 3, 3 >& W,
+                                                     double& result,
+                                                     MsqMatrix< 3, 3 >& deriv_wrt_A,
+                                                     MsqMatrix< 3, 3 > second_wrt_A[6],
+                                                     MsqError& err );
 
     static inline bool invalid_determinant( double d )
     {
@@ -249,7 +265,9 @@ class AWMetric2D : public AWMetric
      *
      * This method always returns an error for 2D-only metrics
      */
-    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A, const MsqMatrix< 3, 3 >& W, double& result,
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 3, 3 >& A,
+                                           const MsqMatrix< 3, 3 >& W,
+                                           double& result,
                                            MsqError& err );
 };
 
@@ -262,7 +280,9 @@ class AWMetric3D : public AWMetric
      *
      * This method always returns an error for 3D-only metrics
      */
-    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A, const MsqMatrix< 2, 2 >& W, double& result,
+    MESQUITE_EXPORT virtual bool evaluate( const MsqMatrix< 2, 2 >& A,
+                                           const MsqMatrix< 2, 2 >& W,
+                                           double& result,
                                            MsqError& err );
 };
 

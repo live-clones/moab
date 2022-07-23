@@ -116,7 +116,14 @@ class MESQUITE_EXPORT Matrix3D
         set( value );
     }
 
-    Matrix3D( double a00, double a01, double a02, double a10, double a11, double a12, double a20, double a21,
+    Matrix3D( double a00,
+              double a01,
+              double a02,
+              double a10,
+              double a11,
+              double a12,
+              double a20,
+              double a21,
               double a22 )
     {
         v_[0] = a00;

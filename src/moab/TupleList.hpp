@@ -322,7 +322,7 @@ class TupleList
 
 #define DIGIT_BITS      8
 #define DIGIT_VALUES    ( 1 << DIGIT_BITS )
-#define DIGIT_MASK      ( ( Value )( DIGIT_VALUES - 1 ) )
+#define DIGIT_MASK      ( (Value)( DIGIT_VALUES - 1 ) )
 #define CEILDIV( a, b ) ( ( ( a ) + (b)-1 ) / ( b ) )
 #define DIGITS          CEILDIV( CHAR_BIT * sizeof( Value ), DIGIT_BITS )
 #define VALUE_BITS      ( DIGIT_BITS * DIGITS )
@@ -337,15 +337,25 @@ class TupleList
     static unsigned radix_zeros( Value bitorkey, Index count[DIGITS][DIGIT_VALUES], unsigned* shift, Index** offsets );
 
     template < class Value >
-    static void radix_index_pass_b( const Value* A, Index n, Index stride, unsigned sh, Index* off,
+    static void radix_index_pass_b( const Value* A,
+                                    Index n,
+                                    Index stride,
+                                    unsigned sh,
+                                    Index* off,
                                     SortData< Value >* out );
 
     template < class Value >
-    static void radix_index_pass_m( const SortData< Value >* src, const SortData< Value >* end, unsigned sh, Index* off,
+    static void radix_index_pass_m( const SortData< Value >* src,
+                                    const SortData< Value >* end,
+                                    unsigned sh,
+                                    Index* off,
                                     SortData< Value >* out );
 
     template < class Value >
-    static void radix_index_pass_e( const SortData< Value >* src, const SortData< Value >* end, unsigned sh, Index* off,
+    static void radix_index_pass_e( const SortData< Value >* src,
+                                    const SortData< Value >* end,
+                                    unsigned sh,
+                                    Index* off,
                                     Index* out );
 
     template < class Value >

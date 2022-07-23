@@ -45,7 +45,9 @@
 namespace MBMesquite
 {
 
-TargetWriter::TargetWriter( TargetCalculator* tc, WeightCalculator* wc, std::string target_base_name,
+TargetWriter::TargetWriter( TargetCalculator* tc,
+                            WeightCalculator* wc,
+                            std::string target_base_name,
                             std::string weight_base_name )
     : targetCalc( tc ), weightCalc( wc ), targetName( target_base_name ), weightName( weight_base_name )
 {

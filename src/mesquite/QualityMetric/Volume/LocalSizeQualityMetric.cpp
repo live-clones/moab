@@ -48,7 +48,11 @@ static inline double compute_corner_area( PatchData& pd, size_t vert_1, size_t v
 }
 
 //! Calculate the volume of the tetrahedron formed by the four vertices.
-static inline double compute_corner_volume( PatchData& pd, size_t vert_1, size_t vert_2, size_t vert_3, size_t vert_4,
+static inline double compute_corner_volume( PatchData& pd,
+                                            size_t vert_1,
+                                            size_t vert_2,
+                                            size_t vert_3,
+                                            size_t vert_4,
                                             MsqError& err )
 {
     const MsqVertex* verts = pd.get_vertex_array( err );
@@ -97,7 +101,10 @@ bool LocalSizeQualityMetric::evaluate( PatchData& pd, size_t this_vert, double& 
     const size_t* v_to_e_array = pd.get_vertex_element_adjacencies( this_vert, num_elems, err );
     MSQ_ERRZERO( err );
 
-    if( num_elems <= 0 ) { return true; }
+    if( num_elems <= 0 )
+    {
+        return true;
+    }
 
     // create an array to store the local metric values before averaging
     // Can we remove this dynamic allocatio?
@@ -171,8 +178,11 @@ bool LocalSizeQualityMetric::evaluate( PatchData& pd, size_t this_vert, double& 
     return true;
 }
 
-bool LocalSizeQualityMetric::evaluate_with_indices( PatchData& pd, size_t vertex, double& value,
-                                                    std::vector< size_t >& indices, MsqError& err )
+bool LocalSizeQualityMetric::evaluate_with_indices( PatchData& pd,
+                                                    size_t vertex,
+                                                    double& value,
+                                                    std::vector< size_t >& indices,
+                                                    MsqError& err )
 {
     indices.clear();
     pd.get_adjacent_vertex_indices( vertex, indices, err );

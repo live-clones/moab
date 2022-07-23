@@ -1,7 +1,7 @@
 ################################################################################
 #                           Standard Stuff
 ################################################################################
-AC_INIT([MOAB],[5.3.1],[moab-dev@mcs.anl.gov],[moab],[http://sigma.mcs.anl.gov])
+AC_INIT([MOAB],[5.4.0],[moab-dev@mcs.anl.gov],[moab],[http://sigma.mcs.anl.gov])
 AC_CONFIG_SRCDIR([moab.make.in])
 AC_CONFIG_SRCDIR([config/MOABConfig.cmake.in])
 AC_CONFIG_SRCDIR([examples/makefile.config.in])
@@ -95,7 +95,7 @@ AC_SUBST(enable_shared)
 
 # All language options initialized -- now call
 # libtool initialization
-# AC_PROG_LIBTOOL is deprecated
+# LT_INIT is deprecated
 LT_INIT([dlopen])
 LT_LANG([C++])
 
@@ -157,8 +157,12 @@ AC_DEFINE_UNQUOTED([MESH_DIR], ["$project_abstopsrcdir/MeshFiles/"], [Path to th
 ################################################################################
 #                              Headers
 ################################################################################
-AC_HEADER_STDC
-AC_CHECK_HEADERS(fcntl.h strings.h sys/file.h sys/time.h unistd.h)
+# Autoupdate added the next two lines to ensure that your configure
+# script's behavior did not change.  They are probably safe to remove.
+#AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
+
+#AC_CHECK_HEADERS(fcntl.h strings.h sys/file.h sys/time.h unistd.h)
 AC_CHECK_HEADER([inttypes.h], [AC_DEFINE(HAVE_INTTYPES_H,  [1], [MOAB qualified HAVE_INTTYPES_H]) ])
 AC_CHECK_HEADER([stdint.h],   [AC_DEFINE(HAVE_STDINT_H,    [1], [MOAB qualified HAVE_STDINT_H])   ])
 AC_CHECK_HEADER([stddef.h],   [AC_DEFINE(HAVE_STDDEF_H,    [1], [MOAB qualified HAVE_STDDEF_H])   ])
@@ -274,7 +278,7 @@ if (test "xyes" != "x$enable_pymoab" && test "xno" != "x$enable_pymoab"); then
 else
   if (test "x$enable_pymoab" != "xno"); then
     ENABLE_pymoab=yes
-    AM_PATH_PYTHON([2.7],,[:])
+    AM_PATH_PYTHON([3.1],,[:])
     AX_PYTHON_DEVEL()
 
     AC_MSG_CHECKING([for the numpy Python package])
@@ -357,21 +361,21 @@ else
 		     pymoab/tests/cyl_grps.h5m:pymoab/tests/cyl_grps.h5m
 		     pymoab/tests/cyl_grps.vtk:pymoab/tests/cyl_grps.vtk])
     # if a python install location is specified, use that
-    if test "x$PYMOAB_PREFIX" != "x"; then
+    if (test "x$PYMOAB_PREFIX" != "x"); then
       pymoab_custom_install=yes
       pymoab_prefix=${PYMOAB_PREFIX}
       pythondir=$pymoab_prefix
     else
       # if a prefix was supplied, then install under the lib directory
       # of the specified prefix location
-      if test "x$prefix" != "xNONE"; then
+      if (test "x$prefix" != "xNONE"); then
         pymoab_prefix=$prefix/lib/python${PYTHON_VERSION}/site-packages
         pymoab_custom_install=yes
         pythondir=$pymoab_prefix
       else
         # if no specific location is used and no prefix was supplied,
         # then install to the system location
-        pymoab_prefix=/usr/lib/python${PYTHON_VERSION}/dist-packages
+        pymoab_prefix=/usr/local/lib/python${PYTHON_VERSION}/site-packages
         pythondir=$pymoab_prefix
       fi
     fi
@@ -954,9 +958,9 @@ AC_ARG_WITH( [vtk-lib-suffix],
                esac],[VTK_LIB_SUFFIX=] )
 
 # Provide downloadable option for TempestRemap library
-# Supported TempestRemap versions: 2.1.1, 2.1.0, 2.0.5, 2.0.3
+# Supported TempestRemap versions: 2.1.3, 2.1.1, 2.0.5, 2.0.3
 # Arguments: 1) Default Version Number, 2) Download by default ?
-AUSCM_CONFIGURE_DOWNLOAD_TEMPESTREMAP([2.1.1], [no])
+AUSCM_CONFIGURE_DOWNLOAD_TEMPESTREMAP([2.1.3], [no])
 
 # Configuration for TempestRemap library
 AC_ARG_WITH([tempestremap],
@@ -1723,7 +1727,8 @@ AC_MSG_NOTICE([
 *************************************************************************
 *     The PyMOAB interface will be installed to a custom location.
 *     In order to access this module from a python interpreter, please add
-*     its install location to the PYTHONPATH environment variable:
+*     its install location to the PYTHONPATH environment variable, *after*
+*     invoking `make install`:
 *
 *     export PYTHONPATH=$pythondir:\$PYTHONPATH
 *

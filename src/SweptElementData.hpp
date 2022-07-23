@@ -79,8 +79,14 @@ class SweptElementData : public SequenceData
 
   public:
     //! constructor
-    SweptElementData( EntityHandle start_handle, const int imin, const int jmin, const int kmin, const int imax,
-                      const int jmax, const int kmax, const int* Cq );
+    SweptElementData( EntityHandle start_handle,
+                      const int imin,
+                      const int jmin,
+                      const int kmin,
+                      const int imax,
+                      const int jmax,
+                      const int kmax,
+                      const int* Cq );
 
     virtual ~SweptElementData();
 
@@ -140,7 +146,9 @@ class SweptElementData : public SequenceData
     inline bool contains( const HomCoord& coords ) const;
 
     //! get connectivity of an entity given entity's parameters
-    inline ErrorCode get_params_connectivity( const int i, const int j, const int k,
+    inline ErrorCode get_params_connectivity( const int i,
+                                              const int j,
+                                              const int k,
                                               std::vector< EntityHandle >& connectivity ) const;
 
     //! add a vertex seq ref to this element sequence;
@@ -148,11 +156,20 @@ class SweptElementData : public SequenceData
     //! is input in bb_min and bb_max (allows partial sharing of vseq rather than the whole
     //! vseq); if it's false, the whole vseq is referenced and the eseq-local coordinates
     //! is computed from the transformed bounding box of the vseq
-    ErrorCode add_vsequence( SweptVertexData* vseq, const HomCoord& p1, const HomCoord& q1, const HomCoord& p2,
-                             const HomCoord& q2, const HomCoord& p3, const HomCoord& q3, bool bb_input = false,
-                             const HomCoord& bb_min = HomCoord::unitv[0], const HomCoord& bb_max = HomCoord::unitv[0] );
+    ErrorCode add_vsequence( SweptVertexData* vseq,
+                             const HomCoord& p1,
+                             const HomCoord& q1,
+                             const HomCoord& p2,
+                             const HomCoord& q2,
+                             const HomCoord& p3,
+                             const HomCoord& q3,
+                             bool bb_input          = false,
+                             const HomCoord& bb_min = HomCoord::unitv[0],
+                             const HomCoord& bb_max = HomCoord::unitv[0] );
 
-    SequenceData* subset( EntityHandle start, EntityHandle end, const int* sequence_data_sizes,
+    SequenceData* subset( EntityHandle start,
+                          EntityHandle end,
+                          const int* sequence_data_sizes,
                           const int* tag_data_sizes ) const;
 
     static EntityID calc_num_entities( EntityHandle start_handle, int irange, int jrange, int krange );
@@ -217,8 +234,10 @@ inline bool SweptElementData::VertexDataRef::contains( const HomCoord& coords ) 
     return ( minmax[0] <= coords && minmax[1] >= coords );
 }
 
-inline SweptElementData::VertexDataRef::VertexDataRef( const HomCoord& this_min, const HomCoord& this_max,
-                                                       const HomXform& tmp_xform, SweptVertexData* this_seq )
+inline SweptElementData::VertexDataRef::VertexDataRef( const HomCoord& this_min,
+                                                       const HomCoord& this_max,
+                                                       const HomXform& tmp_xform,
+                                                       SweptVertexData* this_seq )
     : xform( tmp_xform ), invXform( tmp_xform.inverse() ), srcSeq( this_seq )
 {
     minmax[0] = HomCoord( this_min );
@@ -244,9 +263,15 @@ inline EntityHandle SweptElementData::get_vertex( const HomCoord& coords ) const
     return 0;
 }
 
-inline ErrorCode SweptElementData::add_vsequence( SweptVertexData* vseq, const HomCoord& p1, const HomCoord& q1,
-                                                  const HomCoord& p2, const HomCoord& q2, const HomCoord& p3,
-                                                  const HomCoord& q3, bool bb_input, const HomCoord& bb_min,
+inline ErrorCode SweptElementData::add_vsequence( SweptVertexData* vseq,
+                                                  const HomCoord& p1,
+                                                  const HomCoord& q1,
+                                                  const HomCoord& p2,
+                                                  const HomCoord& q2,
+                                                  const HomCoord& p3,
+                                                  const HomCoord& q3,
+                                                  bool bb_input,
+                                                  const HomCoord& bb_min,
                                                   const HomCoord& bb_max )
 {
     // compute the transform given the vseq-local parameters and the mapping to
@@ -288,7 +313,9 @@ inline ErrorCode SweptElementData::add_vsequence( SweptVertexData* vseq, const H
     return MB_SUCCESS;
 }
 
-inline ErrorCode SweptElementData::get_params_connectivity( const int i, const int j, const int k,
+inline ErrorCode SweptElementData::get_params_connectivity( const int i,
+                                                            const int j,
+                                                            const int k,
                                                             std::vector< EntityHandle >& connectivity ) const
 {
     if( contains( HomCoord( i, j, k ) ) == false ) return MB_FAILURE;

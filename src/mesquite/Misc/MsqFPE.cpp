@@ -146,5 +146,8 @@ MBMesquite::MsqFPE::MsqFPE( bool enabled ) : isEnabled( enabled )
 
 MBMesquite::MsqFPE::~MsqFPE()
 {
-    if( isEnabled ) { set_current_fpe_state( prevState ); }
+    if( isEnabled )
+    {
+        set_current_fpe_state( prevState );
+    }
 }

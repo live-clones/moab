@@ -66,67 +66,67 @@
 int main( int argc, char* argv[] )
 {
     /* input file */
-    const char*        filename;
-    mhdf_FileHandle    file;
-    mhdf_Status        status;
+    const char* filename;
+    mhdf_FileHandle file;
+    mhdf_Status status;
     mhdf_Status* const sptr = &status;
-    hid_t              handle; /* generic handle used to refer to any data block in file */
+    hid_t handle; /* generic handle used to refer to any data block in file */
 
     /* output file */
     const char* gmsh_filename;
-    FILE*       gmsh;
-    unsigned    gmsh_type; /* hexahedral element type number */
-    double      x, y, z; /* temp storage of node coordinates */
-    unsigned    node_offset, node_id; /* temporary values */
-    unsigned*   connectivity; /* temporary value */
+    FILE* gmsh;
+    unsigned gmsh_type;            /* hexahedral element type number */
+    double x, y, z;                /* temp storage of node coordinates */
+    unsigned node_offset, node_id; /* temporary values */
+    unsigned* connectivity;        /* temporary value */
 
     /* node data */
-    long      numnode; /* total number of nodes */
-    long      nodestart; /* file id of first node in list */
-    int       dimension; /* coordinate values per node */
-    double*   nodecoords; /* interleaved node coordinates */
-    unsigned* nodeids; /* GLOBAL_ID value for nodes */
-    int       have_nodeids = 0;
+    long numnode;       /* total number of nodes */
+    long nodestart;     /* file id of first node in list */
+    int dimension;      /* coordinate values per node */
+    double* nodecoords; /* interleaved node coordinates */
+    unsigned* nodeids;  /* GLOBAL_ID value for nodes */
+    int have_nodeids = 0;
 
     /* hex data */
-    char*     hexgroup = NULL; /* name of element group containing hexes */
-    long      numhex; /* total number of hexahedral elements */
-    long      hexstart; /* file id of first hex in group */
-    int       nodes_per_hex; /* length of connectivity list for a hex */
+    char* hexgroup = NULL;     /* name of element group containing hexes */
+    long numhex;               /* total number of hexahedral elements */
+    long hexstart;             /* file id of first hex in group */
+    int nodes_per_hex;         /* length of connectivity list for a hex */
     unsigned* hexconnectivity; /* hex connectivity data */
-    unsigned* hexids; /* GLOBAL_ID value for hexes */
-    int       have_hexids = 0;
+    unsigned* hexids;          /* GLOBAL_ID value for hexes */
+    int have_hexids = 0;
 
     /* list of element groups in file */
-    char**   elem_groups;
+    char** elem_groups;
     unsigned num_elem_groups;
-    char     namebuffer[ 64 ];
+    char namebuffer[64];
 
     /* tag data for accessing GLOBAL_ID */
-    int                   tagsize; /* number of values for each entity */
-    int                   ts, td, tg; /* unused tag properties */
-    int                   havesparse, havedense; /* Boolean values */
+    int tagsize;                   /* number of values for each entity */
+    int ts, td, tg;                /* unused tag properties */
+    int havesparse, havedense;     /* Boolean values */
     enum mhdf_TagDataType tagtype; /* base data type of tag */
-    hid_t                 sparse_handle[ 2 ]; /* handle pair for sparse tag data */
-    unsigned*             sparse_entities; /* temp storage of sparse tag file ids */
-    unsigned*             sparse_ids; /* temp storage of GLOBAL_ID values in spasre tag */
-    long                  junk, numtag; /* number of entities for which tag data is available */
-    long                  fileid, globalid; /* temporary values */
-    long                  ncount = 0, hcount = 0; /* temporary count of number of tag values */
+    hid_t sparse_handle[2];        /* handle pair for sparse tag data */
+    unsigned* sparse_entities;     /* temp storage of sparse tag file ids */
+    unsigned* sparse_ids;          /* temp storage of GLOBAL_ID values in spasre tag */
+    long junk, numtag;             /* number of entities for which tag data is available */
+    long fileid, globalid;         /* temporary values */
+    long ncount = 0, hcount = 0;   /* temporary count of number of tag values */
 
     /* iteration */
-    long     i;
-    int      j;
+    long i;
+    int j;
     unsigned k;
 
     /* process CL args (expect input .h5m file and output .gmsh file name) */
     if( argc != 3 )
     {
-        fprintf( stderr, "Usage: %s <input_file> <output_file>\n", argv[ 0 ] );
+        fprintf( stderr, "Usage: %s <input_file> <output_file>\n", argv[0] );
         return 1;
     }
-    filename = argv[ 1 ];
-    gmsh_filename = argv[ 2 ];
+    filename      = argv[1];
+    gmsh_filename = argv[2];
 
     /* Open the file */
     file = mhdf_openFile( filename, 0, 0, sptr );CHK_ERR( sptr );
@@ -141,11 +141,11 @@ int main( int argc, char* argv[] )
     elem_groups = mhdf_getElemHandles( file, &num_elem_groups, sptr );CHK_ERR( sptr );
     for( k = 0; k < num_elem_groups; ++k )
     {
-        mhdf_getElemTypeName( file, elem_groups[ k ], namebuffer, sizeof( namebuffer ), sptr );CHK_ERR( sptr );
+        mhdf_getElemTypeName( file, elem_groups[k], namebuffer, sizeof( namebuffer ), sptr );CHK_ERR( sptr );
         if( !hexgroup && !strcmp( mdhf_HEX_TYPE_NAME, namebuffer ) )
-            hexgroup = strdup( elem_groups[ k ] );
+            hexgroup = strdup( elem_groups[k] );
         else
-            printf( "Skipping element group '%s' containing element of type '%s'\n", elem_groups[ k ], namebuffer );
+            printf( "Skipping element group '%s' containing element of type '%s'\n", elem_groups[k], namebuffer );
     }
     free( elem_groups );
 
@@ -166,7 +166,7 @@ int main( int argc, char* argv[] )
 
     /* Check for "GLOBAL_ID" tag */
     nodeids = (unsigned*)malloc( numnode * sizeof( unsigned ) );
-    hexids = (unsigned*)malloc( numhex * sizeof( unsigned ) );
+    hexids  = (unsigned*)malloc( numhex * sizeof( unsigned ) );
     mhdf_getTagInfo( file, "GLOBAL_ID", &tagtype, &tagsize, &ts, &td, &tg, &havesparse, sptr );
 
     /* If have GLOBAL_ID tag, try to read values for nodes and hexes */
@@ -180,10 +180,10 @@ int main( int argc, char* argv[] )
         }
 
         /* Check for and read dense-format tag data for nodes */
-        havedense = mhdf_haveDenseTag( file, "GLOBAL_ID", mhdf_node_type_handle( ), sptr );CHK_ERR( sptr );
+        havedense = mhdf_haveDenseTag( file, "GLOBAL_ID", mhdf_node_type_handle(), sptr );CHK_ERR( sptr );
         if( havedense )
         {
-            handle = mhdf_openDenseTagData( file, "GLOBAL_ID", mhdf_node_type_handle( ), &numtag, sptr );CHK_ERR( sptr );
+            handle = mhdf_openDenseTagData( file, "GLOBAL_ID", mhdf_node_type_handle(), &numtag, sptr );CHK_ERR( sptr );
             assert( numtag == numnode );
             mhdf_readDenseTag( handle, 0, numtag, H5T_NATIVE_UINT, nodeids, sptr );CHK_ERR( sptr );
             mhdf_closeData( file, handle, sptr );CHK_ERR( sptr );
@@ -204,25 +204,25 @@ int main( int argc, char* argv[] )
         {
             mhdf_openSparseTagData( file, "GLOBAL_ID", &numtag, &junk, sparse_handle, sptr );CHK_ERR( sptr );
             sparse_entities = (unsigned*)malloc( numtag * sizeof( unsigned ) );
-            mhdf_readSparseTagEntities( sparse_handle[ 0 ], 0, numtag, H5T_NATIVE_UINT, sparse_entities, sptr );CHK_ERR( sptr );
+            mhdf_readSparseTagEntities( sparse_handle[0], 0, numtag, H5T_NATIVE_UINT, sparse_entities, sptr );CHK_ERR( sptr );
             sparse_ids = (unsigned*)malloc( numtag * sizeof( unsigned ) );
-            mhdf_readSparseTagValues( sparse_handle[ 1 ], 0, numtag, H5T_NATIVE_UINT, sparse_ids, sptr );CHK_ERR( sptr );
-            mhdf_closeData( file, sparse_handle[ 0 ], sptr );CHK_ERR( sptr );
-            mhdf_closeData( file, sparse_handle[ 1 ], sptr );CHK_ERR( sptr );
+            mhdf_readSparseTagValues( sparse_handle[1], 0, numtag, H5T_NATIVE_UINT, sparse_ids, sptr );CHK_ERR( sptr );
+            mhdf_closeData( file, sparse_handle[0], sptr );CHK_ERR( sptr );
+            mhdf_closeData( file, sparse_handle[1], sptr );CHK_ERR( sptr );
 
             /* Set hex and node ids from sparse tag data */
             for( i = 0; i < numtag; ++i )
             {
-                fileid = sparse_entities[ i ];
-                globalid = sparse_ids[ i ];
+                fileid   = sparse_entities[i];
+                globalid = sparse_ids[i];
                 if( fileid >= nodestart && fileid - nodestart < numnode )
                 {
-                    nodeids[ fileid - nodestart ] = globalid;
+                    nodeids[fileid - nodestart] = globalid;
                     ++ncount;
                 }
                 else if( fileid >= hexstart && fileid - hexstart < numhex )
                 {
-                    hexids[ fileid - hexstart ] = globalid;
+                    hexids[fileid - hexstart] = globalid;
                     ++hcount;
                 }
             }
@@ -234,7 +234,7 @@ int main( int argc, char* argv[] )
             if( hcount == numhex ) have_hexids = 1;
 
         } /* end have sparse tag for GLOBAL_ID */
-    } /* end have GLOBAL_ID tag */
+    }     /* end have GLOBAL_ID tag */
 
     /* done with input file */
     free( hexgroup );
@@ -243,10 +243,10 @@ int main( int argc, char* argv[] )
     /* if no GLOBAL_ID, just use incrementing values */
     if( !have_nodeids )
         for( i = 0; i < numnode; ++i )
-            nodeids[ i ] = i + 1;
+            nodeids[i] = i + 1;
     if( !have_hexids )
         for( i = 0; i < numhex; ++i )
-            hexids[ i ] = i + 1;
+            hexids[i] = i + 1;
 
     /* write out as gmesh file version 1.0 */
 
@@ -273,14 +273,17 @@ int main( int argc, char* argv[] )
     fprintf( gmsh, "%lu\n", numnode );
     for( i = 0; i < numnode; ++i )
     {
-        x = nodecoords[ dimension * i ];
+        x = nodecoords[dimension * i];
         y = z = 0.0;
         if( dimension > 1 )
         {
-            y = nodecoords[ dimension * i + 1 ];
-            if( dimension > 2 ) { z = nodecoords[ dimension * i + 2 ]; }
+            y = nodecoords[dimension * i + 1];
+            if( dimension > 2 )
+            {
+                z = nodecoords[dimension * i + 2];
+            }
         }
-        fprintf( gmsh, "%u %f %f %f\n", nodeids[ i ], x, y, z );
+        fprintf( gmsh, "%u %f %f %f\n", nodeids[i], x, y, z );
     }
 
     /* Write element connectivity data */
@@ -288,15 +291,15 @@ int main( int argc, char* argv[] )
     fprintf( gmsh, "%lu\n", numhex );
     for( i = 0; i < numhex; ++i )
     {
-        fprintf( gmsh, "%u %u 1 1 %d", hexids[ i ], gmsh_type, nodes_per_hex );
+        fprintf( gmsh, "%u %u 1 1 %d", hexids[i], gmsh_type, nodes_per_hex );
         /* connectivity list for this hex */
         connectivity = hexconnectivity + i * nodes_per_hex;
         for( j = 0; j < nodes_per_hex; ++j )
         {
             /* get offset in node list from file id */
-            node_offset = connectivity[ j ] - nodestart;
+            node_offset = connectivity[j] - nodestart;
             /* get node id from ID list */
-            node_id = nodeids[ node_offset ];
+            node_id = nodeids[node_offset];
             fprintf( gmsh, " %u", node_id );
         }
         fprintf( gmsh, "\n" );

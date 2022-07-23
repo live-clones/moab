@@ -349,8 +349,12 @@ class TerminationCriterion
     bool cull_vertices( PatchData& pd, OFEvaluator& obj_ptr, MsqError& err );
 
     //! experimental, first cut at culling for global patches - not finished
-    bool cull_vertices_global( PatchData& global_patch, Mesh* mesh, MeshDomain* domain, const Settings* settings,
-                               OFEvaluator& of_eval, MsqError& err );
+    bool cull_vertices_global( PatchData& global_patch,
+                               Mesh* mesh,
+                               MeshDomain* domain,
+                               const Settings* settings,
+                               OFEvaluator& of_eval,
+                               MsqError& err );
 
     //! Cleans up after the TerminationCriterion is finished.
     void cleanup( Mesh* ms, MeshDomain* domain, MsqError& err );

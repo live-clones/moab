@@ -80,7 +80,10 @@ static void _run_test( TestFunc func, const char* func_str )
         std::cout << "Failed: " << moab.get_error_string( error ) << std::endl;
     }
 
-    if( MB_SUCCESS != error ) { ++number_tests_failed; }
+    if( MB_SUCCESS != error )
+    {
+        ++number_tests_failed;
+    }
 }
 
 int main( int /*argc*/, char** /*argv[]*/ )

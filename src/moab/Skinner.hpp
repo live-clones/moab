@@ -75,9 +75,14 @@ class Skinner
      *        of skin entities, otherwise only skin entities already extant
      *        will be returned
      */
-    ErrorCode find_skin( const EntityHandle meshset, const Range& entities, bool get_vertices, Range& output_handles,
-                         Range* output_reverse_handles = 0, bool create_vert_elem_adjs = false,
-                         bool create_skin_elements = true, bool look_for_scd = false );
+    ErrorCode find_skin( const EntityHandle meshset,
+                         const Range& entities,
+                         bool get_vertices,
+                         Range& output_handles,
+                         Range* output_reverse_handles = 0,
+                         bool create_vert_elem_adjs    = false,
+                         bool create_skin_elements     = true,
+                         bool look_for_scd             = false );
 
     /**\brief will accept entities all of one dimension and
      *        return entities of n-1 dimension; NOTE: get_vertices argument controls whether
@@ -96,9 +101,15 @@ class Skinner
      *        of skin entities, otherwise only skin entities already extant
      *        will be returned
      */
-    ErrorCode find_skin( const EntityHandle this_set, const EntityHandle* entities, int num_entities, bool get_vertices,
-                         Range& output_handles, Range* output_reverse_handles = 0, bool create_vert_elem_adjs = false,
-                         bool create_skin_elements = true, bool look_for_scd = false );
+    ErrorCode find_skin( const EntityHandle this_set,
+                         const EntityHandle* entities,
+                         int num_entities,
+                         bool get_vertices,
+                         Range& output_handles,
+                         Range* output_reverse_handles = 0,
+                         bool create_vert_elem_adjs    = false,
+                         bool create_skin_elements     = true,
+                         bool look_for_scd             = false );
 
     /**\brief get skin entities of prescribed dimension
      * \param entities The elements for which to find the skin
@@ -107,17 +118,29 @@ class Skinner
      * \param create_vert_elem_adjs If true, this function will cause
      *        vertex-element adjacencies to be generated
      */
-    ErrorCode find_skin( const EntityHandle this_set, const Range& entities, int dim, Range& skin_entities,
-                         bool create_vert_elem_adjs = false, bool create_skin_elements = true );
+    ErrorCode find_skin( const EntityHandle this_set,
+                         const Range& entities,
+                         int dim,
+                         Range& skin_entities,
+                         bool create_vert_elem_adjs = false,
+                         bool create_skin_elements  = true );
 
-    ErrorCode classify_2d_boundary( const Range& boundary, const Range& bar_elements, EntityHandle boundary_edges,
-                                    EntityHandle inferred_edges, EntityHandle non_manifold_edges,
-                                    EntityHandle other_edges, int& number_boundary_nodes );
+    ErrorCode classify_2d_boundary( const Range& boundary,
+                                    const Range& bar_elements,
+                                    EntityHandle boundary_edges,
+                                    EntityHandle inferred_edges,
+                                    EntityHandle non_manifold_edges,
+                                    EntityHandle other_edges,
+                                    int& number_boundary_nodes );
 
     //! given a skin of dimension 2, will classify and return edges
     //! as boundary, inferred, and non-manifold, and the rest (other)
-    ErrorCode classify_2d_boundary( const Range& boundary, const Range& mesh_1d_elements, Range& boundary_edges,
-                                    Range& inferred_edges, Range& non_manifold_edges, Range& other_edges,
+    ErrorCode classify_2d_boundary( const Range& boundary,
+                                    const Range& mesh_1d_elements,
+                                    Range& boundary_edges,
+                                    Range& inferred_edges,
+                                    Range& non_manifold_edges,
+                                    Range& other_edges,
                                     int& number_boundary_nodes );
 
   protected:
@@ -125,7 +148,8 @@ class Skinner
 
     ErrorCode deinitialize();
 
-    ErrorCode find_skin_noadj( const Range& source_entities, Range& forward_target_entities,
+    ErrorCode find_skin_noadj( const Range& source_entities,
+                               Range& forward_target_entities,
                                Range& reverse_target_entities );
 
     ErrorCode add_adjacency( EntityHandle entity );
@@ -136,13 +160,20 @@ class Skinner
 
     bool entity_deletable( EntityHandle entity );
 
-    void find_match( EntityType type, const EntityHandle* conn, const int num_nodes, EntityHandle& match,
+    void find_match( EntityType type,
+                     const EntityHandle* conn,
+                     const int num_nodes,
+                     EntityHandle& match,
                      Skinner::direction& direct );
 
-    bool connectivity_match( const EntityHandle* conn1, const EntityHandle* conn2, const int num_verts,
+    bool connectivity_match( const EntityHandle* conn1,
+                             const EntityHandle* conn2,
+                             const int num_verts,
                              Skinner::direction& direct );
 
-    void find_inferred_edges( Range& skin_boundary, Range& candidate_edges, Range& inferred_edges,
+    void find_inferred_edges( Range& skin_boundary,
+                              Range& candidate_edges,
+                              Range& inferred_edges,
                               double reference_angle_degrees );
 
     bool has_larger_angle( EntityHandle& entity1, EntityHandle& entity2, double reference_angle_cosine );
@@ -160,9 +191,13 @@ class Skinner
      *                    will contain only those skin elements that already
      *                    exist.
      */
-    ErrorCode find_skin_vertices( const EntityHandle this_set, const Range& entities, Range* skin_verts = 0,
-                                  Range* skin_elems = 0, Range* rev_elems = 0, bool create_if_missing = true,
-                                  bool corners_only = false );
+    ErrorCode find_skin_vertices( const EntityHandle this_set,
+                                  const Range& entities,
+                                  Range* skin_verts      = 0,
+                                  Range* skin_elems      = 0,
+                                  Range* rev_elems       = 0,
+                                  bool create_if_missing = true,
+                                  bool corners_only      = false );
 
     /**\brief Skin edges
      *
@@ -190,9 +225,14 @@ class Skinner
      *                  corners of sides will be returned (i.e. no higher-order
      *                  nodes.)  This argument is ignored if skin_verts is NULL.
      */
-    ErrorCode find_skin_vertices_2D( const EntityHandle this_set, Tag tag, const Range& faces, Range* skin_verts = 0,
-                                     Range* skin_edges = 0, Range* reverse_edges = 0, bool create_edges = false,
-                                     bool corners_only = false );
+    ErrorCode find_skin_vertices_2D( const EntityHandle this_set,
+                                     Tag tag,
+                                     const Range& faces,
+                                     Range* skin_verts    = 0,
+                                     Range* skin_edges    = 0,
+                                     Range* reverse_edges = 0,
+                                     bool create_edges    = false,
+                                     bool corners_only    = false );
 
     /**\brief Skin volume mesh
      *
@@ -214,28 +254,44 @@ class Skinner
      *                  corners of sides will be returned (i.e. no higher-order
      *                  nodes.)  This argument is ignored if skin_verts is NULL.
      */
-    ErrorCode find_skin_vertices_3D( const EntityHandle this_set, Tag tag, const Range& entities, Range* skin_verts = 0,
-                                     Range* skin_faces = 0, Range* reverse_faces = 0, bool create_faces = false,
-                                     bool corners_only = false );
+    ErrorCode find_skin_vertices_3D( const EntityHandle this_set,
+                                     Tag tag,
+                                     const Range& entities,
+                                     Range* skin_verts    = 0,
+                                     Range* skin_faces    = 0,
+                                     Range* reverse_faces = 0,
+                                     bool create_faces    = false,
+                                     bool corners_only    = false );
 
-    ErrorCode create_side( const EntityHandle this_set, EntityHandle element, EntityType side_type,
-                           const EntityHandle* side_corners, EntityHandle& side_elem_handle_out );
+    ErrorCode create_side( const EntityHandle this_set,
+                           EntityHandle element,
+                           EntityType side_type,
+                           const EntityHandle* side_corners,
+                           EntityHandle& side_elem_handle_out );
 
     bool edge_reversed( EntityHandle face, const EntityHandle edge_ends[2] );
     bool face_reversed( EntityHandle region, const EntityHandle* face_conn, EntityType face_type );
 
     //! look for structured box comprising source_entities, and if one is found use
     //! structured information to find the skin
-    ErrorCode find_skin_scd( const Range& source_entities, bool get_vertices, Range& output_handles,
+    ErrorCode find_skin_scd( const Range& source_entities,
+                             bool get_vertices,
+                             Range& output_handles,
                              bool create_skin_elements );
 
     //! skin a structured box, taking advantage of structured information
     ErrorCode skin_box( ScdBox* box, bool get_vertices, Range& output_handles, bool create_skin_elements );
 };
 
-inline ErrorCode Skinner::find_skin( const EntityHandle this_set, const EntityHandle* entities, int num_entities,
-                                     bool get_vertices, Range& output_handles, Range* output_reverse_handles,
-                                     bool create_vert_elem_adjs, bool create_skin_elements, bool look_for_scd )
+inline ErrorCode Skinner::find_skin( const EntityHandle this_set,
+                                     const EntityHandle* entities,
+                                     int num_entities,
+                                     bool get_vertices,
+                                     Range& output_handles,
+                                     Range* output_reverse_handles,
+                                     bool create_vert_elem_adjs,
+                                     bool create_skin_elements,
+                                     bool look_for_scd )
 {
     Range ents;
     std::copy( entities, entities + num_entities, range_inserter( ents ) );

@@ -137,7 +137,9 @@ class SequenceData
     void release_tag_data( int index, int tag_size );
 
   protected:
-    SequenceData( const SequenceData* subset_from, EntityHandle start, EntityHandle end,
+    SequenceData( const SequenceData* subset_from,
+                  EntityHandle start,
+                  EntityHandle end,
                   const int* sequence_data_sizes );
 
   private:

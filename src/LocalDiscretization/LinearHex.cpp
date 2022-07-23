@@ -16,8 +16,12 @@ const double LinearHex::corner[8][3] = { { -1, -1, -1 }, { 1, -1, -1 }, { 1, 1, 
 */
 const double LinearHex::gauss[1][2] = { { 2.0, 0.0 } };
 
-ErrorCode LinearHex::jacobianFcn( const double* params, const double* verts, const int /*nverts*/, const int ndim,
-                                  double*, double* result )
+ErrorCode LinearHex::jacobianFcn( const double* params,
+                                  const double* verts,
+                                  const int /*nverts*/,
+                                  const int ndim,
+                                  double*,
+                                  double* result )
 {
     assert( params && verts );
     Matrix3* J = reinterpret_cast< Matrix3* >( result );
@@ -44,8 +48,12 @@ ErrorCode LinearHex::jacobianFcn( const double* params, const double* verts, con
     return MB_SUCCESS;
 }  // LinearHex::jacobian()
 
-ErrorCode LinearHex::evalFcn( const double* params, const double* field, const int /*ndim*/, const int num_tuples,
-                              double*, double* result )
+ErrorCode LinearHex::evalFcn( const double* params,
+                              const double* field,
+                              const int /*ndim*/,
+                              const int num_tuples,
+                              double*,
+                              double* result )
 {
     assert( params && field && num_tuples != -1 );
     for( int i = 0; i < num_tuples; i++ )
@@ -63,8 +71,13 @@ ErrorCode LinearHex::evalFcn( const double* params, const double* field, const i
     return MB_SUCCESS;
 }
 
-ErrorCode LinearHex::integrateFcn( const double* field, const double* verts, const int nverts, const int ndim,
-                                   const int num_tuples, double* work, double* result )
+ErrorCode LinearHex::integrateFcn( const double* field,
+                                   const double* verts,
+                                   const int nverts,
+                                   const int ndim,
+                                   const int num_tuples,
+                                   double* work,
+                                   double* result )
 {
     assert( field && verts && num_tuples != -1 );
     double tmp_result[8];
@@ -99,9 +112,18 @@ ErrorCode LinearHex::integrateFcn( const double* field, const double* verts, con
     return MB_SUCCESS;
 }  // LinearHex::integrate_vector()
 
-ErrorCode LinearHex::reverseEvalFcn( EvalFcn eval, JacobianFcn jacob, InsideFcn ins, const double* posn,
-                                     const double* verts, const int nverts, const int ndim, const double iter_tol,
-                                     const double inside_tol, double* work, double* params, int* is_inside )
+ErrorCode LinearHex::reverseEvalFcn( EvalFcn eval,
+                                     JacobianFcn jacob,
+                                     InsideFcn ins,
+                                     const double* posn,
+                                     const double* verts,
+                                     const int nverts,
+                                     const int ndim,
+                                     const double iter_tol,
+                                     const double inside_tol,
+                                     double* work,
+                                     double* params,
+                                     int* is_inside )
 {
     assert( posn && verts );
     return EvalSet::evaluate_reverse( eval, jacob, ins, posn, verts, nverts, ndim, iter_tol, inside_tol, work, params,
@@ -113,7 +135,10 @@ int LinearHex::insideFcn( const double* params, const int ndim, const double tol
     return EvalSet::inside_function( params, ndim, tol );
 }
 
-ErrorCode LinearHex::normalFcn( const int ientDim, const int facet, const int nverts, const double* verts,
+ErrorCode LinearHex::normalFcn( const int ientDim,
+                                const int facet,
+                                const int nverts,
+                                const double* verts,
                                 double normal[3] )
 {
     // assert(facet < 6 && ientDim == 2 && nverts == 8);

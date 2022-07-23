@@ -122,8 +122,11 @@ bool PMeanPTemplate::evaluate( EvalType type, PatchData& pd, double& value_out, 
     return true;
 }
 
-bool PMeanPTemplate::evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out,
-                                             std::vector< Vector3D >& grad_out, MsqError& err )
+bool PMeanPTemplate::evaluate_with_gradient( EvalType type,
+                                             PatchData& pd,
+                                             double& value_out,
+                                             std::vector< Vector3D >& grad_out,
+                                             MsqError& err )
 {
     QualityMetric* qm = get_quality_metric();
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );
@@ -168,9 +171,12 @@ bool PMeanPTemplate::evaluate_with_gradient( EvalType type, PatchData& pd, doubl
     return true;
 }
 
-bool PMeanPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& pd, double& value_out,
+bool PMeanPTemplate::evaluate_with_Hessian_diagonal( EvalType type,
+                                                     PatchData& pd,
+                                                     double& value_out,
                                                      std::vector< Vector3D >& grad_out,
-                                                     std::vector< SymMatrix3D >& hess_diag_out, MsqError& err )
+                                                     std::vector< SymMatrix3D >& hess_diag_out,
+                                                     MsqError& err )
 {
     QualityMetric* qm = get_quality_metric();
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );
@@ -242,8 +248,12 @@ bool PMeanPTemplate::evaluate_with_Hessian_diagonal( EvalType type, PatchData& p
     return true;
 }
 
-bool PMeanPTemplate::evaluate_with_Hessian( EvalType type, PatchData& pd, double& value_out,
-                                            std::vector< Vector3D >& grad_out, MsqHessian& Hessian_out, MsqError& err )
+bool PMeanPTemplate::evaluate_with_Hessian( EvalType type,
+                                            PatchData& pd,
+                                            double& value_out,
+                                            std::vector< Vector3D >& grad_out,
+                                            MsqHessian& Hessian_out,
+                                            MsqError& err )
 {
     QualityMetric* qm = get_quality_metric();
     qm->get_evaluations( pd, qmHandles, OF_FREE_EVALS_ONLY, err );

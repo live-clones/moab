@@ -51,14 +51,19 @@ void PointDomain::element_normal_at( Mesh::ElementHandle, Vector3D& coordinate )
     coordinate.set( 0, 0, 0 );
 }
 
-void PointDomain::vertex_normal_at( const Mesh::VertexHandle*, Vector3D coordinates[], unsigned count,
+void PointDomain::vertex_normal_at( const Mesh::VertexHandle*,
+                                    Vector3D coordinates[],
+                                    unsigned count,
                                     MsqError& err ) const
 {
     std::fill( coordinates, coordinates + count, Vector3D( 0, 0, 0 ) );
     MSQ_SETERR( err )( "Cannot get normal for PointDomain", MsqError::INTERNAL_ERROR );
 }
 
-void PointDomain::closest_point( Mesh::VertexHandle, const Vector3D&, Vector3D& closest, Vector3D& normal,
+void PointDomain::closest_point( Mesh::VertexHandle,
+                                 const Vector3D&,
+                                 Vector3D& closest,
+                                 Vector3D& normal,
                                  MsqError& err ) const
 {
     closest = geom();
@@ -66,7 +71,9 @@ void PointDomain::closest_point( Mesh::VertexHandle, const Vector3D&, Vector3D& 
     MSQ_SETERR( err )( "Cannot get normal for PointDomain", MsqError::INTERNAL_ERROR );
 }
 
-void PointDomain::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array, size_t num_handles,
+void PointDomain::domain_DoF( const Mesh::VertexHandle*,
+                              unsigned short* dof_array,
+                              size_t num_handles,
                               MsqError& ) const
 {
     std::fill( dof_array, dof_array + num_handles, 0 );
@@ -89,14 +96,19 @@ void LineDomain::element_normal_at( Mesh::ElementHandle, Vector3D& coordinate ) 
     coordinate = geom().direction();
 }
 
-void LineDomain::vertex_normal_at( const Mesh::VertexHandle*, Vector3D coordinates[], unsigned count,
+void LineDomain::vertex_normal_at( const Mesh::VertexHandle*,
+                                   Vector3D coordinates[],
+                                   unsigned count,
                                    MsqError& err ) const
 {
     std::fill( coordinates, coordinates + count, geom().direction() );
     MSQ_SETERR( err )( "Cannot get normal for LineDomain", MsqError::INTERNAL_ERROR );
 }
 
-void LineDomain::closest_point( Mesh::VertexHandle, const Vector3D& position, Vector3D& closest, Vector3D& normal,
+void LineDomain::closest_point( Mesh::VertexHandle,
+                                const Vector3D& position,
+                                Vector3D& closest,
+                                Vector3D& normal,
                                 MsqError& err ) const
 {
     closest = geom().point( geom().closest( position ) );
@@ -140,7 +152,9 @@ void CircleDomain::element_normal_at( Mesh::ElementHandle h, Vector3D& coordinat
     CircleDomain::vertex_normal_at( h, coordinate );
 }
 
-void CircleDomain::vertex_normal_at( const Mesh::VertexHandle* handles, Vector3D coordinates[], unsigned count,
+void CircleDomain::vertex_normal_at( const Mesh::VertexHandle* handles,
+                                     Vector3D coordinates[],
+                                     unsigned count,
                                      MsqError& err ) const
 {
     for( unsigned i = 0; i < count; ++i )
@@ -148,7 +162,10 @@ void CircleDomain::vertex_normal_at( const Mesh::VertexHandle* handles, Vector3D
     MSQ_SETERR( err )( "Cannot get normal for CircleDomain", MsqError::INTERNAL_ERROR );
 }
 
-void CircleDomain::closest_point( Mesh::VertexHandle, const Vector3D& position, Vector3D& closest, Vector3D& normal,
+void CircleDomain::closest_point( Mesh::VertexHandle,
+                                  const Vector3D& position,
+                                  Vector3D& closest,
+                                  Vector3D& normal,
                                   MsqError& err ) const
 {
     // no normal, get tangent instead
@@ -160,7 +177,9 @@ void CircleDomain::closest_point( Mesh::VertexHandle, const Vector3D& position, 
     MSQ_SETERR( err )( "Cannot get normal for CircleDomain", MsqError::INTERNAL_ERROR );
 }
 
-void CircleDomain::domain_DoF( const Mesh::VertexHandle*, unsigned short* dof_array, size_t num_handles,
+void CircleDomain::domain_DoF( const Mesh::VertexHandle*,
+                               unsigned short* dof_array,
+                               size_t num_handles,
                                MsqError& ) const
 {
     std::fill( dof_array, dof_array + num_handles, 1 );

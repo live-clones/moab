@@ -40,7 +40,8 @@ class Range;
 class OrientedBox
 {
   private:
-    void order_axes_by_length( double ax1_len, double ax2_len,
+    void order_axes_by_length( double ax1_len,
+                               double ax2_len,
                                double ax3_len );  //!< orders the box axes by the given lengths for each axis
 
   public:
@@ -108,14 +109,17 @@ class OrientedBox
     };
 
     /** Calculate a CovarienceData struct from a list of triangles */
-    static ErrorCode covariance_data_from_tris( CovarienceData& result, Interface* moab_instance,
+    static ErrorCode covariance_data_from_tris( CovarienceData& result,
+                                                Interface* moab_instance,
                                                 const Range& elements );
 
     /** Calculate an OrientedBox given an array of CovarienceData and
      *  the list  of vertices the box is to bound.
      */
-    static ErrorCode compute_from_covariance_data( OrientedBox& result, Interface* moab_instance,
-                                                   const CovarienceData* orient_array, unsigned orient_array_length,
+    static ErrorCode compute_from_covariance_data( OrientedBox& result,
+                                                   Interface* moab_instance,
+                                                   const CovarienceData* orient_array,
+                                                   unsigned orient_array_length,
                                                    const Range& vertices );
 
     /** Test for intersection of a ray (or line segment) with this box.
@@ -126,9 +130,11 @@ class OrientedBox
      *\param nonnegative_ray_len Optional length of ray in forward direction
      *\param negative_ray_len    Optional length of ray in reverse direction
      */
-    bool intersect_ray( const CartVect& ray_start_point, const CartVect& ray_unit_direction,
-                        const double distance_tolerance, const double* nonnegatve_ray_len = 0,
-                        const double* negative_ray_len = 0 ) const;
+    bool intersect_ray( const CartVect& ray_start_point,
+                        const CartVect& ray_unit_direction,
+                        const double distance_tolerance,
+                        const double* nonnegatve_ray_len = 0,
+                        const double* negative_ray_len   = 0 ) const;
 
     /**\brief Find closest position on/within box to input position.
      *
@@ -146,8 +152,10 @@ class OrientedBox
     /** Calculate an OrientedBox given a CovarienceData struct and
      *  the list of points the box is to bound.
      */
-    static ErrorCode compute_from_covariance_data( OrientedBox& result, Interface* moab_instance,
-                                                   CovarienceData& orientation_data, const Range& vertices );
+    static ErrorCode compute_from_covariance_data( OrientedBox& result,
+                                                   Interface* moab_instance,
+                                                   CovarienceData& orientation_data,
+                                                   const Range& vertices );
 };
 
 std::ostream& operator<<( std::ostream&, const OrientedBox& );

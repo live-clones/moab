@@ -100,7 +100,9 @@ class RefinerTagManager
     int copy_gid( EntityHandle ent_input, EntityHandle ent_output );
 
     void set_sharing( EntityHandle ent_handle, ProcessSet& procs );
-    void get_common_processes( int num, const EntityHandle* src, ProcessSet& common_shared_procs,
+    void get_common_processes( int num,
+                               const EntityHandle* src,
+                               ProcessSet& common_shared_procs,
                                bool on_output_mesh = true );
 
     void set_element_tags_from_ent( EntityHandle ent_input );

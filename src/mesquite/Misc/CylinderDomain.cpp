@@ -86,8 +86,11 @@ void CylinderDomain::vertex_normal_at( const Mesh::VertexHandle* h, Vector3D coo
         vertex_normal_at( h[i], coords[i] );
 }
 
-void CylinderDomain::closest_point( Mesh::VertexHandle handle, const Vector3D& position, Vector3D& closest,
-                                    Vector3D& normal, MsqError& ) const
+void CylinderDomain::closest_point( Mesh::VertexHandle handle,
+                                    const Vector3D& position,
+                                    Vector3D& closest,
+                                    Vector3D& normal,
+                                    MsqError& ) const
 {
     evaluate( handle, position, closest, normal );
 }

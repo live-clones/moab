@@ -18,7 +18,12 @@
 
 using namespace moab;
 
-int compare_coords( double* xval, double* yval, double* zval, double* nodex, double* nodey, double* nodez,
+int compare_coords( double* xval,
+                    double* yval,
+                    double* zval,
+                    double* nodex,
+                    double* nodey,
+                    double* nodez,
                     const int num_nodes );
 int compare_connect( int* connect1, int* connect2, const int num_comps );
 
@@ -186,7 +191,12 @@ int main()
     return 1;
 }
 
-int compare_coords( double* xval, double* yval, double* zval, double* nodex, double* nodey, double* nodez,
+int compare_coords( double* xval,
+                    double* yval,
+                    double* zval,
+                    double* nodex,
+                    double* nodey,
+                    double* nodez,
                     const int num_nodes )
 {
     int i, result = 0;

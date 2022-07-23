@@ -118,7 +118,10 @@ int main( int argc, char* argv[] )
         }
         for( int j = 1; argv[i][j]; ++j )
         {
-            if( argv[i][j] == 'w' ) { write_final_meshes = true; }
+            if( argv[i][j] == 'w' )
+            {
+                write_final_meshes = true;
+            }
             else
             {
                 int idx;

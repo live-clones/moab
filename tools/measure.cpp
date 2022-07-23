@@ -50,6 +50,7 @@ double measure( moab::EntityType type, int num_vertices, const double* vertex_co
             return 0.5 * ( ( coords[1] - coords[0] ) * ( coords[2] - coords[0] ) ).length();
         case moab::MBQUAD:
             num_vertices = 4;
+            // fall through
         case moab::MBPOLYGON: {
             CartVect mid( 0, 0, 0 );
             for( int i = 0; i < num_vertices; ++i )

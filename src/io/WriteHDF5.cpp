@@ -61,6 +61,13 @@ typedef int id_t;
 
 #ifdef MOAB_HAVE_VALGRIND
 #include <valgrind/memcheck.h>
+
+template < typename T >
+inline void VALGRIND_MAKE_VEC_UNDEFINED( std::vector< T >& v )
+{
+    (void)VALGRIND_MAKE_MEM_UNDEFINED( (T*)&v[0], v.size() * sizeof( T ) );
+}
+
 #else
 #ifndef VALGRIND_CHECK_MEM_IS_DEFINED
 #define VALGRIND_CHECK_MEM_IS_DEFINED( a, b ) ( (void)0 )
@@ -71,16 +78,17 @@ typedef int id_t;
 #ifndef VALGRIND_MAKE_MEM_UNDEFINED
 #define VALGRIND_MAKE_MEM_UNDEFINED( a, b ) ( (void)0 )
 #endif
+
+template < typename T >
+inline void VALGRIND_MAKE_VEC_UNDEFINED( std::vector< T >& )
+{
+    (void)VALGRIND_MAKE_MEM_UNDEFINED( 0, 0 );
+}
+
 #endif
 
 namespace moab
 {
-
-template < typename T >
-inline void VALGRIND_MAKE_VEC_UNDEFINED( std::vector< T >& v )
-{
-    (void)VALGRIND_MAKE_MEM_UNDEFINED( (T*)&v[0], v.size() * sizeof( T ) );
-}
 
 #define WRITE_HDF5_BUFFER_SIZE ( 40 * 1024 * 1024 )
 
@@ -481,9 +489,14 @@ WriteHDF5::~WriteHDF5()
     iFace->release_interface( writeUtil );
 }
 
-ErrorCode WriteHDF5::write_file( const char* filename, bool overwrite, const FileOptions& opts,
-                                 const EntityHandle* set_array, const int num_sets,
-                                 const std::vector< std::string >& qa_records, const Tag* tag_list, int num_tags,
+ErrorCode WriteHDF5::write_file( const char* filename,
+                                 bool overwrite,
+                                 const FileOptions& opts,
+                                 const EntityHandle* set_array,
+                                 const int num_sets,
+                                 const std::vector< std::string >& qa_records,
+                                 const Tag* tag_list,
+                                 int num_tags,
                                  int user_dimension )
 {
     mhdf_Status status;
@@ -553,9 +566,14 @@ ErrorCode WriteHDF5::write_file( const char* filename, bool overwrite, const Fil
     return result;
 }
 
-ErrorCode WriteHDF5::write_file_impl( const char* filename, bool overwrite, const FileOptions& opts,
-                                      const EntityHandle* set_array, const int num_sets,
-                                      const std::vector< std::string >& qa_records, const Tag* tag_list, int num_tags,
+ErrorCode WriteHDF5::write_file_impl( const char* filename,
+                                      bool overwrite,
+                                      const FileOptions& opts,
+                                      const EntityHandle* set_array,
+                                      const int num_sets,
+                                      const std::vector< std::string >& qa_records,
+                                      const Tag* tag_list,
+                                      int num_tags,
                                       int user_dimension )
 {
     ErrorCode result;
@@ -709,7 +727,10 @@ ErrorCode WriteHDF5::write_file_impl( const char* filename, bool overwrite, cons
 
     times[TOTAL_TIME] = timer.time_since_birth();
 
-    if( cputime ) { print_times( times ); }
+    if( cputime )
+    {
+        print_times( times );
+    }
 
     return MB_SUCCESS;
 }
@@ -1078,7 +1099,10 @@ ErrorCode WriteHDF5::write_elems( ExportSet& elems )
     return MB_SUCCESS;
 }
 
-ErrorCode WriteHDF5::get_set_info( EntityHandle set, long& num_entities, long& num_children, long& num_parents,
+ErrorCode WriteHDF5::get_set_info( EntityHandle set,
+                                   long& num_entities,
+                                   long& num_children,
+                                   long& num_parents,
                                    unsigned long& flags )
 {
     ErrorCode rval;
@@ -1104,8 +1128,11 @@ ErrorCode WriteHDF5::get_set_info( EntityHandle set, long& num_entities, long& n
     return MB_SUCCESS;
 }
 
-ErrorCode WriteHDF5::write_set_data( const WriteUtilIface::EntityListType which_data, const hid_t handle,
-                                     IODebugTrack& track, Range* ranged, Range* null_stripped,
+ErrorCode WriteHDF5::write_set_data( const WriteUtilIface::EntityListType which_data,
+                                     const hid_t handle,
+                                     IODebugTrack& track,
+                                     Range* ranged,
+                                     Range* null_stripped,
                                      std::vector< long >* set_sizes )
 {
     // ranged must be non-null for CONTENTS and null for anything else
@@ -1559,7 +1586,8 @@ inline size_t count_num_handles( HandleRangeIter iter, HandleRangeIter end )
 }
 
 template < class HandleRangeIter >
-inline ErrorCode range_to_id_list_templ( HandleRangeIter begin, HandleRangeIter end,
+inline ErrorCode range_to_id_list_templ( HandleRangeIter begin,
+                                         HandleRangeIter end,
                                          const RangeMap< EntityHandle, WriteHDF5::wid_t >& idMap,
                                          WriteHDF5::wid_t* array )
 {
@@ -1601,9 +1629,11 @@ inline ErrorCode range_to_id_list_templ( HandleRangeIter begin, HandleRangeIter 
 }
 
 template < class HandleRangeIter >
-inline ErrorCode range_to_blocked_list_templ( HandleRangeIter begin, HandleRangeIter end,
+inline ErrorCode range_to_blocked_list_templ( HandleRangeIter begin,
+                                              HandleRangeIter end,
                                               const RangeMap< EntityHandle, WriteHDF5::wid_t >& idMap,
-                                              std::vector< WriteHDF5::wid_t >& output_id_list, bool& ranged_list )
+                                              std::vector< WriteHDF5::wid_t >& output_id_list,
+                                              bool& ranged_list )
 {
     output_id_list.clear();
     if( begin == end )
@@ -1676,15 +1706,18 @@ inline ErrorCode range_to_blocked_list_templ( HandleRangeIter begin, HandleRange
     return MB_SUCCESS;
 }
 
-ErrorCode WriteHDF5::range_to_blocked_list( const Range& input_range, std::vector< wid_t >& output_id_list,
+ErrorCode WriteHDF5::range_to_blocked_list( const Range& input_range,
+                                            std::vector< wid_t >& output_id_list,
                                             bool& ranged_list )
 {
     return range_to_blocked_list_templ( input_range.const_pair_begin(), input_range.const_pair_end(), idMap,
                                         output_id_list, ranged_list );
 }
 
-ErrorCode WriteHDF5::range_to_blocked_list( const EntityHandle* array, size_t num_input_ranges,
-                                            std::vector< wid_t >& output_id_list, bool& ranged_list )
+ErrorCode WriteHDF5::range_to_blocked_list( const EntityHandle* array,
+                                            size_t num_input_ranges,
+                                            std::vector< wid_t >& output_id_list,
+                                            bool& ranged_list )
 {
     // We assume this in the cast on the following line
     typedef std::pair< EntityHandle, EntityHandle > mtype;
@@ -1698,7 +1731,10 @@ ErrorCode WriteHDF5::range_to_id_list( const Range& range, wid_t* array )
     return range_to_id_list_templ( range.const_pair_begin(), range.const_pair_end(), idMap, array );
 }
 
-ErrorCode WriteHDF5::vector_to_id_list( const EntityHandle* input, size_t input_len, wid_t* output, size_t& output_len,
+ErrorCode WriteHDF5::vector_to_id_list( const EntityHandle* input,
+                                        size_t input_len,
+                                        wid_t* output,
+                                        size_t& output_len,
                                         bool remove_zeros )
 {
     const EntityHandle* i_iter = input;
@@ -1718,7 +1754,8 @@ ErrorCode WriteHDF5::vector_to_id_list( const EntityHandle* input, size_t input_
     return MB_SUCCESS;
 }
 
-ErrorCode WriteHDF5::vector_to_id_list( const std::vector< EntityHandle >& input, std::vector< wid_t >& output,
+ErrorCode WriteHDF5::vector_to_id_list( const std::vector< EntityHandle >& input,
+                                        std::vector< wid_t >& output,
                                         bool remove_zeros )
 {
     output.resize( input.size() );
@@ -1899,7 +1936,10 @@ ErrorCode WriteHDF5::write_tag( const TagDesc& tag_data, double* times )
     return MB_SUCCESS == rval ? MB_SUCCESS : error( rval );
 }
 
-ErrorCode WriteHDF5::write_sparse_ids( const TagDesc& tag_data, const Range& range, hid_t id_table, size_t table_size,
+ErrorCode WriteHDF5::write_sparse_ids( const TagDesc& tag_data,
+                                       const Range& range,
+                                       hid_t id_table,
+                                       size_t table_size,
                                        const char* name )
 {
     ErrorCode rval;
@@ -1969,8 +2009,11 @@ ErrorCode WriteHDF5::write_sparse_ids( const TagDesc& tag_data, const Range& ran
     return MB_SUCCESS;
 }
 
-ErrorCode WriteHDF5::write_sparse_tag( const TagDesc& tag_data, const std::string& name, DataType mb_data_type,
-                                       hid_t value_type, int value_type_size )
+ErrorCode WriteHDF5::write_sparse_tag( const TagDesc& tag_data,
+                                       const std::string& name,
+                                       DataType mb_data_type,
+                                       hid_t value_type,
+                                       int value_type_size )
 {
     ErrorCode rval;
     mhdf_Status status;
@@ -2012,8 +2055,12 @@ ErrorCode WriteHDF5::write_sparse_tag( const TagDesc& tag_data, const std::strin
     return MB_SUCCESS;
 }
 
-ErrorCode WriteHDF5::write_var_len_indices( const TagDesc& tag_data, const Range& range, hid_t idx_table,
-                                            size_t table_size, int /*type_size*/, const char* name )
+ErrorCode WriteHDF5::write_var_len_indices( const TagDesc& tag_data,
+                                            const Range& range,
+                                            hid_t idx_table,
+                                            size_t table_size,
+                                            int /*type_size*/,
+                                            const char* name )
 {
     ErrorCode rval;
     mhdf_Status status;
@@ -2091,8 +2138,14 @@ ErrorCode WriteHDF5::write_var_len_indices( const TagDesc& tag_data, const Range
     return MB_SUCCESS;
 }
 
-ErrorCode WriteHDF5::write_var_len_data( const TagDesc& tag_data, const Range& range, hid_t table, size_t table_size,
-                                         bool handle_tag, hid_t hdf_type, int type_size, const char* name )
+ErrorCode WriteHDF5::write_var_len_data( const TagDesc& tag_data,
+                                         const Range& range,
+                                         hid_t table,
+                                         size_t table_size,
+                                         bool handle_tag,
+                                         hid_t hdf_type,
+                                         int type_size,
+                                         const char* name )
 {
     ErrorCode rval;
     mhdf_Status status;
@@ -2188,8 +2241,11 @@ ErrorCode WriteHDF5::write_var_len_data( const TagDesc& tag_data, const Range& r
     return MB_SUCCESS;
 }
 
-ErrorCode WriteHDF5::write_var_len_tag( const TagDesc& tag_data, const std::string& name, DataType mb_data_type,
-                                        hid_t hdf_type, int type_size )
+ErrorCode WriteHDF5::write_var_len_tag( const TagDesc& tag_data,
+                                        const std::string& name,
+                                        DataType mb_data_type,
+                                        hid_t hdf_type,
+                                        int type_size )
 {
     ErrorCode rval;
     mhdf_Status status;
@@ -2236,8 +2292,12 @@ ErrorCode WriteHDF5::write_var_len_tag( const TagDesc& tag_data, const std::stri
     return MB_SUCCESS;
 }
 
-ErrorCode WriteHDF5::write_dense_tag( const TagDesc& tag_data, const ExportSet& elem_data, const std::string& name,
-                                      DataType mb_data_type, hid_t value_type, int value_type_size )
+ErrorCode WriteHDF5::write_dense_tag( const TagDesc& tag_data,
+                                      const ExportSet& elem_data,
+                                      const std::string& name,
+                                      DataType mb_data_type,
+                                      hid_t value_type,
+                                      int value_type_size )
 {
     CHECK_OPEN_HANDLES;
 
@@ -2258,9 +2318,15 @@ ErrorCode WriteHDF5::write_dense_tag( const TagDesc& tag_data, const ExportSet& 
     return MB_SUCCESS;
 }
 
-ErrorCode WriteHDF5::write_tag_values( Tag tag_id, hid_t data_table, unsigned long offset_in, const Range& range_in,
-                                       DataType mb_data_type, hid_t value_type, int value_type_size,
-                                       unsigned long max_num_ents, IODebugTrack& track )
+ErrorCode WriteHDF5::write_tag_values( Tag tag_id,
+                                       hid_t data_table,
+                                       unsigned long offset_in,
+                                       const Range& range_in,
+                                       DataType mb_data_type,
+                                       hid_t value_type,
+                                       int value_type_size,
+                                       unsigned long max_num_ents,
+                                       IODebugTrack& track )
 {
     mhdf_Status status;
 
@@ -2467,17 +2533,24 @@ ErrorCode WriteHDF5::gather_tags( const Tag* user_tag_list, int num_tags )
 // overridden with an alternate version in WriteHDF5Parallel
 // that supports parallel I/O.  If we're here
 // then MOAB was not built with support for parallel HDF5 I/O.
-ErrorCode WriteHDF5::parallel_create_file( const char* /* filename */, bool /* overwrite */,
+ErrorCode WriteHDF5::parallel_create_file( const char* /* filename */,
+                                           bool /* overwrite */,
                                            const std::vector< std::string >& /* qa_records */,
-                                           const FileOptions& /* opts */, const Tag* /* tag_list */, int /* num_tags */,
-                                           int /* dimension */, double* /* times */ )
+                                           const FileOptions& /* opts */,
+                                           const Tag* /* tag_list */,
+                                           int /* num_tags */,
+                                           int /* dimension */,
+                                           double* /* times */ )
 {
     MB_SET_ERR( MB_NOT_IMPLEMENTED, "WriteHDF5 does not support parallel writing" );
 }
 
-ErrorCode WriteHDF5::serial_create_file( const char* filename, bool overwrite,
-                                         const std::vector< std::string >& qa_records, const Tag* user_tag_list,
-                                         int num_user_tags, int dimension )
+ErrorCode WriteHDF5::serial_create_file( const char* filename,
+                                         bool overwrite,
+                                         const std::vector< std::string >& qa_records,
+                                         const Tag* user_tag_list,
+                                         int num_user_tags,
+                                         int dimension )
 {
     long first_id;
     mhdf_Status status;
@@ -2733,7 +2806,9 @@ ErrorCode WriteHDF5::create_elem_table( const ExportSet& block, long num_entitie
     return MB_SUCCESS;
 }
 
-ErrorCode WriteHDF5::count_set_size( const Range& sets, long& contents_length_out, long& children_length_out,
+ErrorCode WriteHDF5::count_set_size( const Range& sets,
+                                     long& contents_length_out,
+                                     long& children_length_out,
                                      long& parents_length_out )
 {
     ErrorCode rval;
@@ -2844,8 +2919,13 @@ ErrorCode WriteHDF5::create_set_tables( long num_set_contents, long num_set_chil
     return MB_SUCCESS;
 }
 
-ErrorCode WriteHDF5::get_tag_size( Tag tag, DataType& moab_type, int& num_bytes, int& type_size, int& array_length,
-                                   mhdf_TagDataType& file_type, hid_t& hdf_type )
+ErrorCode WriteHDF5::get_tag_size( Tag tag,
+                                   DataType& moab_type,
+                                   int& num_bytes,
+                                   int& type_size,
+                                   int& array_length,
+                                   mhdf_TagDataType& file_type,
+                                   hid_t& hdf_type )
 {
     ErrorCode rval;
     Tag type_handle;
@@ -2862,7 +2942,10 @@ ErrorCode WriteHDF5::get_tag_size( Tag tag, DataType& moab_type, int& num_bytes,
     rval = iFace->tag_get_data_type( tag, moab_type );
     CHK_MB_ERR_0( rval );
     rval = iFace->tag_get_length( tag, array_length );
-    if( MB_VARIABLE_DATA_LENGTH == rval ) { array_length = MB_VARIABLE_LENGTH; }
+    if( MB_VARIABLE_DATA_LENGTH == rval )
+    {
+        array_length = MB_VARIABLE_LENGTH;
+    }
     else if( MB_SUCCESS != rval )
         return error( rval );
     rval = iFace->tag_get_bytes( tag, num_bytes );
@@ -3010,7 +3093,8 @@ ErrorCode WriteHDF5::get_tag_data_length( const TagDesc& tag_info, const Range& 
     return MB_SUCCESS;
 }
 
-ErrorCode WriteHDF5::create_tag( const TagDesc& tag_data, unsigned long num_sparse_entities,
+ErrorCode WriteHDF5::create_tag( const TagDesc& tag_data,
+                                 unsigned long num_sparse_entities,
                                  unsigned long data_table_size )
 {
     TagType mb_storage;
@@ -3208,7 +3292,10 @@ void WriteHDF5::print_id_map( std::ostream& s, const char* pfx ) const
     {
         const char* n1 = CN::EntityTypeName( TYPE_FROM_HANDLE( i->begin ) );
         EntityID id    = ID_FROM_HANDLE( i->begin );
-        if( 1 == i->count ) { s << pfx << n1 << " " << id << " -> " << i->value << std::endl; }
+        if( 1 == i->count )
+        {
+            s << pfx << n1 << " " << id << " -> " << i->value << std::endl;
+        }
         else
         {
             const char* n2 = CN::EntityTypeName( TYPE_FROM_HANDLE( i->begin + i->count - 1 ) );

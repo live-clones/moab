@@ -169,7 +169,10 @@ void create_hexes_and_verts()
             {
                 gid = 1 + i + j * ( NI + 1 ) + k * ( NI + 1 ) * ( NJ + 1 );
                 err = mbint->tag_set_data( global_id_tag, &handle, 1, &gid );
-                if( err != MB_SUCCESS ) { exit( 1 ); }
+                if( err != MB_SUCCESS )
+                {
+                    exit( 1 );
+                }
                 handle++;
             }
 

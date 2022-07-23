@@ -28,7 +28,10 @@ class CpuTimer
     {
 #ifdef MOAB_HAVE_MPI
         int flag = 0;
-        if( MPI_SUCCESS == MPI_Initialized( &flag ) && flag ) { mpi_initialized = 1; }
+        if( MPI_SUCCESS == MPI_Initialized( &flag ) && flag )
+        {
+            mpi_initialized = 1;
+        }
 #endif
         tAtBirth = runtime();
         tAtLast  = tAtBirth;

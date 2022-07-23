@@ -189,6 +189,7 @@ int main( int argc, char* argv[] )
                 break;
             case 'h':
                 usage( false );
+                break;
             default:
                 usage();
         }

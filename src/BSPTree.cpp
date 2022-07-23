@@ -301,7 +301,9 @@ ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane, const Range& left
     return MB_FAILURE;
 }
 
-ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf, Plane plane, const std::vector< EntityHandle >& left_entities,
+ErrorCode BSPTree::split_leaf( BSPTreeIter& leaf,
+                               Plane plane,
+                               const std::vector< EntityHandle >& left_entities,
                                const std::vector< EntityHandle >& right_entities )
 {
     EntityHandle left, right, parent = leaf.handle();
@@ -636,7 +638,9 @@ ErrorCode BSPTreeBoxIter::face_corners( const SideBits face, const double hex_co
  * is updated with a new location on the plane, and old_coords_out
  * contains the original value of cut_end_coords.
  */
-static inline void plane_cut_edge( double old_coords_out[3], const double keep_end_coords[3], double cut_end_coords[3],
+static inline void plane_cut_edge( double old_coords_out[3],
+                                   const double keep_end_coords[3],
+                                   double cut_end_coords[3],
                                    const BSPTree::Plane& plane )
 {
     const CartVect start( keep_end_coords ), end( cut_end_coords );
@@ -715,7 +719,8 @@ static inline void copy_coords( double dest[3], const double source[3] )
 }
 
 /** reverse of plane_cut_box */
-static inline ErrorCode plane_uncut_box( const double cut_face_in[4][3], double corners_inout[8][3],
+static inline ErrorCode plane_uncut_box( const double cut_face_in[4][3],
+                                         double corners_inout[8][3],
                                          const BSPTree::Plane& plane )
 {
     switch( BSPTreeBoxIter::side_on_plane( corners_inout, plane ) )
@@ -1171,8 +1176,12 @@ ErrorCode BSPTree::leaf_containing_point( EntityHandle root, const double point[
 }
 
 template < typename PlaneIter >
-static inline bool ray_intersect_halfspaces( const CartVect& ray_pt, const CartVect& ray_dir, const PlaneIter& begin,
-                                             const PlaneIter& end, double& t_enter, double& t_exit )
+static inline bool ray_intersect_halfspaces( const CartVect& ray_pt,
+                                             const CartVect& ray_dir,
+                                             const PlaneIter& begin,
+                                             const PlaneIter& end,
+                                             double& t_enter,
+                                             double& t_exit )
 {
     const double epsilon = 1e-12;
 
@@ -1255,7 +1264,9 @@ BoxPlaneIter::BoxPlaneIter( const double coords[8][3] ) : faceNum( 0 )
     }
 }
 
-bool BSPTreeBoxIter::intersect_ray( const double ray_point[3], const double ray_vect[3], double& t_enter,
+bool BSPTreeBoxIter::intersect_ray( const double ray_point[3],
+                                    const double ray_vect[3],
+                                    double& t_enter,
                                     double& t_exit ) const
 {
     BoxPlaneIter iter( this->leafCoords ), end;
@@ -1324,7 +1335,9 @@ BSPTreePlaneIter& BSPTreePlaneIter::operator++()
     return *this;
 }
 
-bool BSPTreeIter::intersect_ray( const double ray_point[3], const double ray_vect[3], double& t_enter,
+bool BSPTreeIter::intersect_ray( const double ray_point[3],
+                                 const double ray_vect[3],
+                                 double& t_enter,
                                  double& t_exit ) const
 {
     // intersect with half-spaces defining tree

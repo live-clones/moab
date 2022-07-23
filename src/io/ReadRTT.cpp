@@ -78,7 +78,9 @@ ReadRTT::ReadRTT( Interface* impl )
         MBI->tag_get_handle( "FACETING_TOL", 1, MB_TYPE_DOUBLE, faceting_tol_tag, MB_TAG_SPARSE | MB_TAG_CREAT, &zero );
     assert( !rval );
 #ifdef NDEBUG
-    if( !rval ) {};  // Line to avoid compiler warning about variable set but not used
+    if( !rval )
+    {
+    };  // Line to avoid compiler warning about variable set but not used
 #endif
 }
 
@@ -94,15 +96,21 @@ ReadRTT::~ReadRTT()
     delete myGeomTool;
 }
 
-ErrorCode ReadRTT::read_tag_values( const char* /*file_name*/, const char* /*tag_name*/, const FileOptions& /*opts*/,
-                                    std::vector< int >& /*tag_values_out*/, const SubsetList* /*subset_list*/ )
+ErrorCode ReadRTT::read_tag_values( const char* /*file_name*/,
+                                    const char* /*tag_name*/,
+                                    const FileOptions& /*opts*/,
+                                    std::vector< int >& /*tag_values_out*/,
+                                    const SubsetList* /*subset_list*/ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
 // load the file as called by the Interface function
-ErrorCode ReadRTT::load_file( const char* filename, const EntityHandle*, const FileOptions&,
-                              const ReaderIface::SubsetList* subset_list, const Tag* /*file_id_tag*/ )
+ErrorCode ReadRTT::load_file( const char* filename,
+                              const EntityHandle*,
+                              const FileOptions&,
+                              const ReaderIface::SubsetList* subset_list,
+                              const Tag* /*file_id_tag*/ )
 {
     ErrorCode rval;
 
@@ -164,7 +172,8 @@ ErrorCode ReadRTT::load_file( const char* filename, const EntityHandle*, const F
 /*
  * builds the topology of the problem
  */
-ErrorCode ReadRTT::generate_topology( std::vector< side > side_data, std::vector< cell > cell_data,
+ErrorCode ReadRTT::generate_topology( std::vector< side > side_data,
+                                      std::vector< cell > cell_data,
                                       std::map< int, EntityHandle >& surface_map )
 {
 
@@ -236,8 +245,10 @@ ErrorCode ReadRTT::generate_topology( std::vector< side > side_data, std::vector
 /*
  * builds the moab representation of the mesh
  */
-ErrorCode ReadRTT::build_moab( std::vector< node > node_data, std::vector< facet > facet_data,
-                               std::vector< tet > tet_data, std::map< int, EntityHandle > surface_map )
+ErrorCode ReadRTT::build_moab( std::vector< node > node_data,
+                               std::vector< facet > facet_data,
+                               std::vector< tet > tet_data,
+                               std::map< int, EntityHandle > surface_map )
 {
 
     ErrorCode rval;         // reusable return value
@@ -352,7 +363,10 @@ ErrorCode ReadRTT::read_header( const char* filename )
     {
         while( std::getline( input_file, line ) )
         {
-            if( line.compare( "header" ) == 0 ) { rval = get_header_data( input_file ); }
+            if( line.compare( "header" ) == 0 )
+            {
+                rval = get_header_data( input_file );
+            }
         }
         input_file.close();
     }
@@ -565,9 +579,18 @@ ErrorCode ReadRTT::get_header_data( std::ifstream& input_file )
             }
         }
 
-        if( line.find( "title" ) != std::string::npos ) { header_data.title = split_string[1]; }
-        if( line.find( "date" ) != std::string::npos ) { header_data.date = split_string[1]; }
-        if( line.find( "end_header" ) != std::string::npos ) { return MB_SUCCESS; }
+        if( line.find( "title" ) != std::string::npos )
+        {
+            header_data.title = split_string[1];
+        }
+        if( line.find( "date" ) != std::string::npos )
+        {
+            header_data.date = split_string[1];
+        }
+        if( line.find( "end_header" ) != std::string::npos )
+        {
+            return MB_SUCCESS;
+        }
     }
 
     // otherwise we never found the end_header keyword
@@ -583,9 +606,11 @@ ReadRTT::side ReadRTT::get_side_data( std::string sidedata )
     std::vector< std::string > tokens;
     tokens = ReadRTT::split_string( sidedata, ' ' );
 
-    std::vector< std::string >::iterator it;
     // set the side id
-    if( tokens.size() != 2 ) { MB_SET_ERR_RET_VAL( "Error, too many tokens found from side_data", new_side ); }
+    if( tokens.size() != 2 )
+    {
+        MB_SET_ERR_RET_VAL( "Error, too many tokens found from side_data", new_side );
+    }
     // create the new side
     new_side.id = std::atoi( tokens[0].c_str() );
 
@@ -620,10 +645,11 @@ ReadRTT::cell ReadRTT::get_cell_data( std::string celldata )
     std::vector< std::string > tokens;
     tokens = ReadRTT::split_string( celldata, ' ' );
 
-    std::vector< std::string >::iterator it;
-
     // set the side id
-    if( tokens.size() != 2 ) { MB_SET_ERR_RET_VAL( "Error, too many tokens found from cell_data", new_cell ); }
+    if( tokens.size() != 2 )
+    {
+        MB_SET_ERR_RET_VAL( "Error, too many tokens found from cell_data", new_cell );
+    }
     // create the new side
     new_cell.id   = std::atoi( tokens[0].c_str() );
     new_cell.name = tokens[1];
@@ -641,8 +667,10 @@ ReadRTT::node ReadRTT::get_node_data( std::string nodedata )
     tokens = ReadRTT::split_string( nodedata, ' ' );
 
     // set the side id
-    if( tokens.size() != 5 ) { MB_SET_ERR_RET_VAL( "Error, too many tokens found from get_node_data", new_node ); }
-    std::vector< std::string >::iterator it;
+    if( tokens.size() != 5 )
+    {
+        MB_SET_ERR_RET_VAL( "Error, too many tokens found from get_node_data", new_node );
+    }
     new_node.id = std::atoi( tokens[0].c_str() );
     new_node.x  = std::atof( tokens[1].c_str() );
     new_node.y  = std::atof( tokens[2].c_str() );
@@ -660,7 +688,10 @@ ReadRTT::facet ReadRTT::get_facet_data( std::string facetdata )
     tokens = ReadRTT::split_string( facetdata, ' ' );
 
     // set the side id
-    if( tokens.size() != 7 ) { MB_SET_ERR_RET_VAL( "Error, too many tokens found from get_facet_data", new_facet ); }
+    if( tokens.size() != 7 )
+    {
+        MB_SET_ERR_RET_VAL( "Error, too many tokens found from get_facet_data", new_facet );
+    }
 
     new_facet.id = std::atoi( tokens[0].c_str() );
     // branch on the rtt version number
@@ -698,7 +729,10 @@ ReadRTT::tet ReadRTT::get_tet_data( std::string tetdata )
     tokens = ReadRTT::split_string( tetdata, ' ' );
 
     // set the side id
-    if( tokens.size() != 7 ) { MB_SET_ERR_RET_VAL( "Error, too many tokens found from get_tet_data", new_tet ); }
+    if( tokens.size() != 7 )
+    {
+        MB_SET_ERR_RET_VAL( "Error, too many tokens found from get_tet_data", new_tet );
+    }
     new_tet.id = std::atoi( tokens[0].c_str() );
     // branch on the version number
     if( header_data.version == "v1.0.0" )
@@ -785,8 +819,10 @@ std::vector< std::string > ReadRTT::split_string( std::string string_to_split, c
 /*
  * Generate the parent-child links bwetween the cell and surface meshsets
  */
-void ReadRTT::generate_parent_child_links( int num_ents[4], std::vector< EntityHandle > entity_map[4],
-                                           std::vector< side > side_data, std::vector< cell > cell_data )
+void ReadRTT::generate_parent_child_links( int num_ents[4],
+                                           std::vector< EntityHandle > entity_map[4],
+                                           std::vector< side > side_data,
+                                           std::vector< cell > cell_data )
 {
     ErrorCode rval;  // return value
     // loop over the number of surfaces
@@ -811,7 +847,10 @@ void ReadRTT::generate_parent_child_links( int num_ents[4], std::vector< EntityH
                     EntityHandle cell_handle = entity_map[3][j];
                     // parent
                     rval = MBI->add_parent_child( cell_handle, surf_handle );
-                    if( rval != MB_SUCCESS ) { std::cerr << "Failed to add parent child relationship" << std::endl; }
+                    if( rval != MB_SUCCESS )
+                    {
+                        std::cerr << "Failed to add parent child relationship" << std::endl;
+                    }
                 }
             }
         }
@@ -822,8 +861,10 @@ void ReadRTT::generate_parent_child_links( int num_ents[4], std::vector< EntityH
 /*
  * sets the sense of the surfaces wrt to volumes using geom topo tool
  */
-void ReadRTT::set_surface_senses( int num_ents[4], std::vector< EntityHandle > entity_map[4],
-                                  std::vector< side > side_data, std::vector< cell > cell_data )
+void ReadRTT::set_surface_senses( int num_ents[4],
+                                  std::vector< EntityHandle > entity_map[4],
+                                  std::vector< side > side_data,
+                                  std::vector< cell > cell_data )
 {
 
     ErrorCode rval;  // return value
@@ -853,7 +894,10 @@ void ReadRTT::set_surface_senses( int num_ents[4], std::vector< EntityHandle > e
                     else
                         rval = myGeomTool->set_sense( surf_handle, 0, SENSE_REVERSE );
 
-                    if( rval != MB_SUCCESS ) { std::cerr << "Failed to set sense appropriately" << std::endl; }
+                    if( rval != MB_SUCCESS )
+                    {
+                        std::cerr << "Failed to set sense appropriately" << std::endl;
+                    }
                 }
             }
         }

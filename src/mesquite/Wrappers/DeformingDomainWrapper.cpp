@@ -88,8 +88,11 @@ void DeformingDomainWrapper::set_vertex_movement_limit_factor( double f )
     movementFactor = f;
 }
 
-void DeformingDomainWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain, ParallelMesh* pmesh, Settings* settings,
-                                          QualityAssessor* qa, MsqError& err )
+void DeformingDomainWrapper::run_wrapper( MeshDomainAssoc* mesh_and_domain,
+                                          ParallelMesh* pmesh,
+                                          Settings* settings,
+                                          QualityAssessor* qa,
+                                          MsqError& err )
 {
     if( movementFactor <= 0 )
     {
@@ -174,7 +177,10 @@ DeformingCurveSmoother::DeformingCurveSmoother() : metricType( DEFAULT_CURVE_TYP
 
 DeformingCurveSmoother::~DeformingCurveSmoother() {}
 
-void DeformingCurveSmoother::store_initial_mesh( Mesh* mesh, const Mesh::VertexHandle* verts, int nverts, CurveDomain*,
+void DeformingCurveSmoother::store_initial_mesh( Mesh* mesh,
+                                                 const Mesh::VertexHandle* verts,
+                                                 int nverts,
+                                                 CurveDomain*,
                                                  MsqError& err )
 {
     if( nverts < 2 )
@@ -217,8 +223,12 @@ void DeformingCurveSmoother::store_initial_mesh( Mesh* mesh, const Mesh::VertexH
     mesh->tag_set_vertex_data( tag, nverts - 2, verts + 1, &vals[0], err );MSQ_ERRRTN( err );
 }
 
-void DeformingCurveSmoother::smooth_curve( Mesh* mesh, const Mesh::VertexHandle* verts, int nverts, CurveDomain* geom,
-                                           Scheme, MsqError& err )
+void DeformingCurveSmoother::smooth_curve( Mesh* mesh,
+                                           const Mesh::VertexHandle* verts,
+                                           int nverts,
+                                           CurveDomain* geom,
+                                           Scheme,
+                                           MsqError& err )
 {
     if( nverts < 2 )
     {

@@ -52,7 +52,10 @@ MeshOutputFunctor::~MeshOutputFunctor()
         delete this->new_entities[i];
 }
 
-void MeshOutputFunctor::print_vert_crud( EntityHandle vout, int nvhash, EntityHandle* vhash, const double* vcoords,
+void MeshOutputFunctor::print_vert_crud( EntityHandle vout,
+                                         int nvhash,
+                                         EntityHandle* vhash,
+                                         const double* vcoords,
                                          const void* /*vtags*/ )
 {
     std::cout << "+ {";
@@ -219,7 +222,10 @@ EntityHandle MeshOutputFunctor::map_vertex( EntityHandle vhash, const double* vc
             this->tag_manager->set_gid( vertex_handle, gid[0] );
         }
     }
-    if( !vertex_handle ) { std::cerr << "Could not insert vertex into new mesh!\n"; }
+    if( !vertex_handle )
+    {
+        std::cerr << "Could not insert vertex into new mesh!\n";
+    }
 #ifdef MB_DEBUG
     this->print_vert_crud( vertex_handle, 1, &vhash, vcoords, vtags );
     std::cout << "\nMap vert: " << vhash << " to: " << vertex_handle << "\n";
@@ -234,8 +240,14 @@ EntityHandle MeshOutputFunctor::operator()( int nvhash, EntityHandle* vhash, con
     {
         bool newly_created = this->split_vertices[nvhash]->find_or_create( vhash, vcoords, vertex_handle,
                                                                            this->proc_partition_counts, true );
-        if( newly_created ) { this->assign_tags( vertex_handle, vtags ); }
-        if( !vertex_handle ) { std::cerr << "Could not insert mid-edge vertex!\n"; }
+        if( newly_created )
+        {
+            this->assign_tags( vertex_handle, vtags );
+        }
+        if( !vertex_handle )
+        {
+            std::cerr << "Could not insert mid-edge vertex!\n";
+        }
 #ifdef MB_DEBUG
         std::cout << "(-" << nvhash << "-) ";
         this->print_vert_crud( vertex_handle, nvhash, vhash, vcoords, vtags );
@@ -271,7 +283,7 @@ void MeshOutputFunctor::operator()( EntityType etyp )
     {
 #ifdef MB_DEBUG
         std::cout << " *** ";
-#endif  // MB_DEBUG
+#endif  // MB_DEBUG 
         // FIXME: Handle tag assignment for elements as well as vertices
         this->tag_manager->assign_element_tags( elem_handle );
     }

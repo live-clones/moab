@@ -116,8 +116,11 @@ class TagInfo
      *\param data Pointer to memory in which to store consecutive tag values,
      *            one for each passed entity.
      */
-    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
-                                size_t num_entities, void* data ) const = 0;
+    virtual ErrorCode get_data( const SequenceManager* seqman,
+                                Error* error_handler,
+                                const EntityHandle* entities,
+                                size_t num_entities,
+                                void* data ) const = 0;
 
     /**\brief Get tag value for passed entities
      *
@@ -129,7 +132,9 @@ class TagInfo
      *\param data Pointer to memory in which to store consecutive tag values,
      *            one for each passed entity.
      */
-    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler, const Range& entities,
+    virtual ErrorCode get_data( const SequenceManager* seqman,
+                                Error* error_handler,
+                                const Range& entities,
                                 void* data ) const = 0;
 
     /**\brief Get tag value for passed entities
@@ -145,8 +150,12 @@ class TagInfo
      *                length of the tag value for the corresponding
      *                entity.
      */
-    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
-                                size_t num_entities, const void** data_ptrs, int* data_lengths ) const = 0;
+    virtual ErrorCode get_data( const SequenceManager* seqman,
+                                Error* error_handler,
+                                const EntityHandle* entities,
+                                size_t num_entities,
+                                const void** data_ptrs,
+                                int* data_lengths ) const = 0;
 
     /**\brief Get tag value for passed entities
      *
@@ -160,8 +169,11 @@ class TagInfo
      *                length of the tag value for the corresponding
      *                entity.
      */
-    virtual ErrorCode get_data( const SequenceManager* seqman, Error* error_handler, const Range& entities,
-                                const void** data_ptrs, int* data_lengths ) const = 0;
+    virtual ErrorCode get_data( const SequenceManager* seqman,
+                                Error* error_handler,
+                                const Range& entities,
+                                const void** data_ptrs,
+                                int* data_lengths ) const = 0;
 
     /**\brief Set tag value for passed entities
      *
@@ -173,8 +185,11 @@ class TagInfo
      *\param data Pointer to memory holding consecutive tag values,
      *            one for each passed entity.
      */
-    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
-                                size_t num_entities, const void* data ) = 0;
+    virtual ErrorCode set_data( SequenceManager* seqman,
+                                Error* error_handler,
+                                const EntityHandle* entities,
+                                size_t num_entities,
+                                const void* data ) = 0;
 
     /**\brief Set tag value for passed entities
      *
@@ -185,7 +200,9 @@ class TagInfo
      *\param data Pointer to memory holding consecutive tag values,
      *            one for each passed entity.
      */
-    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler, const Range& entities,
+    virtual ErrorCode set_data( SequenceManager* seqman,
+                                Error* error_handler,
+                                const Range& entities,
                                 const void* data ) = 0;
 
     /**\brief Set tag value for passed entities
@@ -202,8 +219,12 @@ class TagInfo
      *                entity.  Array is required for variable-length
      *                tags and is ignored for fixed-length tags.
      */
-    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
-                                size_t num_entities, void const* const* data_ptrs, const int* data_lengths ) = 0;
+    virtual ErrorCode set_data( SequenceManager* seqman,
+                                Error* error_handler,
+                                const EntityHandle* entities,
+                                size_t num_entities,
+                                void const* const* data_ptrs,
+                                const int* data_lengths ) = 0;
 
     /**\brief Set tag value for passed entities
      *
@@ -218,8 +239,11 @@ class TagInfo
      *                entity.  Array is required for variable-length
      *                tags and is ignored for fixed-length tags.
      */
-    virtual ErrorCode set_data( SequenceManager* seqman, Error* error_handler, const Range& entities,
-                                void const* const* data_ptrs, const int* data_lengths ) = 0;
+    virtual ErrorCode set_data( SequenceManager* seqman,
+                                Error* error_handler,
+                                const Range& entities,
+                                void const* const* data_ptrs,
+                                const int* data_lengths ) = 0;
 
     /**\brief Set tag value for passed entities
      *
@@ -234,8 +258,12 @@ class TagInfo
      *                 fixed-length tags.  Required for variable-
      *                 length tags.
      */
-    virtual ErrorCode clear_data( SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
-                                  size_t num_entities, const void* value_ptr, int value_len = 0 ) = 0;
+    virtual ErrorCode clear_data( SequenceManager* seqman,
+                                  Error* error_handler,
+                                  const EntityHandle* entities,
+                                  size_t num_entities,
+                                  const void* value_ptr,
+                                  int value_len = 0 ) = 0;
 
     /**\brief Set tag value for passed entities
      *
@@ -249,8 +277,11 @@ class TagInfo
      *                 fixed-length tags.  Required for variable-
      *                 length tags.
      */
-    virtual ErrorCode clear_data( SequenceManager* seqman, Error* error_handler, const Range& entities,
-                                  const void* value_ptr, int value_len = 0 ) = 0;
+    virtual ErrorCode clear_data( SequenceManager* seqman,
+                                  Error* error_handler,
+                                  const Range& entities,
+                                  const void* value_ptr,
+                                  int value_len = 0 ) = 0;
 
     /**\brief Remove/clear tag data for entities
      *
@@ -260,7 +291,9 @@ class TagInfo
      *\param entities  Entity handles for which to store tag data
      *\param num_entities Length of \c entities array
      */
-    virtual ErrorCode remove_data( SequenceManager* seqman, Error* error_handler, const EntityHandle* entities,
+    virtual ErrorCode remove_data( SequenceManager* seqman,
+                                   Error* error_handler,
+                                   const EntityHandle* entities,
                                    size_t num_entities ) = 0;
 
     /**\brief Remove/clear tag data for entities
@@ -295,8 +328,12 @@ class TagInfo
      *      even though MOAB would normally not explicitly store tag values
      *      for such entities.
      */
-    virtual ErrorCode tag_iterate( SequenceManager* seqman, Error* error_handler, Range::iterator& iter,
-                                   const Range::iterator& end, void*& data_ptr, bool allocate = true ) = 0;
+    virtual ErrorCode tag_iterate( SequenceManager* seqman,
+                                   Error* error_handler,
+                                   Range::iterator& iter,
+                                   const Range::iterator& end,
+                                   void*& data_ptr,
+                                   bool allocate = true ) = 0;
 
     /**\brief Get all tagged entities
      *
@@ -311,8 +348,10 @@ class TagInfo
      *\param intersect Optional intersect list.  If specified,
      *                search is restricted to entities in this list.
      */
-    virtual ErrorCode get_tagged_entities( const SequenceManager* seqman, Range& output_entities,
-                                           EntityType type = MBMAXTYPE, const Range* intersect = 0 ) const = 0;
+    virtual ErrorCode get_tagged_entities( const SequenceManager* seqman,
+                                           Range& output_entities,
+                                           EntityType type        = MBMAXTYPE,
+                                           const Range* intersect = 0 ) const = 0;
 
     /**\brief Count all tagged entities
      *
@@ -327,8 +366,10 @@ class TagInfo
      *\param intersect Optional intersect list.  If specified,
      *                search is restricted to entities in this list.
      */
-    virtual ErrorCode num_tagged_entities( const SequenceManager* seqman, size_t& output_count,
-                                           EntityType type = MBMAXTYPE, const Range* intersect = 0 ) const = 0;
+    virtual ErrorCode num_tagged_entities( const SequenceManager* seqman,
+                                           size_t& output_count,
+                                           EntityType type        = MBMAXTYPE,
+                                           const Range* intersect = 0 ) const = 0;
 
     /**\brief Get all tagged entities with tag value
      *
@@ -343,8 +384,11 @@ class TagInfo
      *\param intersect_entities Optional intersect list.  If specified,
      *                search is restricted to entities in this list.
      */
-    virtual ErrorCode find_entities_with_value( const SequenceManager* seqman, Error* error_handler,
-                                                Range& output_entities, const void* value, int value_bytes = 0,
+    virtual ErrorCode find_entities_with_value( const SequenceManager* seqman,
+                                                Error* error_handler,
+                                                Range& output_entities,
+                                                const void* value,
+                                                int value_bytes                 = 0,
                                                 EntityType type                 = MBMAXTYPE,
                                                 const Range* intersect_entities = 0 ) const = 0;
 
@@ -354,7 +398,8 @@ class TagInfo
     /**\brief Get memory use for tag data.
      *
      */
-    virtual ErrorCode get_memory_use( const SequenceManager* seqman, unsigned long& total,
+    virtual ErrorCode get_memory_use( const SequenceManager* seqman,
+                                      unsigned long& total,
                                       unsigned long& per_entity ) const = 0;
 
   protected:

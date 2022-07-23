@@ -799,8 +799,13 @@ void gs_data::gs_data_op_many( realType** u, uint n, int op )
  Setup
  --------------------------------------------------------------------------*/
 
-ErrorCode gs_data::initialize( uint n, const long* label, const Ulong* ulabel, uint maxv, const unsigned int nlabels,
-                               const unsigned int nulabels, crystal_data* crystal )
+ErrorCode gs_data::initialize( uint n,
+                               const long* label,
+                               const Ulong* ulabel,
+                               uint maxv,
+                               const unsigned int nlabels,
+                               const unsigned int nulabels,
+                               crystal_data* crystal )
 {
     nlinfo = NULL;
     unsigned int j;

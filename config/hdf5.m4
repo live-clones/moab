@@ -18,9 +18,11 @@ AC_DEFUN([FATHOM_HDF5_LIBS_HELPER_FORTRAN],[
   for arg in $HDF5_LIBS
   do
     case "$arg" in
-      -lhdf5_hl) AC_HAVE_LIBRARY([hdf5hl_fortran], [HDF5_FLIBS="$HDF5_FLIBS -lhdf5hl_fortran"], [], [$HDF5_LIBS $HDF5_FLIBS])
+      -lhdf5_hl) AC_CHECK_LIB([hdf5hl_fortran],[main],[HDF5_FLIBS="$HDF5_FLIBS -lhdf5hl_fortran"],[],[$HDF5_LIBS $HDF5_FLIBS])ac_cv_lib_hdf5hl_fortran=ac_cv_lib_hdf5hl_fortran_main
+
         ;; 
-      -lhdf5)    AC_HAVE_LIBRARY([hdf5_fortran], [HDF5_FLIBS="$HDF5_FLIBS -lhdf5_fortran"], [], [$HDF5_LIBS $HDF5_FLIBS])
+      -lhdf5)    AC_CHECK_LIB([hdf5_fortran],[main],[HDF5_FLIBS="$HDF5_FLIBS -lhdf5_fortran"],[],[$HDF5_LIBS $HDF5_FLIBS])ac_cv_lib_hdf5_fortran=ac_cv_lib_hdf5_fortran_main
+
         ;; 
     esac
   done
@@ -41,9 +43,11 @@ AC_DEFUN([FATHOM_HDF5_LIBS_HELPER_CXX],[
   for arg in $HDF5_LIBS
   do
     case "$arg" in #(
-      -lhdf5_hl) AC_HAVE_LIBRARY([hdf5hl_cpp], [HDF5_CXXLIBS="$HDF5_CXXLIBS -lhdf5hl_cpp"], [], [$HDF5_LIBS $HDF5_CXXLIBS])
+      -lhdf5_hl) AC_CHECK_LIB([hdf5hl_cpp],[main],[HDF5_CXXLIBS="$HDF5_CXXLIBS -lhdf5hl_cpp"],[],[$HDF5_LIBS $HDF5_CXXLIBS])ac_cv_lib_hdf5hl_cpp=ac_cv_lib_hdf5hl_cpp_main
+
         ;; #(
-      -lhdf5)    AC_HAVE_LIBRARY([hdf5_cpp], [HDF5_CXXLIBS="$HDF5_CXXLIBS -lhdf5_cpp"], [], [$HDF5_LIBS $HDF5_CXXLIBS])
+      -lhdf5)    AC_CHECK_LIB([hdf5_cpp],[main],[HDF5_CXXLIBS="$HDF5_CXXLIBS -lhdf5_cpp"],[],[$HDF5_LIBS $HDF5_CXXLIBS])ac_cv_lib_hdf5_cpp=ac_cv_lib_hdf5_cpp_main
+
         ;; #(
     esac
   done
@@ -72,7 +76,8 @@ if (test "xyes" != "x$HAVE_LIB_HDF5"); then
   FATHOM_HDF5_LIBS_HELPER([$LIBS])
   if (test $HAVE_LIB_HDF5 = yes); then
     # Look for HDF5's high level library
-    AC_HAVE_LIBRARY([hdf5_hl], [HAVE_LIB_HDF5HL=yes; HDF5_LIBS="-lhdf5_hl $HDF5_LIBS"], [], [$HDF5_LIBS])
+    AC_CHECK_LIB([hdf5_hl],[main],[HAVE_LIB_HDF5HL=yes; HDF5_LIBS="-lhdf5_hl $HDF5_LIBS"],[],[$HDF5_LIBS])ac_cv_lib_hdf5_hl=ac_cv_lib_hdf5_hl_main
+
     #if (test $HAVE_LIB_HDF5HL=yes); then
     #  HDF5_FLIBS=""
     #  FATHOM_HDF5_LIBS_HELPER_FORTRAN

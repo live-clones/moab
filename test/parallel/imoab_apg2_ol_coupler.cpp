@@ -590,7 +590,7 @@ int main( int argc, char* argv[] )
     int tagTypes[2]  = { DENSE_DOUBLE, DENSE_DOUBLE };
     int atmCompNDoFs = 1 /* FV disc_orders[0]*disc_orders[0] */, ocnCompNDoFs = 1 /*FV*/;
 
-    const char* bottomFields         = "T_ph:u_ph:v_ph";  // same as on phys atm mesh
+    const char* bottomFields = "T_ph:u_ph:v_ph";  // same as on phys atm mesh
 
     const char* bottomProjectedFields = "T_proj:u_proj:v_proj";
 
@@ -604,7 +604,8 @@ int main( int argc, char* argv[] )
     const char* bottomPhProjectedFields = "Tph_proj:uph_proj:vph_proj";
 
     // tags on phys grid atm mesh
-    const char* bottomPhLndProjectedFields = "TphL_proj:uphL_proj:vphL_proj";  // L and Lnd signify the fields projected from land
+    const char* bottomPhLndProjectedFields =
+        "TphL_proj:uphL_proj:vphL_proj";  // L and Lnd signify the fields projected from land
 
     if( couComm != MPI_COMM_NULL )
     {
@@ -644,7 +645,7 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "failed to get num primary elems" );
             int numAllElem = nelem[2];
             std::vector< double > vals;
-            int storLeng = atmCompNDoFs * numAllElem * 3; // 3 tags
+            int storLeng = atmCompNDoFs * numAllElem * 3;  // 3 tags
             vals.resize( storLeng );
             for( int k = 0; k < storLeng; k++ )
                 vals[k] = 0.;
@@ -709,7 +710,8 @@ int main( int argc, char* argv[] )
     {
         int tagIndexIn2;
         ierr = iMOAB_DefineTagStorage( cmpOcnPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs, &tagIndexIn2 );
-        CHECKIERR( ierr, "failed to define the field tag for receiving back the tag T_proj, u_proj, v_proj on ocn pes" );
+        CHECKIERR( ierr,
+                   "failed to define the field tag for receiving back the tag T_proj, u_proj, v_proj on ocn pes" );
     }
     // send the tag to ocean pes, from ocean mesh on coupler pes
     //   from couComm, using common joint comm ocn_coupler
@@ -810,7 +812,8 @@ int main( int argc, char* argv[] )
     {
         int tagIndexIn2;
         ierr = iMOAB_DefineTagStorage( cmpLndPID, bottomProjectedFields, &tagTypes[1], &ocnCompNDoFs, &tagIndexIn2 );
-        CHECKIERR( ierr, "failed to define the field tag for receiving back the tag T_proj, u_proj, v_proj on lnd pes" );
+        CHECKIERR( ierr,
+                   "failed to define the field tag for receiving back the tag T_proj, u_proj, v_proj on lnd pes" );
     }
     if( couComm != MPI_COMM_NULL )
     {
@@ -904,8 +907,8 @@ int main( int argc, char* argv[] )
     if( atmComm != MPI_COMM_NULL )
     {
         int tagIndexIn2;
-        ierr = iMOAB_DefineTagStorage( cmpPhAtmPID, bottomPhProjectedFields, &tagTypes[1], &atmCompNDoFs,
-                                       &tagIndexIn2 );
+        ierr =
+            iMOAB_DefineTagStorage( cmpPhAtmPID, bottomPhProjectedFields, &tagTypes[1], &atmCompNDoFs, &tagIndexIn2 );
         CHECKIERR( ierr, "failed to define the field tag for receiving back the tag "
                          "Tph_proj, etc on atm pes" );
     }

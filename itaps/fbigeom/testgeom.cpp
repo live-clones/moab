@@ -159,7 +159,10 @@ int main( int argc, char* argv[] )
     std::string filename = STRINGIFY( MESHDIR ) "/shell.h5m";
     std::string engine_opt;
 
-    if( argc == 1 ) { std::cout << "Using default input file: " << filename << std::endl; }
+    if( argc == 1 )
+    {
+        std::cout << "Using default input file: " << filename << std::endl;
+    }
     else if( argc == 2 )
     {
         filename = argv[1];
@@ -1079,7 +1082,9 @@ bool construct_test( FBiGeom_Instance geom )
     return true;
 }
 
-static bool compare_box( const double* expected_min, const double* expected_max, const double* actual_min,
+static bool compare_box( const double* expected_min,
+                         const double* expected_max,
+                         const double* actual_min,
                          const double* actual_max )
 {
     bool same   = true;
@@ -1256,8 +1261,11 @@ bool booleans_test( FBiGeom_Instance geom )
     return true;
 }
 
-static int get_entities( FBiGeom_Instance geom, int entity_type, std::vector< iBase_EntityHandle >& entities_out,
-                         iBase_TagHandle id_tag = 0, std::vector< int >* ids_out = 0 )
+static int get_entities( FBiGeom_Instance geom,
+                         int entity_type,
+                         std::vector< iBase_EntityHandle >& entities_out,
+                         iBase_TagHandle id_tag      = 0,
+                         std::vector< int >* ids_out = 0 )
 {
     int err, num;
     iBase_EntitySetHandle root;
@@ -1285,8 +1293,11 @@ static int get_entities( FBiGeom_Instance geom, int entity_type, std::vector< iB
     return iBase_SUCCESS;
 }
 
-static int check_firmness( FBiGeom_Instance geom, const std::vector< iBase_EntityHandle >& entities,
-                           const std::vector< int >& ids, iBase_TagHandle firmness_tag, const char* expected_value,
+static int check_firmness( FBiGeom_Instance geom,
+                           const std::vector< iBase_EntityHandle >& entities,
+                           const std::vector< int >& ids,
+                           iBase_TagHandle firmness_tag,
+                           const char* expected_value,
                            const char* ent_type_str )
 {
     const int firmness_size = 4;
@@ -1314,7 +1325,8 @@ static int check_firmness( FBiGeom_Instance geom, const std::vector< iBase_Entit
     return iBase_SUCCESS;
 }
 
-static int count_num_with_tag( FBiGeom_Instance geom, const std::vector< iBase_EntityHandle >& ents,
+static int count_num_with_tag( FBiGeom_Instance geom,
+                               const std::vector< iBase_EntityHandle >& ents,
                                iBase_TagHandle tag )
 {
     int err, bytes;

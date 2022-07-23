@@ -53,8 +53,10 @@ class MESQUITE_EXPORT ReferenceMeshInterface
   public:
     virtual ~ReferenceMeshInterface();
 
-    virtual void get_reference_vertex_coordinates( const Mesh::VertexHandle* vertices, size_t num_vertices,
-                                                   Vector3D* coordinates_out, MsqError& err ) = 0;
+    virtual void get_reference_vertex_coordinates( const Mesh::VertexHandle* vertices,
+                                                   size_t num_vertices,
+                                                   Vector3D* coordinates_out,
+                                                   MsqError& err ) = 0;
 };
 
 class ReferenceMesh : public ReferenceMeshInterface
@@ -64,7 +66,8 @@ class ReferenceMesh : public ReferenceMeshInterface
     MESQUITE_EXPORT virtual ~ReferenceMesh();
 
     MESQUITE_EXPORT virtual void get_reference_vertex_coordinates( const Mesh::VertexHandle* vertices,
-                                                                   size_t num_vertices, Vector3D* coordinates_out,
+                                                                   size_t num_vertices,
+                                                                   Vector3D* coordinates_out,
                                                                    MsqError& err );
 
   private:

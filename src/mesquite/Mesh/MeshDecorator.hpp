@@ -77,65 +77,99 @@ class MESQUITE_EXPORT MeshDecorator : public Mesh
 
     //************ Vertex Properties ********************
 
-    virtual void vertices_get_fixed_flag( const VertexHandle vert_array[], std::vector< bool >& fixed_flag_array,
-                                          size_t num_vtx, MsqError& err );
+    virtual void vertices_get_fixed_flag( const VertexHandle vert_array[],
+                                          std::vector< bool >& fixed_flag_array,
+                                          size_t num_vtx,
+                                          MsqError& err );
 
-    virtual void vertices_get_slaved_flag( const VertexHandle vert_array[], std::vector< bool >& slaved_flag_array,
-                                           size_t num_vtx, MsqError& err );
+    virtual void vertices_get_slaved_flag( const VertexHandle vert_array[],
+                                           std::vector< bool >& slaved_flag_array,
+                                           size_t num_vtx,
+                                           MsqError& err );
 
-    virtual void vertices_get_coordinates( const VertexHandle vert_array[], MsqVertex* coordinates, size_t num_vtx,
+    virtual void vertices_get_coordinates( const VertexHandle vert_array[],
+                                           MsqVertex* coordinates,
+                                           size_t num_vtx,
                                            MsqError& err );
 
     virtual void vertex_set_coordinates( VertexHandle vertex, const Vector3D& coordinates, MsqError& err );
 
     virtual void vertex_set_byte( VertexHandle vertex, unsigned char byte, MsqError& err );
 
-    virtual void vertices_set_byte( const VertexHandle* vert_array, const unsigned char* byte_array, size_t array_size,
+    virtual void vertices_set_byte( const VertexHandle* vert_array,
+                                    const unsigned char* byte_array,
+                                    size_t array_size,
                                     MsqError& err );
 
     virtual void vertex_get_byte( const VertexHandle vertex, unsigned char* byte, MsqError& err );
 
-    virtual void vertices_get_byte( const VertexHandle* vertex, unsigned char* byte_array, size_t array_size,
+    virtual void vertices_get_byte( const VertexHandle* vertex,
+                                    unsigned char* byte_array,
+                                    size_t array_size,
                                     MsqError& err );
 
     //**************** Vertex Topology *****************
 
-    virtual void vertices_get_attached_elements( const VertexHandle* vertex_array, size_t num_vertex,
-                                                 std::vector< ElementHandle >& elements, std::vector< size_t >& offsets,
+    virtual void vertices_get_attached_elements( const VertexHandle* vertex_array,
+                                                 size_t num_vertex,
+                                                 std::vector< ElementHandle >& elements,
+                                                 std::vector< size_t >& offsets,
                                                  MsqError& err );
 
     //*************** Element Topology *************
 
-    virtual void elements_get_attached_vertices( const ElementHandle* elem_handles, size_t num_elems,
+    virtual void elements_get_attached_vertices( const ElementHandle* elem_handles,
+                                                 size_t num_elems,
                                                  std::vector< VertexHandle >& vert_handles,
-                                                 std::vector< size_t >& offsets, MsqError& err );
+                                                 std::vector< size_t >& offsets,
+                                                 MsqError& err );
 
-    virtual void elements_get_topologies( const ElementHandle* element_handle_array, EntityTopology* element_topologies,
-                                          size_t num_elements, MsqError& err );
+    virtual void elements_get_topologies( const ElementHandle* element_handle_array,
+                                          EntityTopology* element_topologies,
+                                          size_t num_elements,
+                                          MsqError& err );
 
     //***************  Tags  ***********
 
-    virtual TagHandle tag_create( const std::string& tag_name, TagType type, unsigned length, const void* default_value,
+    virtual TagHandle tag_create( const std::string& tag_name,
+                                  TagType type,
+                                  unsigned length,
+                                  const void* default_value,
                                   MsqError& err );
 
     virtual void tag_delete( TagHandle handle, MsqError& err );
 
     virtual TagHandle tag_get( const std::string& name, MsqError& err );
 
-    virtual void tag_properties( TagHandle handle, std::string& name_out, TagType& type_out, unsigned& length_out,
+    virtual void tag_properties( TagHandle handle,
+                                 std::string& name_out,
+                                 TagType& type_out,
+                                 unsigned& length_out,
                                  MsqError& err );
 
-    virtual void tag_set_element_data( TagHandle handle, size_t num_elems, const ElementHandle* elem_array,
-                                       const void* tag_data, MsqError& err );
+    virtual void tag_set_element_data( TagHandle handle,
+                                       size_t num_elems,
+                                       const ElementHandle* elem_array,
+                                       const void* tag_data,
+                                       MsqError& err );
 
-    virtual void tag_set_vertex_data( TagHandle handle, size_t num_elems, const VertexHandle* node_array,
-                                      const void* tag_data, MsqError& err );
+    virtual void tag_set_vertex_data( TagHandle handle,
+                                      size_t num_elems,
+                                      const VertexHandle* node_array,
+                                      const void* tag_data,
+                                      MsqError& err );
 
-    virtual void tag_get_element_data( TagHandle handle, size_t num_elems, const ElementHandle* elem_array,
-                                       void* tag_data, MsqError& err );
+    virtual void tag_get_element_data( TagHandle handle,
+                                       size_t num_elems,
+                                       const ElementHandle* elem_array,
+                                       void* tag_data,
+                                       MsqError& err );
 
-    virtual void tag_get_vertex_data( TagHandle handle, size_t num_elems, const VertexHandle* node_array,
-                                      void* tag_data, MsqError& err );
+    virtual void tag_get_vertex_data( TagHandle handle,
+                                      size_t num_elems,
+                                      const VertexHandle* node_array,
+                                      void* tag_data,
+                                      MsqError& err );
 
     //**************** Memory Management ****************
 

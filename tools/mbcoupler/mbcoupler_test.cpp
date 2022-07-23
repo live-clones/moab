@@ -302,9 +302,9 @@ ErrorCode get_file_options( int argc,
     gNormTag                   = "";
     ssNormTag                  = "";
     readOpts                   = ( nprocs > 1 ? "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
-                              "PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;CPUTIME"
-                            : "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
-                              "PARALLEL_RESOLVE_SHARED_ENTS;CPUTIME" );
+                                                "PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=3.0.1;CPUTIME"
+                                              : "PARALLEL=READ_PART;PARTITION=PARALLEL_PARTITION;PARTITION_DISTRIBUTE;"
+                                                "PARALLEL_RESOLVE_SHARED_ENTS;CPUTIME" );
     outFile                    = "";
     writeOpts                  = ( nprocs > 1 ? "PARALLEL=WRITE_PART;CPUTIME" : "" );
     dbgFile                    = "";

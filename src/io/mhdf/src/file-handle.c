@@ -45,7 +45,10 @@ FileHandle* mhdf_alloc_FileHandle( hid_t hdf_table, hid_t id_type, mhdf_Status* 
     FileHandle* rval;
 
     /* check that id_type is sane */
-    if( id_type == -1 ) { id_type = H5T_NATIVE_ULONG; }
+    if( id_type == -1 )
+    {
+        id_type = H5T_NATIVE_ULONG;
+    }
     else if( H5T_INTEGER != H5Tget_class( id_type ) )
     {
         mhdf_setFail( status, "Invalid ID type: not integer class" );
@@ -55,10 +58,10 @@ FileHandle* mhdf_alloc_FileHandle( hid_t hdf_table, hid_t id_type, mhdf_Status* 
     rval = (FileHandle*)mhdf_malloc( sizeof( FileHandle ), status );
     if( !rval ) return NULL;
 
-    rval->magic = FILE_HANDLE_MAGIC;
-    rval->hdf_handle = hdf_table;
+    rval->magic             = FILE_HANDLE_MAGIC;
+    rval->hdf_handle        = hdf_table;
     rval->open_handle_count = 0;
-    rval->id_type = id_type;
-    rval->max_id = 0L;
+    rval->id_type           = id_type;
+    rval->max_id            = 0L;
     return rval;
 }

@@ -1487,7 +1487,7 @@ void test_eul_read_write_ghosting()
 
     std::string read_opts = "PARALLEL=READ_PART;PARTITION;PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_"
                             "GHOSTS=2.0.1;PARTITION_METHOD=SQIJ;VARIABLE=";
-    rval = mb.load_file( example_eul.c_str(), &set, read_opts.c_str() );CHECK_ERR( rval );
+    rval                  = mb.load_file( example_eul.c_str(), &set, read_opts.c_str() );CHECK_ERR( rval );
 
     read_opts = "PARALLEL=READ_PART;PARTITION;PARTITION_METHOD=SQIJ;VARIABLE=T;NOMESH";
     rval      = mb.load_file( example_eul.c_str(), &set, read_opts.c_str() );CHECK_ERR( rval );

@@ -121,20 +121,23 @@ static inline bool FBiGeom_isError( moab::ErrorCode code )
         if( FBiGeom_isError( *err ) ) return; \
     } while( false )
 
-#define CHECK_SIZE( array, allocated, size, type, retval )                                                   \
-    do                                                                                                       \
-    {                                                                                                        \
-        if( 0 != ( allocated ) && NULL != ( array ) && ( allocated ) < ( size ) )                            \
-        {                                                                                                    \
-            ERROR( iBase_MEMORY_ALLOCATION_FAILED, "Allocated array not "                                    \
-                                                   "enough to hold returned contents." );                    \
-        }                                                                                                    \
-        if( ( size ) && ( ( allocated ) == 0 || NULL == ( array ) ) )                                        \
-        {                                                                                                    \
-            ( array )     = (type*)malloc( ( size ) * sizeof( type ) );                                      \
-            ( allocated ) = ( size );                                                                        \
-            if( NULL == ( array ) ) { ERROR( iBase_MEMORY_ALLOCATION_FAILED, "Couldn't allocate array." ); } \
-        }                                                                                                    \
+#define CHECK_SIZE( array, allocated, size, type, retval )                                \
+    do                                                                                    \
+    {                                                                                     \
+        if( 0 != ( allocated ) && NULL != ( array ) && ( allocated ) < ( size ) )         \
+        {                                                                                 \
+            ERROR( iBase_MEMORY_ALLOCATION_FAILED, "Allocated array not "                 \
+                                                   "enough to hold returned contents." ); \
+        }                                                                                 \
+        if( ( size ) && ( ( allocated ) == 0 || NULL == ( array ) ) )                     \
+        {                                                                                 \
+            ( array )     = (type*)malloc( ( size ) * sizeof( type ) );                   \
+            ( allocated ) = ( size );                                                     \
+            if( NULL == ( array ) )                                                       \
+            {                                                                             \
+                ERROR( iBase_MEMORY_ALLOCATION_FAILED, "Couldn't allocate array." );      \
+            }                                                                             \
+        }                                                                                 \
     } while( false )
 
 #endif  // FBIGEOM_MOAB_HPP

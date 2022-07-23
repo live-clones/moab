@@ -228,10 +228,10 @@ int main( int argc, char* argv[] )
             }
 
             QualityType quality_type = MB_EDGE_RATIO;
-            for( int i = 0; i < num_qualities; i++, quality_type = ( QualityType )( quality_type + 1 ) )
+            for( int i = 0; i < num_qualities; i++, quality_type = (QualityType)( quality_type + 1 ) )
             {
                 while( !( vw.possible_quality( et, quality_type ) ) && quality_type < MB_QUALITY_COUNT )
-                    quality_type = ( QualityType )( quality_type + 1 );  // will get them in order
+                    quality_type = (QualityType)( quality_type + 1 );  // will get them in order
                 const char* name_q = vw.quality_name( quality_type );
                 double local_min, global_min;
                 double local_max, global_max;
@@ -270,7 +270,10 @@ int main( int argc, char* argv[] )
             }
         }
     }  // etype
-    if( ofile.is_open() ) { ofile.close(); }
+    if( ofile.is_open() )
+    {
+        ofile.close();
+    }
 #ifdef MOAB_HAVE_MPI
     MPI_Finalize();
 #endif

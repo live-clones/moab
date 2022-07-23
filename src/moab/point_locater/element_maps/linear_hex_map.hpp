@@ -24,7 +24,8 @@ namespace element_utility
       public:
         // Natural coordinates
         template < typename Moab, typename Entity_handle, typename Points, typename Point >
-        std::pair< bool, CartVect > evaluate_reverse( const double* verts, const double* eval_point,
+        std::pair< bool, CartVect > evaluate_reverse( const double* verts,
+                                                      const double* eval_point,
                                                       const double tol = 1.e-6 ) const
         {
             CartVect params( 3, 0.0 );
@@ -52,7 +53,9 @@ namespace element_utility
                    ( params[1] <= 1. + tol ) && ( params[2] >= -1. - tol ) && ( params[2] <= 1. + tol );
         }
 
-        bool solve_inverse( const CartVect& point, CartVect& params, const CartVect* verts,
+        bool solve_inverse( const CartVect& point,
+                            CartVect& params,
+                            const CartVect* verts,
                             const double tol = 1.e-6 ) const
         {
             const double error_tol_sqr = tol * tol;
@@ -76,7 +79,10 @@ namespace element_utility
                 ss << "Iter #: " << num_iterations << " Err: " << delta.length() << " Iterate: ";
                 ss << params[0] << ", " << params[1] << ", " << params[2] << std::endl;
 #endif
-                if( ++num_iterations >= 5 ) { return false; }
+                if( ++num_iterations >= 5 )
+                {
+                    return false;
+                }
                 Matrix3 J;
                 jacobian( params, verts, J );
                 double det = moab::Matrix3::determinant3( J );

@@ -338,7 +338,10 @@ void TerminationCriterion::cull_for_global_patch( bool val )
   it is only called when this criterion is used as the 'outer' termination
   criterion.
  */
-void TerminationCriterion::reset_outer( Mesh* mesh, MeshDomain* domain, OFEvaluator& obj_eval, const Settings* settings,
+void TerminationCriterion::reset_outer( Mesh* mesh,
+                                        MeshDomain* domain,
+                                        OFEvaluator& obj_eval,
+                                        const Settings* settings,
                                         MsqError& err )
 {
     const unsigned long totalFlag = terminationCriterionFlag | cullingMethodFlag;
@@ -391,7 +394,10 @@ void TerminationCriterion::reset_inner( PatchData& pd, OFEvaluator& obj_eval, Ms
     iterationCounter = 0;
 
     // reset the inner timer if needed
-    if( totalFlag & CPU_TIME ) { mTimer.reset(); }
+    if( totalFlag & CPU_TIME )
+    {
+        mTimer.reset();
+    }
 
     // GRADIENT
     currentGradInfNorm = initialGradInfNorm = 0.0;
@@ -475,7 +481,10 @@ void TerminationCriterion::reset_inner( PatchData& pd, OFEvaluator& obj_eval, Ms
     // need them later to compare the current movement with.
     if( totalFlag & VERTEX_MOVEMENT_RELATIVE )
     {
-        if( initialVerticesMemento ) { pd.recreate_vertices_memento( initialVerticesMemento, err ); }
+        if( initialVerticesMemento )
+        {
+            pd.recreate_vertices_memento( initialVerticesMemento, err );
+        }
         else
         {
             initialVerticesMemento = pd.create_vertices_memento( err );
@@ -622,8 +631,11 @@ void TerminationCriterion::accumulate_inner( PatchData& pd, double of_value, Vec
                  << std::endl;
 }
 
-void TerminationCriterion::accumulate_outer( Mesh* mesh, MeshDomain* domain, OFEvaluator& of_eval,
-                                             const Settings* settings, MsqError& err )
+void TerminationCriterion::accumulate_outer( Mesh* mesh,
+                                             MeshDomain* domain,
+                                             OFEvaluator& of_eval,
+                                             const Settings* settings,
+                                             MsqError& err )
 {
     PatchData global_patch;
     if( settings ) global_patch.attach_settings( settings );
@@ -915,7 +927,10 @@ bool TerminationCriterion::cull_vertices( PatchData& pd, OFEvaluator& of_eval, M
                 return false;
             }
             // if the improvement was enough, cull
-            if( currentOFValue <= cullingEps ) { cull_bool = true; }
+            if( currentOFValue <= cullingEps )
+            {
+                cull_bool = true;
+            }
             // PRINT_INFO("\ncurrentOFValue = %f, bool = %i\n",currentOFValue,cull_bool);
 
             break;
@@ -941,7 +956,10 @@ bool TerminationCriterion::cull_vertices( PatchData& pd, OFEvaluator& of_eval, M
             // if movement was enough, cull
             prev_m = pd.get_max_vertex_movement_squared( previousVerticesMemento, err );
             MSQ_ERRZERO( err );
-            if( prev_m <= cullingEps * cullingEps ) { cull_bool = true; }
+            if( prev_m <= cullingEps * cullingEps )
+            {
+                cull_bool = true;
+            }
 
             break;
             // if culling on vertex movement relative
@@ -951,7 +969,10 @@ bool TerminationCriterion::cull_vertices( PatchData& pd, OFEvaluator& of_eval, M
             MSQ_ERRZERO( err );
             init_m = pd.get_max_vertex_movement_squared( initialVerticesMemento, err );
             MSQ_ERRZERO( err );
-            if( prev_m <= ( cullingEps * cullingEps * init_m ) ) { cull_bool = true; }
+            if( prev_m <= ( cullingEps * cullingEps * init_m ) )
+            {
+                cull_bool = true;
+            }
             break;
         case UNTANGLED_MESH:
             if( !patchInvertedCount ) cull_bool = true;
@@ -979,8 +1000,12 @@ bool TerminationCriterion::cull_vertices( PatchData& pd, OFEvaluator& of_eval, M
   cull_vertices with a single vertex-based patch at a time.  If the patch
   satisfies the culling criterion, it's free vertices are then soft-fixed.
  */
-bool TerminationCriterion::cull_vertices_global( PatchData& global_patch, Mesh* mesh, MeshDomain* domain,
-                                                 const Settings* settings, OFEvaluator& of_eval, MsqError& err )
+bool TerminationCriterion::cull_vertices_global( PatchData& global_patch,
+                                                 Mesh* mesh,
+                                                 MeshDomain* domain,
+                                                 const Settings* settings,
+                                                 OFEvaluator& of_eval,
+                                                 MsqError& err )
 {
     if( !cullingGlobalPatch ) return false;
 

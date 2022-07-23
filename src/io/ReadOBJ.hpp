@@ -123,11 +123,17 @@ class ReadOBJ : public ReaderIface
     //! factory method
     static ReaderIface* factory( Interface* );
 
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
-                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name,
+                         const EntityHandle* file_set,
+                         const FileOptions& opts,
+                         const SubsetList* subset_list = 0,
+                         const Tag* file_id_tag        = 0 );
 
-    ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                               std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
+    ErrorCode read_tag_values( const char* file_name,
+                               const char* tag_name,
+                               const FileOptions& opts,
+                               std::vector< int >& tag_values_out,
+                               const SubsetList* subset_list = 0 );
 
     //! Constructor
     ReadOBJ( Interface* impl = NULL );
@@ -178,7 +184,8 @@ class ReadOBJ : public ReaderIface
     /* create_new_face converts tokenized string input to
      * face structure
      */
-    ErrorCode create_new_face( std::vector< std::string > f_tokens, const std::vector< EntityHandle >& vertex_list,
+    ErrorCode create_new_face( std::vector< std::string > f_tokens,
+                               const std::vector< EntityHandle >& vertex_list,
                                EntityHandle& face_eh );
 
     /*
@@ -186,7 +193,8 @@ class ReadOBJ : public ReaderIface
      * from a quad face.
      */
 
-    ErrorCode split_quad( std::vector< std::string > f_tokens, std::vector< EntityHandle >& vertex_list,
+    ErrorCode split_quad( std::vector< std::string > f_tokens,
+                          std::vector< EntityHandle >& vertex_list,
                           Range& face_eh );
 
     ErrorCode create_tri_faces( std::vector< EntityHandle > quad_vert_eh,

@@ -304,12 +304,11 @@ extern "C" {
  * same order as the entities in that primary definition table.
  * 
  */
- 
+
 /**
  *\defgroup mhdf MHDF API for reading/writing MOAB-format HDF5 mesh files.
  */
 /*@{*/
-
 
 /**
  *\defgroup mhdf_status Error handling
@@ -321,23 +320,19 @@ extern "C" {
  */
 /*@{*/
 
-
 /** \brief Get an mhdf_ElemHandle object for the node data.  
  *
  * \return A special element group handle used when specifying adjacency or
  * tag data for nodes. 
  */
-const char*
-mhdf_node_type_handle(void);
-
+const char* mhdf_node_type_handle( void );
 
 /** \brief Return a special element group handle used to specify the set group.
  *
  *  \return A special element group handle used to specify the set group
  *  for reading/writing tag data on sets.
  */
-const char*
-mhdf_set_type_handle(void);
+const char* mhdf_set_type_handle( void );
 
 #define MHDF_INDEX_TYPE H5T_NATIVE_LONG
 
@@ -350,14 +345,13 @@ mhdf_set_type_handle(void);
  * \param buffer_size The length of <code>buffer</code>.
  * \param status     Passed back status of API call.
  */
-void
-mhdf_getElemName( mhdf_FileHandle file_handle,
-                  unsigned int type_index,
-                  char* buffer, size_t buffer_size, 
-                  mhdf_Status* status );
+void mhdf_getElemName( mhdf_FileHandle file_handle,
+                       unsigned int type_index,
+                       char* buffer,
+                       size_t buffer_size,
+                       mhdf_Status* status );
 
-int
-mhdf_checkOpenHandles( mhdf_FileHandle handle, mhdf_Status* status );
+int mhdf_checkOpenHandles( mhdf_FileHandle handle, mhdf_Status* status );
 
 /** \brief Common close function for all data handle types.
  *
@@ -370,10 +364,7 @@ mhdf_checkOpenHandles( mhdf_FileHandle handle, mhdf_Status* status );
  * \param handle The data object to close.
  * \param status     Passed back status of API call.
  */
-void
-mhdf_closeData( mhdf_FileHandle file,
-                hid_t handle,
-                mhdf_Status* status );
+void mhdf_closeData( mhdf_FileHandle file, hid_t handle, mhdf_Status* status );
 
 /**\brief Get start ID that will be assigned to next created dataset
  *
@@ -381,10 +372,7 @@ mhdf_closeData( mhdf_FileHandle file,
  * call to any of mhdf_createNodeCoords, mhdf_createConnectivity, 
  * mhdf_createPolyConnectivity, or mhdf_createSetMeta
  */
-void
-mhdf_getNextStartId( mhdf_FileHandle file,
-                     mhdf_index_t* start_id_out,
-                     mhdf_Status* status );
+void mhdf_getNextStartId( mhdf_FileHandle file, mhdf_index_t* start_id_out, mhdf_Status* status );
 
 /** \brief Write the file history as a list of strings.
  *
@@ -396,11 +384,7 @@ mhdf_getNextStartId( mhdf_FileHandle file,
  * \param num_strings The length of <code>strings</code>
  * \param status     Passed back status of API call.
  */
-void
-mhdf_writeHistory( mhdf_FileHandle file, 
-                   const char** strings, 
-                   int num_strings, 
-                   mhdf_Status* status );
+void mhdf_writeHistory( mhdf_FileHandle file, const char** strings, int num_strings, mhdf_Status* status );
 
 /** \brief Read the file history as a list of strings.
  *
@@ -415,10 +399,7 @@ mhdf_writeHistory( mhdf_FileHandle file,
  * \param status     Passed back status of API call.
  * \return An array of null-terminates strings.
  */
-char**
-mhdf_readHistory( mhdf_FileHandle file,
-                  int* num_records_out, 
-                  mhdf_Status* status );
+char** mhdf_readHistory( mhdf_FileHandle file, int* num_records_out, mhdf_Status* status );
 /*@}*/
 /**
  *\defgroup mhdf_node Node coordinate data.
@@ -427,9 +408,7 @@ mhdf_readHistory( mhdf_FileHandle file,
 
 /* Node Coordinates */
 
-int
-mhdf_haveNodes( mhdf_FileHandle file_handle, mhdf_Status* status );
-                
+int mhdf_haveNodes( mhdf_FileHandle file_handle, mhdf_Status* status );
 
 /** \brief Create new table for node coordinate data 
  *
@@ -442,12 +421,11 @@ mhdf_haveNodes( mhdf_FileHandle file_handle, mhdf_Status* status );
  * \param status     Passed back status of API call.
  * \return An HDF5 handle to the coordinate table.
  */
-hid_t
-mhdf_createNodeCoords( mhdf_FileHandle file_handle,
-                       int dimension,
-                       long num_nodes,
-                       long* first_node_id_out,
-                       mhdf_Status* status );
+hid_t mhdf_createNodeCoords( mhdf_FileHandle file_handle,
+                             int dimension,
+                             long num_nodes,
+                             long* first_node_id_out,
+                             mhdf_Status* status );
 
 /** \brief Open table containing node coordinate data 
  *
@@ -460,15 +438,13 @@ mhdf_createNodeCoords( mhdf_FileHandle file_handle,
  * \param status     Passed back status of API call.
  * \return An HDF5 handle to the coordinate table.
  */
-hid_t
-mhdf_openNodeCoords( mhdf_FileHandle file_handle,
-                     long* num_nodes_out,
-                     int* dimension_out,
-                     long* first_node_id_out,
-                     mhdf_Status* status );
+hid_t mhdf_openNodeCoords( mhdf_FileHandle file_handle,
+                           long* num_nodes_out,
+                           int* dimension_out,
+                           long* first_node_id_out,
+                           mhdf_Status* status );
 
-hid_t
-mhdf_openNodeCoordsSimple( mhdf_FileHandle file_handle, mhdf_Status* status );
+hid_t mhdf_openNodeCoordsSimple( mhdf_FileHandle file_handle, mhdf_Status* status );
 
 /** \brief Write node coordinate data
  *
@@ -481,19 +457,13 @@ mhdf_openNodeCoordsSimple( mhdf_FileHandle file_handle, mhdf_Status* status );
  * \param coords       Interleaved node coordinate data.
  * \param status     Passed back status of API call.
  */
-void
-mhdf_writeNodeCoords( hid_t data_handle,
-                      long offset,
-                      long count,
-                      const double* coords,
-                      mhdf_Status* status );
-void
-mhdf_writeNodeCoordsWithOpt( hid_t data_handle,
-                      long offset,
-                      long count,
-                      const double* coords,
-                      hid_t write_prop,
-                      mhdf_Status* status );
+void mhdf_writeNodeCoords( hid_t data_handle, long offset, long count, const double* coords, mhdf_Status* status );
+void mhdf_writeNodeCoordsWithOpt( hid_t data_handle,
+                                  long offset,
+                                  long count,
+                                  const double* coords,
+                                  hid_t write_prop,
+                                  mhdf_Status* status );
 
 /** \brief Write node coordinate data
  *
@@ -508,21 +478,19 @@ mhdf_writeNodeCoordsWithOpt( hid_t data_handle,
  * \param coords       Coordinate list.
  * \param status     Passed back status of API call.
  */
-void
-mhdf_writeNodeCoord( hid_t data_handle,
-                     long offset,
-                     long count,
-                     int dimension,
-                     const double* coords,
-                     mhdf_Status* status );
-void
-mhdf_writeNodeCoordWithOpt( hid_t data_handle,
-                     long offset,
-                     long count,
-                     int dimension,
-                     const double* coords,
-                     hid_t write_prop,
-                     mhdf_Status* status );
+void mhdf_writeNodeCoord( hid_t data_handle,
+                          long offset,
+                          long count,
+                          int dimension,
+                          const double* coords,
+                          mhdf_Status* status );
+void mhdf_writeNodeCoordWithOpt( hid_t data_handle,
+                                 long offset,
+                                 long count,
+                                 int dimension,
+                                 const double* coords,
+                                 hid_t write_prop,
+                                 mhdf_Status* status );
 
 /** \brief Read node coordinate data
  *
@@ -535,20 +503,13 @@ mhdf_writeNodeCoordWithOpt( hid_t data_handle,
  * \param coordinates  Buffer in which to write node coordinate data.
  * \param status       Passed back status of API call.
  */
-void
-mhdf_readNodeCoords( hid_t data_handle,
-                     long offset,
-                     long count,
-                     double* coordinates,
-                     mhdf_Status* status );
-void
-mhdf_readNodeCoordsWithOpt( hid_t data_handle,
-                     long offset,
-                     long count,
-                     double* coordinates,
-                     hid_t read_prop,
-                     mhdf_Status* status );
-
+void mhdf_readNodeCoords( hid_t data_handle, long offset, long count, double* coordinates, mhdf_Status* status );
+void mhdf_readNodeCoordsWithOpt( hid_t data_handle,
+                                 long offset,
+                                 long count,
+                                 double* coordinates,
+                                 hid_t read_prop,
+                                 mhdf_Status* status );
 
 /** \brief Read node coordinate data
  *
@@ -563,21 +524,19 @@ mhdf_readNodeCoordsWithOpt( hid_t data_handle,
  * \param coords       Buffer in which to write node coordinate data.
  * \param status     Passed back status of API call.
  */
-void
-mhdf_readNodeCoord( hid_t data_handle,
-                    long offset,
-                    long count,
-                    int dimension,
-                    double* coords,
-                    mhdf_Status* status );
-void
-mhdf_readNodeCoordWithOpt( hid_t data_handle,
-                    long offset,
-                    long count,
-                    int dimension,
-                    double* coords,
-                    hid_t read_prop,
-                    mhdf_Status* status );
+void mhdf_readNodeCoord( hid_t data_handle,
+                         long offset,
+                         long count,
+                         int dimension,
+                         double* coords,
+                         mhdf_Status* status );
+void mhdf_readNodeCoordWithOpt( hid_t data_handle,
+                                long offset,
+                                long count,
+                                int dimension,
+                                double* coords,
+                                hid_t read_prop,
+                                mhdf_Status* status );
 
 /*@}*/
 /**
@@ -610,11 +569,10 @@ mhdf_readNodeCoordWithOpt( hid_t data_handle,
  *                     passed to \ref mhdf_createFile .
  * \param status     Passed back status of API call.
  */
-void
-mhdf_addElement( mhdf_FileHandle file_handle,
-                 const char* elem_handle,
-                 unsigned int named_elem_type,
-                 mhdf_Status* status );
+void mhdf_addElement( mhdf_FileHandle file_handle,
+                      const char* elem_handle,
+                      unsigned int named_elem_type,
+                      mhdf_Status* status );
 
 /** \brief Get the list of element groups in the file.
  *
@@ -636,10 +594,7 @@ mhdf_addElement( mhdf_FileHandle file_handle,
  *                       single memory block and should be freed
  *                       with <em>one</em> call to free().
  */
-char**
-mhdf_getElemHandles( mhdf_FileHandle file_handle,
-                     unsigned int* count_out,
-                     mhdf_Status* status );
+char** mhdf_getElemHandles( mhdf_FileHandle file_handle, unsigned int* count_out, mhdf_Status* status );
 
 /** 
  * \brief Get the element type name for a given element group handle.
@@ -653,11 +608,11 @@ mhdf_getElemHandles( mhdf_FileHandle file_handle,
  * \param buf_len     The length of <code>buffer</code>.
  * \param status      Passed back status of API call.
  */
-void
-mhdf_getElemTypeName( mhdf_FileHandle file_handle,
-                      const char* elem_handle,
-                      char* buffer, size_t buf_len,
-                      mhdf_Status* status );
+void mhdf_getElemTypeName( mhdf_FileHandle file_handle,
+                           const char* elem_handle,
+                           char* buffer,
+                           size_t buf_len,
+                           mhdf_Status* status );
 
 /** \brief Check if an element group contains polygon or polyhedron
  *
@@ -670,10 +625,7 @@ mhdf_getElemTypeName( mhdf_FileHandle file_handle,
  * \return Zero if normal fixed-connectivity element data.  Non-zero if
  *         poly(gon/hedron) general-connectivity data.
  */
-int
-mhdf_isPolyElement( mhdf_FileHandle file_handle,
-                    const char* elem_handle,
-                    mhdf_Status* status );
+int mhdf_isPolyElement( mhdf_FileHandle file_handle, const char* elem_handle, mhdf_Status* status );
 
 /** \brief Create connectivity table for an element group
  * 
@@ -697,14 +649,12 @@ mhdf_isPolyElement( mhdf_FileHandle file_handle,
  * \param status      Passed back status of API call.
  * \return The HDF5 handle to the connectivity data.
  */
-hid_t 
-mhdf_createConnectivity( mhdf_FileHandle file_handle,
-                         const char* elem_handle,
-                         int num_nodes_per_elem,
-                         long num_elements,
-                         long* first_elem_id_out,
-                         mhdf_Status* status );
-
+hid_t mhdf_createConnectivity( mhdf_FileHandle file_handle,
+                               const char* elem_handle,
+                               int num_nodes_per_elem,
+                               long num_elements,
+                               long* first_elem_id_out,
+                               mhdf_Status* status );
 
 /** \brief Open connectivity table for an element group
  * 
@@ -731,19 +681,14 @@ mhdf_createConnectivity( mhdf_FileHandle file_handle,
  * \param status      Passed back status of API call.
  * \return The HDF5 handle to the connectivity data.
  */
-hid_t
-mhdf_openConnectivity( mhdf_FileHandle file_handle,
-                       const char* elem_handle,
-                       int* num_nodes_per_elem_out,
-                       long* num_elements_out,
-                       long* first_elem_id_out,
-                       mhdf_Status* status );
-
-hid_t
-mhdf_openConnectivitySimple( mhdf_FileHandle file_handle, 
+hid_t mhdf_openConnectivity( mhdf_FileHandle file_handle,
                              const char* elem_handle,
+                             int* num_nodes_per_elem_out,
+                             long* num_elements_out,
+                             long* first_elem_id_out,
                              mhdf_Status* status );
-                             
+
+hid_t mhdf_openConnectivitySimple( mhdf_FileHandle file_handle, const char* elem_handle, mhdf_Status* status );
 
 /** \brief Write element coordinate data
  *
@@ -761,21 +706,19 @@ mhdf_openConnectivitySimple( mhdf_FileHandle file_handle,
  * \param node_id_list Interleaved connectivity data specified as global node IDs.
  * \param status       Passed back status of API call.
  */
-void
-mhdf_writeConnectivity( hid_t data_handle,
-                        long offset,
-                        long count,
-                        hid_t hdf_integer_type,
-                        const void* node_id_list,
-                        mhdf_Status* status );
-void
-mhdf_writeConnectivityWithOpt( hid_t data_handle,
-                        long offset,
-                        long count,
-                        hid_t hdf_integer_type,
-                        const void* node_id_list,
-                        hid_t write_prop,
-                        mhdf_Status* status );
+void mhdf_writeConnectivity( hid_t data_handle,
+                             long offset,
+                             long count,
+                             hid_t hdf_integer_type,
+                             const void* node_id_list,
+                             mhdf_Status* status );
+void mhdf_writeConnectivityWithOpt( hid_t data_handle,
+                                    long offset,
+                                    long count,
+                                    hid_t hdf_integer_type,
+                                    const void* node_id_list,
+                                    hid_t write_prop,
+                                    mhdf_Status* status );
 
 /** \brief Read element coordinate data
  *
@@ -794,24 +737,21 @@ mhdf_writeConnectivityWithOpt( hid_t data_handle,
  *                     connectivity data specified as global node IDs.
  * \param status       Passed back status of API call.
  */
-void 
-mhdf_readConnectivity( hid_t data_handle,
-                       long offset,
-                       long count,
-                       hid_t hdf_integer_type,
-                       void* node_id_list,
-                       mhdf_Status* status );
-void 
-mhdf_readConnectivityWithOpt( hid_t data_handle,
-                       long offset,
-                       long count,
-                       hid_t hdf_integer_type,
-                       void* node_id_list,
-                       hid_t read_prop,
-                       mhdf_Status* status );
+void mhdf_readConnectivity( hid_t data_handle,
+                            long offset,
+                            long count,
+                            hid_t hdf_integer_type,
+                            void* node_id_list,
+                            mhdf_Status* status );
+void mhdf_readConnectivityWithOpt( hid_t data_handle,
+                                   long offset,
+                                   long count,
+                                   hid_t hdf_integer_type,
+                                   void* node_id_list,
+                                   hid_t read_prop,
+                                   mhdf_Status* status );
 
 /* Poly(gon|hedra) */
-
 
 /** \brief Create a new table for polygon or polyhedron connectivity data.
  *
@@ -844,14 +784,13 @@ mhdf_readConnectivityWithOpt( hid_t data_handle,
  *                     connectivity list, respectively.
  * \param status       Passed back status of API call.
  */
-void
-mhdf_createPolyConnectivity( mhdf_FileHandle file_handle,
-                             const char* elem_handle,
-                             long num_poly,
-                             long data_list_length,
-                             long* first_id_out,
-                             hid_t idx_and_id_handles_out[2],
-                             mhdf_Status* status );
+void mhdf_createPolyConnectivity( mhdf_FileHandle file_handle,
+                                  const char* elem_handle,
+                                  long num_poly,
+                                  long data_list_length,
+                                  long* first_id_out,
+                                  hid_t idx_and_id_handles_out[2],
+                                  mhdf_Status* status );
 
 /** \brief Open a table of polygon or polyhedron connectivity data.
  *
@@ -884,14 +823,13 @@ mhdf_createPolyConnectivity( mhdf_FileHandle file_handle,
  *                     connectivity list, respectively.
  * \param status       Passed back status of API call.
  */
-void
-mhdf_openPolyConnectivity( mhdf_FileHandle file_handle,
-                           const char* elem_handle,
-                           long* num_poly_out,
-                           long* data_list_length_out,
-                           long* first_id_out,
-                           hid_t idx_and_id_handles_out[2],
-                           mhdf_Status* status );
+void mhdf_openPolyConnectivity( mhdf_FileHandle file_handle,
+                                const char* elem_handle,
+                                long* num_poly_out,
+                                long* data_list_length_out,
+                                long* first_id_out,
+                                hid_t idx_and_id_handles_out[2],
+                                mhdf_Status* status );
 
 /** \brief Write polygon or polyhedron index data.
  *
@@ -920,21 +858,19 @@ mhdf_openPolyConnectivity( mhdf_FileHandle file_handle,
  * \param index_list   The index list for the polys.
  * \param status       Passed back status of API call.
  */
-void
-mhdf_writePolyConnIndices( hid_t poly_handle,
-                           long offset,
-                           long count,
-                           hid_t hdf_integer_type,
-                           const void* index_list,
-                           mhdf_Status* status );
-void
-mhdf_writePolyConnIndicesWithOpt( hid_t poly_handle,
-                           long offset,
-                           long count,
-                           hid_t hdf_integer_type,
-                           const void* index_list,
-                           hid_t write_prop,
-                           mhdf_Status* status );
+void mhdf_writePolyConnIndices( hid_t poly_handle,
+                                long offset,
+                                long count,
+                                hid_t hdf_integer_type,
+                                const void* index_list,
+                                mhdf_Status* status );
+void mhdf_writePolyConnIndicesWithOpt( hid_t poly_handle,
+                                       long offset,
+                                       long count,
+                                       hid_t hdf_integer_type,
+                                       const void* index_list,
+                                       hid_t write_prop,
+                                       mhdf_Status* status );
 
 /** \brief Write polygon or polyhedron connectivity data.
  *
@@ -964,21 +900,19 @@ mhdf_writePolyConnIndicesWithOpt( hid_t poly_handle,
  *                     of the polys.
  * \param status       Passed back status of API call.
  */
-void
-mhdf_writePolyConnIDs( hid_t poly_handle,
-                       long offset,
-                       long count,
-                       hid_t hdf_integer_type,
-                       const void* id_list,
-                       mhdf_Status* status );
-void
-mhdf_writePolyConnIDsWithOpt( hid_t poly_handle,
-                       long offset,
-                       long count,
-                       hid_t hdf_integer_type,
-                       const void* id_list,
-                       hid_t write_prop,
-                       mhdf_Status* status );
+void mhdf_writePolyConnIDs( hid_t poly_handle,
+                            long offset,
+                            long count,
+                            hid_t hdf_integer_type,
+                            const void* id_list,
+                            mhdf_Status* status );
+void mhdf_writePolyConnIDsWithOpt( hid_t poly_handle,
+                                   long offset,
+                                   long count,
+                                   hid_t hdf_integer_type,
+                                   const void* id_list,
+                                   hid_t write_prop,
+                                   mhdf_Status* status );
 
 /** \brief Read polygon or polyhedron index data.
  *
@@ -1005,21 +939,19 @@ mhdf_writePolyConnIDsWithOpt( hid_t poly_handle,
  * \param index_list   The memory location at which to write the indices.
  * \param status       Passed back status of API call.
  */
-void 
-mhdf_readPolyConnIndices( hid_t poly_handle,
-                          long offset,
-                          long count,
-                          hid_t hdf_integer_type,
-                          void* index_list,
-                          mhdf_Status* status );
-void 
-mhdf_readPolyConnIndicesWithOpt( hid_t poly_handle,
-                          long offset,
-                          long count,
-                          hid_t hdf_integer_type,
-                          void* index_list,
-                          hid_t read_prop,
-                          mhdf_Status* status );
+void mhdf_readPolyConnIndices( hid_t poly_handle,
+                               long offset,
+                               long count,
+                               hid_t hdf_integer_type,
+                               void* index_list,
+                               mhdf_Status* status );
+void mhdf_readPolyConnIndicesWithOpt( hid_t poly_handle,
+                                      long offset,
+                                      long count,
+                                      hid_t hdf_integer_type,
+                                      void* index_list,
+                                      hid_t read_prop,
+                                      mhdf_Status* status );
 
 /** \brief Read polygon or polyhedron connectivity data.
  *
@@ -1046,21 +978,19 @@ mhdf_readPolyConnIndicesWithOpt( hid_t poly_handle,
  * \param id_list      The memory location at which to write the connectivity data.
  * \param status       Passed back status of API call.
  */
-void 
-mhdf_readPolyConnIDs( hid_t poly_handle,
-                      long offset,
-                      long count,
-                      hid_t hdf_integer_type,
-                      void* id_list,
-                      mhdf_Status* status );
-void 
-mhdf_readPolyConnIDsWithOpt( hid_t poly_handle,
-                      long offset,
-                      long count,
-                      hid_t hdf_integer_type,
-                      void* id_list,
-                      hid_t read_prop,
-                      mhdf_Status* status );
+void mhdf_readPolyConnIDs( hid_t poly_handle,
+                           long offset,
+                           long count,
+                           hid_t hdf_integer_type,
+                           void* id_list,
+                           mhdf_Status* status );
+void mhdf_readPolyConnIDsWithOpt( hid_t poly_handle,
+                                  long offset,
+                                  long count,
+                                  hid_t hdf_integer_type,
+                                  void* id_list,
+                                  hid_t read_prop,
+                                  mhdf_Status* status );
 /*@}*/
 /**
  *\defgroup mhdf_adj Adjacency data.
@@ -1072,7 +1002,6 @@ mhdf_readPolyConnIDsWithOpt( hid_t poly_handle,
  * IDs of the adjacent entities.
  */
 /*@{*/
-                     
 
 /** \brief Create adjacency data table for nodes, elements, polys, etc. 
  * 
@@ -1094,11 +1023,10 @@ mhdf_readPolyConnIDsWithOpt( hid_t poly_handle,
  * \param status       Passed back status of API call.
  * \return The HDF5 handle to the connectivity data.
  */
-hid_t
-mhdf_createAdjacency( mhdf_FileHandle file_handle,
-                      const char* elem_handle,
-                      long adj_list_size,
-                      mhdf_Status* status );
+hid_t mhdf_createAdjacency( mhdf_FileHandle file_handle,
+                            const char* elem_handle,
+                            long adj_list_size,
+                            mhdf_Status* status );
 
 /** \brief Check if adjacency data is present in the file for the specified
  *  element group.
@@ -1107,10 +1035,7 @@ mhdf_createAdjacency( mhdf_FileHandle file_handle,
  * \param elem_handle  A handle to an element group.  
  * \param status       Passed back status of API call.
  */
-int
-mhdf_haveAdjacency( mhdf_FileHandle file,
-                    const char* elem_handle,
-                    mhdf_Status* status );
+int mhdf_haveAdjacency( mhdf_FileHandle file, const char* elem_handle, mhdf_Status* status );
 
 /** \brief Open adjacency data table for nodes, elements, polys, etc. 
  * 
@@ -1132,11 +1057,10 @@ mhdf_haveAdjacency( mhdf_FileHandle file,
  * \param status       Passed back status of API call.
  * \return The HDF5 handle to the connectivity data.
  */
-hid_t
-mhdf_openAdjacency( mhdf_FileHandle file_handle,
-                    const char* elem_handle,
-                    long* adj_list_size,
-                    mhdf_Status* status );
+hid_t mhdf_openAdjacency( mhdf_FileHandle file_handle,
+                          const char* elem_handle,
+                          long* adj_list_size,
+                          mhdf_Status* status );
 
 /** \brief Write node/element adjacency data
  *
@@ -1162,21 +1086,19 @@ mhdf_openAdjacency( mhdf_FileHandle file_handle,
  * \param adj_list_data Adjacency data to write.
  * \param status       Passed back status of API call.
  */
-void
-mhdf_writeAdjacency( hid_t data_handle,
-                     long offset,
-                     long count,
-                     hid_t hdf_integer_type,
-                     const void* adj_list_data,
-                     mhdf_Status* status );
-void
-mhdf_writeAdjacencyWithOpt( hid_t data_handle,
-                     long offset,
-                     long count,
-                     hid_t hdf_integer_type,
-                     const void* adj_list_data,
-                     hid_t write_prop,
-                     mhdf_Status* status );
+void mhdf_writeAdjacency( hid_t data_handle,
+                          long offset,
+                          long count,
+                          hid_t hdf_integer_type,
+                          const void* adj_list_data,
+                          mhdf_Status* status );
+void mhdf_writeAdjacencyWithOpt( hid_t data_handle,
+                                 long offset,
+                                 long count,
+                                 hid_t hdf_integer_type,
+                                 const void* adj_list_data,
+                                 hid_t write_prop,
+                                 mhdf_Status* status );
 
 /** \brief Read node/element adjacency data
  *
@@ -1202,21 +1124,19 @@ mhdf_writeAdjacencyWithOpt( hid_t data_handle,
  * \param adj_list_data_out Pointer to memory at which to write adjacency data.
  * \param status       Passed back status of API call.
  */
-void
-mhdf_readAdjacency( hid_t data_handle,
-                    long offset,
-                    long count,
-                    hid_t hdf_integer_type,
-                    void* adj_list_data_out,
-                    mhdf_Status* status );
-void
-mhdf_readAdjacencyWithOpt( hid_t data_handle,
-                    long offset,
-                    long count,
-                    hid_t hdf_integer_type,
-                    void* adj_list_data_out,
-                    hid_t read_prop,
-                    mhdf_Status* status );
+void mhdf_readAdjacency( hid_t data_handle,
+                         long offset,
+                         long count,
+                         hid_t hdf_integer_type,
+                         void* adj_list_data_out,
+                         mhdf_Status* status );
+void mhdf_readAdjacencyWithOpt( hid_t data_handle,
+                                long offset,
+                                long count,
+                                hid_t hdf_integer_type,
+                                void* adj_list_data_out,
+                                hid_t read_prop,
+                                mhdf_Status* status );
 
 /*@}*/
 
@@ -1255,18 +1175,17 @@ mhdf_readAdjacencyWithOpt( hid_t data_handle,
  */
 /*@{*/
 
-
 /**
  *\defgroup mhdf_set_flag Set flag bits
  */
 /*@{*/
 
 /** \brief Make entities in set aware of owning set (MOAB-specific?)*/
-#define mhdf_SET_OWNER_BIT 0x1  
-/** \brief Set cannot contain duplicates */ 
-#define mhdf_SET_UNIQUE_BIT 0x2  
+#define mhdf_SET_OWNER_BIT 0x1
+/** \brief Set cannot contain duplicates */
+#define mhdf_SET_UNIQUE_BIT 0x2
 /** \brief Set order is preserved */
-#define mhdf_SET_ORDER_BIT 0x4  
+#define mhdf_SET_ORDER_BIT 0x4
 
 /** \brief The bit specifying set storage format.
  *
@@ -1308,11 +1227,7 @@ mhdf_readAdjacencyWithOpt( hid_t data_handle,
  * \param status       Passed back status of API call.
  *\return The handle to the set meta-data table.  
  */
-hid_t
-mhdf_createSetMeta( mhdf_FileHandle file_handle,
-                    long num_sets,
-                    long* first_set_id_out,
-                    mhdf_Status* status );
+hid_t mhdf_createSetMeta( mhdf_FileHandle file_handle, long num_sets, long* first_set_id_out, mhdf_Status* status );
 
 /** \brief Check if file contains any sets
  *
@@ -1326,12 +1241,11 @@ mhdf_createSetMeta( mhdf_FileHandle file_handle,
  * \param status       Passed back status of API call.
  *\return Zero if the file does not contain any sets, one if it does.
  */
-int
-mhdf_haveSets( mhdf_FileHandle file,
-               int* have_set_data_out,
-               int* have_set_child_out,
-               int* have_set_parents_out,
-               mhdf_Status* status );
+int mhdf_haveSets( mhdf_FileHandle file,
+                   int* have_set_data_out,
+                   int* have_set_child_out,
+                   int* have_set_parents_out,
+                   mhdf_Status* status );
 
 /** \brief Open table holding list of meshsets and their properties.
  * 
@@ -1346,14 +1260,9 @@ mhdf_haveSets( mhdf_FileHandle file,
  * \param status       Passed back status of API call.
  *\return The handle to the set meta-data table.  
  */
-hid_t
-mhdf_openSetMeta( mhdf_FileHandle file_handle,
-                  long* num_sets_out,
-                  long* first_set_id_out,
-                  mhdf_Status* status );
+hid_t mhdf_openSetMeta( mhdf_FileHandle file_handle, long* num_sets_out, long* first_set_id_out, mhdf_Status* status );
 
-hid_t
-mhdf_openSetMetaSimple( mhdf_FileHandle file_handle, mhdf_Status* status );
+hid_t mhdf_openSetMetaSimple( mhdf_FileHandle file_handle, mhdf_Status* status );
 
 /** \brief Read list of sets and meta-information about sets.
  *
@@ -1371,21 +1280,19 @@ mhdf_openSetMetaSimple( mhdf_FileHandle file_handle, mhdf_Status* status );
  * \param status       Passed back status of API call.
  *\param set_desc_data The memory location at which to write the data.
  */
-void
-mhdf_readSetMeta( hid_t data_handle,
-                  long offset,
-                  long count,
-                  hid_t hdf_integer_type,
-                  void* set_desc_data,  
-                  mhdf_Status* status );
-void
-mhdf_readSetMetaWithOpt( hid_t data_handle,
-                  long offset,
-                  long count,
-                  hid_t hdf_integer_type,
-                  void* set_desc_data,  
-                  hid_t read_prop,
-                  mhdf_Status* status );
+void mhdf_readSetMeta( hid_t data_handle,
+                       long offset,
+                       long count,
+                       hid_t hdf_integer_type,
+                       void* set_desc_data,
+                       mhdf_Status* status );
+void mhdf_readSetMetaWithOpt( hid_t data_handle,
+                              long offset,
+                              long count,
+                              hid_t hdf_integer_type,
+                              void* set_desc_data,
+                              hid_t read_prop,
+                              mhdf_Status* status );
 
 /** \brief Read only the flags portion of the set description table
  *
@@ -1398,22 +1305,19 @@ mhdf_readSetMetaWithOpt( hid_t data_handle,
  *\param set_flag_data Array of integers.
  *\param status      Location at which to store status of API call.
  */
-void
-mhdf_readSetFlags( hid_t data_handle,
-                   long offset,
-                   long count,
-                   hid_t hdf_integer_type,
-                   void* set_flag_data,
-                   mhdf_Status* status );
-void
-mhdf_readSetFlagsWithOpt( hid_t data_handle,
-                   long offset,
-                   long count,
-                   hid_t hdf_integer_type,
-                   void* set_flag_data,
-                   hid_t read_prop,
-                   mhdf_Status* status );
-
+void mhdf_readSetFlags( hid_t data_handle,
+                        long offset,
+                        long count,
+                        hid_t hdf_integer_type,
+                        void* set_flag_data,
+                        mhdf_Status* status );
+void mhdf_readSetFlagsWithOpt( hid_t data_handle,
+                               long offset,
+                               long count,
+                               hid_t hdf_integer_type,
+                               void* set_flag_data,
+                               hid_t read_prop,
+                               mhdf_Status* status );
 
 /** \brief Read only the content end indices portion of the set description table
  *
@@ -1430,21 +1334,19 @@ mhdf_readSetFlagsWithOpt( hid_t data_handle,
  *\param end_indices_out Array of indices.
  *\param status      Location at which to store status of API call.
  */
-void
-mhdf_readSetContentEndIndices( hid_t data_handle,
-                               long offset,
-                               long count,
-                               hid_t hdf_integer_type,
-                               void* end_indices_out,
-                               mhdf_Status* status );
-void
-mhdf_readSetContentEndIndicesWithOpt( hid_t data_handle,
-                               long offset,
-                               long count,
-                               hid_t hdf_integer_type,
-                               void* end_indices_out,
-                               hid_t read_prop,
-                               mhdf_Status* status );
+void mhdf_readSetContentEndIndices( hid_t data_handle,
+                                    long offset,
+                                    long count,
+                                    hid_t hdf_integer_type,
+                                    void* end_indices_out,
+                                    mhdf_Status* status );
+void mhdf_readSetContentEndIndicesWithOpt( hid_t data_handle,
+                                           long offset,
+                                           long count,
+                                           hid_t hdf_integer_type,
+                                           void* end_indices_out,
+                                           hid_t read_prop,
+                                           mhdf_Status* status );
 
 /** \brief Read only the child end indices portion of the set description table
  *
@@ -1461,21 +1363,19 @@ mhdf_readSetContentEndIndicesWithOpt( hid_t data_handle,
  *\param end_indices_out Array of indices.
  *\param status      Location at which to store status of API call.
  */
-void
-mhdf_readSetChildEndIndices( hid_t data_handle,
-                             long offset,
-                             long count,
-                             hid_t hdf_integer_type,
-                             void* end_indices_out,
-                             mhdf_Status* status );
-void
-mhdf_readSetChildEndIndicesWithOpt( hid_t data_handle,
-                             long offset,
-                             long count,
-                             hid_t hdf_integer_type,
-                             void* end_indices_out,
-                             hid_t read_prop,
-                             mhdf_Status* status );
+void mhdf_readSetChildEndIndices( hid_t data_handle,
+                                  long offset,
+                                  long count,
+                                  hid_t hdf_integer_type,
+                                  void* end_indices_out,
+                                  mhdf_Status* status );
+void mhdf_readSetChildEndIndicesWithOpt( hid_t data_handle,
+                                         long offset,
+                                         long count,
+                                         hid_t hdf_integer_type,
+                                         void* end_indices_out,
+                                         hid_t read_prop,
+                                         mhdf_Status* status );
 
 /** \brief Read only the parent end indices portion of the set description table
  *
@@ -1492,22 +1392,19 @@ mhdf_readSetChildEndIndicesWithOpt( hid_t data_handle,
  *\param end_indices_out Array of indices.
  *\param status      Location at which to store status of API call.
  */
-void
-mhdf_readSetParentEndIndices( hid_t data_handle,
-                              long offset,
-                              long count,
-                              hid_t hdf_integer_type,
-                              void* end_indices_out,
-                              mhdf_Status* status );
-void
-mhdf_readSetParentEndIndicesWithOpt( hid_t data_handle,
-                              long offset,
-                              long count,
-                              hid_t hdf_integer_type,
-                              void* end_indices_out,
-                              hid_t read_prop,
-                              mhdf_Status* status );
-
+void mhdf_readSetParentEndIndices( hid_t data_handle,
+                                   long offset,
+                                   long count,
+                                   hid_t hdf_integer_type,
+                                   void* end_indices_out,
+                                   mhdf_Status* status );
+void mhdf_readSetParentEndIndicesWithOpt( hid_t data_handle,
+                                          long offset,
+                                          long count,
+                                          hid_t hdf_integer_type,
+                                          void* end_indices_out,
+                                          hid_t read_prop,
+                                          mhdf_Status* status );
 
 /** \brief Write list of sets and meta-information about sets.
  *
@@ -1525,21 +1422,19 @@ mhdf_readSetParentEndIndicesWithOpt( hid_t data_handle,
  *\param set_desc_data The data to write.
  * \param status       Passed back status of API call.
  */
-void
-mhdf_writeSetMeta( hid_t data_handle,
-                   long offset,
-                   long count,
-                   hid_t hdf_integer_type,
-                   const void* set_desc_data,  
-                   mhdf_Status* status );
-void
-mhdf_writeSetMetaWithOpt( hid_t data_handle,
-                   long offset,
-                   long count,
-                   hid_t hdf_integer_type,
-                   const void* set_desc_data,  
-                   hid_t write_prop,
-                   mhdf_Status* status );
+void mhdf_writeSetMeta( hid_t data_handle,
+                        long offset,
+                        long count,
+                        hid_t hdf_integer_type,
+                        const void* set_desc_data,
+                        mhdf_Status* status );
+void mhdf_writeSetMetaWithOpt( hid_t data_handle,
+                               long offset,
+                               long count,
+                               hid_t hdf_integer_type,
+                               const void* set_desc_data,
+                               hid_t write_prop,
+                               mhdf_Status* status );
 
 /** \brief Create file object to hold list of meshset contents. 
  *
@@ -1556,10 +1451,7 @@ mhdf_writeSetMetaWithOpt( hid_t data_handle,
  *\param status      Passed back status of API call.
  *\return A handle to the table.
  */
-hid_t
-mhdf_createSetData( mhdf_FileHandle file_handle,
-                    long data_list_size,
-                    mhdf_Status* status );
+hid_t mhdf_createSetData( mhdf_FileHandle file_handle, long data_list_size, mhdf_Status* status );
 
 /** \brief Open the file object for the meshset contents. 
  *
@@ -1575,10 +1467,7 @@ mhdf_createSetData( mhdf_FileHandle file_handle,
  *\param status             Passed back status of API call.
  *\return                   A handle to the table.
  */
-hid_t
-mhdf_openSetData( mhdf_FileHandle file_handle,
-                  long* data_list_size_out,
-                  mhdf_Status* status );
+hid_t mhdf_openSetData( mhdf_FileHandle file_handle, long* data_list_size_out, mhdf_Status* status );
 
 /** \brief Write set contents.
  *
@@ -1600,21 +1489,19 @@ mhdf_openSetData( mhdf_FileHandle file_handle,
  *\param set_data    The data to write.
  *\param status      Passed back status of API call.
  */
-void
-mhdf_writeSetData( hid_t set_handle,
-                   long offset,
-                   long count,
-                   hid_t hdf_integer_type,
-                   const void* set_data,
-                   mhdf_Status* status );
-void
-mhdf_writeSetDataWithOpt( hid_t set_handle,
-                   long offset,
-                   long count,
-                   hid_t hdf_integer_type,
-                   const void* set_data,
-                   hid_t write_prop,
-                   mhdf_Status* status );
+void mhdf_writeSetData( hid_t set_handle,
+                        long offset,
+                        long count,
+                        hid_t hdf_integer_type,
+                        const void* set_data,
+                        mhdf_Status* status );
+void mhdf_writeSetDataWithOpt( hid_t set_handle,
+                               long offset,
+                               long count,
+                               hid_t hdf_integer_type,
+                               const void* set_data,
+                               hid_t write_prop,
+                               mhdf_Status* status );
 
 /** \brief Read set contents.
  *
@@ -1636,21 +1523,19 @@ mhdf_writeSetDataWithOpt( hid_t set_handle,
  *\param set_data    A pointer to memory at which to store the read data.
  *\param status      Passed back status of API call.
  */
-void
-mhdf_readSetData( hid_t set_handle,
-                  long offset,
-                  long count,
-                  hid_t hdf_integer_type,
-                  void* set_data,
-                  mhdf_Status* status );
-void
-mhdf_readSetDataWithOpt( hid_t set_handle,
-                  long offset,
-                  long count,
-                  hid_t hdf_integer_type,
-                  void* set_data,
-                  hid_t read_prop,
-                  mhdf_Status* status );
+void mhdf_readSetData( hid_t set_handle,
+                       long offset,
+                       long count,
+                       hid_t hdf_integer_type,
+                       void* set_data,
+                       mhdf_Status* status );
+void mhdf_readSetDataWithOpt( hid_t set_handle,
+                              long offset,
+                              long count,
+                              hid_t hdf_integer_type,
+                              void* set_data,
+                              hid_t read_prop,
+                              mhdf_Status* status );
 
 /** \brief Create file object for storing the set child list 
  *
@@ -1666,10 +1551,7 @@ mhdf_readSetDataWithOpt( hid_t set_handle,
  *\param status           Passed back status of API call.
  *\return A handle to the data object in the file.
  */
-hid_t
-mhdf_createSetChildren( mhdf_FileHandle file_handle,
-                        long child_list_size,
-                        mhdf_Status* status );
+hid_t mhdf_createSetChildren( mhdf_FileHandle file_handle, long child_list_size, mhdf_Status* status );
 
 /** \brief Open the file object containing the set child list 
  *
@@ -1683,10 +1565,7 @@ mhdf_createSetChildren( mhdf_FileHandle file_handle,
  *\param status           Passed back status of API call.
  *\return A handle to the data object in the file.
  */
-hid_t
-mhdf_openSetChildren( mhdf_FileHandle file_handle,
-                      long* child_list_size,
-                      mhdf_Status* status );
+hid_t mhdf_openSetChildren( mhdf_FileHandle file_handle, long* child_list_size, mhdf_Status* status );
 
 /** \brief Create file object for storing the set parent list 
  *
@@ -1702,10 +1581,7 @@ mhdf_openSetChildren( mhdf_FileHandle file_handle,
  *\param status            Passed back status of API call.
  *\return A handle to the data object in the file.
  */
-hid_t
-mhdf_createSetParents( mhdf_FileHandle file_handle,
-                       long parent_list_size,
-                       mhdf_Status* status );
+hid_t mhdf_createSetParents( mhdf_FileHandle file_handle, long parent_list_size, mhdf_Status* status );
 
 /** \brief Open the file object containing the set parent list 
  *
@@ -1719,10 +1595,7 @@ mhdf_createSetParents( mhdf_FileHandle file_handle,
  *\param status            Passed back status of API call.
  *\return A handle to the data object in the file.
  */
-hid_t
-mhdf_openSetParents( mhdf_FileHandle file_handle,
-                     long* parent_list_size,
-                     mhdf_Status* status );
+hid_t mhdf_openSetParents( mhdf_FileHandle file_handle, long* parent_list_size, mhdf_Status* status );
 
 /** \brief Write set parent/child list
  *
@@ -1741,21 +1614,19 @@ mhdf_openSetParents( mhdf_FileHandle file_handle,
  *\param id_list     The data to write.
  *\param status      Passed back status of API call.
  */
-void
-mhdf_writeSetParentsChildren( hid_t data_handle,
-                              long offset,
-                              long count,
-                              hid_t hdf_integer_type,
-                              const void* id_list,
-                              mhdf_Status* status );
-void
-mhdf_writeSetParentsChildrenWithOpt( hid_t data_handle,
-                              long offset,
-                              long count,
-                              hid_t hdf_integer_type,
-                              const void* id_list,
-                              hid_t write_prop,
-                              mhdf_Status* status );
+void mhdf_writeSetParentsChildren( hid_t data_handle,
+                                   long offset,
+                                   long count,
+                                   hid_t hdf_integer_type,
+                                   const void* id_list,
+                                   mhdf_Status* status );
+void mhdf_writeSetParentsChildrenWithOpt( hid_t data_handle,
+                                          long offset,
+                                          long count,
+                                          hid_t hdf_integer_type,
+                                          const void* id_list,
+                                          hid_t write_prop,
+                                          mhdf_Status* status );
 
 /** \brief Read set parent/child list
  *
@@ -1774,21 +1645,19 @@ mhdf_writeSetParentsChildrenWithOpt( hid_t data_handle,
  *\param id_list     Pointer to memory in which to the read data.
  *\param status      Passed back status of API call.
  */
-void
-mhdf_readSetParentsChildren( hid_t data_handle,
-                             long offset,
-                             long count,
-                             hid_t hdf_integer_type,
-                             void* id_list,
-                             mhdf_Status* status );
-void
-mhdf_readSetParentsChildrenWithOpt( hid_t data_handle,
-                             long offset,
-                             long count,
-                             hid_t hdf_integer_type,
-                             void* id_list,
-                             hid_t read_prop,
-                             mhdf_Status* status );
+void mhdf_readSetParentsChildren( hid_t data_handle,
+                                  long offset,
+                                  long count,
+                                  hid_t hdf_integer_type,
+                                  void* id_list,
+                                  mhdf_Status* status );
+void mhdf_readSetParentsChildrenWithOpt( hid_t data_handle,
+                                         long offset,
+                                         long count,
+                                         hid_t hdf_integer_type,
+                                         void* id_list,
+                                         hid_t read_prop,
+                                         mhdf_Status* status );
 
 /*@}*/
 
@@ -1812,20 +1681,19 @@ mhdf_readSetParentsChildrenWithOpt( hid_t data_handle,
  */
 /*@{*/
 
-
 /**
  *\defgroup mhdf_tag_flag Tag type values   (MOAB-specific)
  */
 /*@{*/
 
 /** \brief Was dense tag data in mesh database */
-#define mhdf_DENSE_TYPE   2 
+#define mhdf_DENSE_TYPE 2
 /** \brief Was sparse tag data in mesh database */
-#define mhdf_SPARSE_TYPE  1 
+#define mhdf_SPARSE_TYPE 1
 /** \brief Was bit-field tag data in mesh database */
-#define mhdf_BIT_TYPE     0 
+#define mhdf_BIT_TYPE 0
 /** \brief Unused */
-#define mhdf_MESH_TYPE    3 
+#define mhdf_MESH_TYPE 3
 
 /*@}*/
 
@@ -1848,10 +1716,7 @@ mhdf_readSetParentsChildrenWithOpt( hid_t data_handle,
  *\param status       Passed back status of API call.
  *\return             The converted type.
  */
-hid_t
-mhdf_getNativeType( hid_t input_type,
-                    int size,
-                    mhdf_Status* status );
+hid_t mhdf_getNativeType( hid_t input_type, int size, mhdf_Status* status );
 
 /** \brief Add a tag to the file
  *
@@ -1880,24 +1745,19 @@ mhdf_getNativeType( hid_t input_type,
  *                      used to specify the input data type for mhdf_ENTITY_ID
  *                      tags.  
  */
-void
-mhdf_createTag( mhdf_FileHandle file_handle,
-                const char* tag_name,
-                enum mhdf_TagDataType tag_type,
-                int size,
-                int storage,
-                const void* default_value,
-                const void* global_value,
-                hid_t hdf_type,
-                hid_t mhdf_base_type,
-                mhdf_Status* status );
-
-/**\brief Get handle to HDF5 type object for tag data */
-hid_t
-mhdf_getTagDataType( mhdf_FileHandle file_handle, 
-                     const char* tag_name, 
+void mhdf_createTag( mhdf_FileHandle file_handle,
+                     const char* tag_name,
+                     enum mhdf_TagDataType tag_type,
+                     int size,
+                     int storage,
+                     const void* default_value,
+                     const void* global_value,
+                     hid_t hdf_type,
+                     hid_t mhdf_base_type,
                      mhdf_Status* status );
 
+/**\brief Get handle to HDF5 type object for tag data */
+hid_t mhdf_getTagDataType( mhdf_FileHandle file_handle, const char* tag_name, mhdf_Status* status );
 
 /** \brief Add variable-length tag to file
  *
@@ -1924,19 +1784,17 @@ mhdf_getTagDataType( mhdf_FileHandle file_handle,
  *                      used to specify the input data type for mhdf_ENTITY_ID
  *                      tags.  
  */
-void
-mhdf_createVarLenTag( mhdf_FileHandle file_handle,
-                      const char* tag_name,
-                      enum mhdf_TagDataType tag_type,
-                      int storage,
-                      const void* default_value,
-                      int default_value_length,
-                      const void* global_value,
-                      int global_value_length,
-                      hid_t hdf_type,
-                      hid_t hdf_base_type,
-                      mhdf_Status* status );
-                
+void mhdf_createVarLenTag( mhdf_FileHandle file_handle,
+                           const char* tag_name,
+                           enum mhdf_TagDataType tag_type,
+                           int storage,
+                           const void* default_value,
+                           int default_value_length,
+                           const void* global_value,
+                           int global_value_length,
+                           hid_t hdf_type,
+                           hid_t hdf_base_type,
+                           mhdf_Status* status );
 
 /** \brief Get the number of tags in the file.
  *
@@ -1944,9 +1802,7 @@ mhdf_createVarLenTag( mhdf_FileHandle file_handle,
  *\param status        Passed back status of API call.
  *\return The number of tags.
  */
-int
-mhdf_getNumberTags( mhdf_FileHandle file_handle,
-                    mhdf_Status* status );
+int mhdf_getNumberTags( mhdf_FileHandle file_handle, mhdf_Status* status );
 
 /** \brief Get the name for each tag defined in the file.
  *
@@ -1957,11 +1813,8 @@ mhdf_getNumberTags( mhdf_FileHandle file_handle,
  *        and each string is allocated with <code>malloc</code>.
  *        The caller should release this memory by calling 
  *        <code>free</code> for each string and the array.
- */                 
-char**
-mhdf_getTagNames( mhdf_FileHandle file_handle,
-                  int* num_names_out,
-                  mhdf_Status* status );
+ */
+char** mhdf_getTagNames( mhdf_FileHandle file_handle, int* num_names_out, mhdf_Status* status );
 
 /** \brief Get the description of a specified tag.
  *
@@ -1982,18 +1835,15 @@ mhdf_getTagNames( mhdf_FileHandle file_handle,
  *\param have_global_out  Non-zero if the file contains a global/mesh value for the tag.
  *\param have_sparse_out  Non-zero if the file contains a sparse data table for this tag.
  */
-void
-mhdf_getTagInfo( mhdf_FileHandle file_handle,
-                 const char* tag_name,
-                 enum mhdf_TagDataType* class_out,
-                 int* size_out,
-                 int* tstt_storage_out,
-                 int* have_default_out,
-                 int* have_global_out,
-                 int* have_sparse_out,
-                 mhdf_Status* status );
-                 
-
+void mhdf_getTagInfo( mhdf_FileHandle file_handle,
+                      const char* tag_name,
+                      enum mhdf_TagDataType* class_out,
+                      int* size_out,
+                      int* tstt_storage_out,
+                      int* have_default_out,
+                      int* have_global_out,
+                      int* have_sparse_out,
+                      mhdf_Status* status );
 
 /** \brief Get the default and global values of the tag.
  *
@@ -2008,13 +1858,12 @@ mhdf_getTagInfo( mhdf_FileHandle file_handle,
  *                        at which to write that value.
  *\param status           Passed back status of API call.
  */
-void
-mhdf_getTagValues( mhdf_FileHandle file_handle,
-                   const char* tag_name,
-                   hid_t output_data_type,
-                   void* default_value,
-                   void* global_value,
-                   mhdf_Status* status );
+void mhdf_getTagValues( mhdf_FileHandle file_handle,
+                        const char* tag_name,
+                        hid_t output_data_type,
+                        void* default_value,
+                        void* global_value,
+                        mhdf_Status* status );
 
 /** \brief Check if the file contains dense tag data for the specified tag and element group.
  *
@@ -2029,11 +1878,7 @@ mhdf_getTagValues( mhdf_FileHandle file_handle,
  *\param status       Passed back status of API call.
  *\return Non-zero if file contains specified data.  Zero otherwise.
  */
-int
-mhdf_haveDenseTag( mhdf_FileHandle file_handle,
-                   const char* tag_name,
-                   const char* elem_group,
-                   mhdf_Status* status );
+int mhdf_haveDenseTag( mhdf_FileHandle file_handle, const char* tag_name, const char* elem_group, mhdf_Status* status );
 
 /** \brief Create an object to hold dense tag values for a given element group.
  *
@@ -2049,12 +1894,11 @@ mhdf_haveDenseTag( mhdf_FileHandle file_handle,
  *\param status       Passed back status of API call.
  *\return             Handle to data object in file.
  */
-hid_t
-mhdf_createDenseTagData( mhdf_FileHandle file_handle,
-                         const char* tag_name,
-                         const char* elem_group,
-                         long num_values,
-                         mhdf_Status* status );
+hid_t mhdf_createDenseTagData( mhdf_FileHandle file_handle,
+                               const char* tag_name,
+                               const char* elem_group,
+                               long num_values,
+                               mhdf_Status* status );
 
 /** \brief Open the object containing dense tag values for a given element group.
  *
@@ -2068,12 +1912,11 @@ mhdf_createDenseTagData( mhdf_FileHandle file_handle,
  *\param status         Passed back status of API call.
  *\return               Handle to data object in file.
  */
-hid_t
-mhdf_openDenseTagData( mhdf_FileHandle file_handle,
-                       const char* tag_name,
-                       const char* elem_group,
-                       long* num_values_out,
-                       mhdf_Status* status );
+hid_t mhdf_openDenseTagData( mhdf_FileHandle file_handle,
+                             const char* tag_name,
+                             const char* elem_group,
+                             long* num_values_out,
+                             mhdf_Status* status );
 
 /** \brief Create file objects to store sparse tag data 
  *
@@ -2090,12 +1933,11 @@ mhdf_openDenseTagData( mhdf_FileHandle file_handle,
  *                      is the list of corresponding tag values.  
  *\param status         Passed back status of API call.
  */
-void
-mhdf_createSparseTagData( mhdf_FileHandle file_handle,
-                          const char* tag_name,
-                          long num_values,
-                          hid_t entities_and_values_out[2],
-                          mhdf_Status* status );
+void mhdf_createSparseTagData( mhdf_FileHandle file_handle,
+                               const char* tag_name,
+                               long num_values,
+                               hid_t entities_and_values_out[2],
+                               mhdf_Status* status );
 
 /** \brief Create file objects to store (sparse) variable-length tag data 
  *
@@ -2116,13 +1958,12 @@ mhdf_createSparseTagData( mhdf_FileHandle file_handle,
  *                      is the handle to the index table.
  *\param status         Passed back status of API call.
  */
-void
-mhdf_createVarLenTagData( mhdf_FileHandle file_handle,
-                          const char* tag_name,
-                          long num_entities,
-                          long num_values,
-                          hid_t entities_and_values_out[3],
-                          mhdf_Status* status );
+void mhdf_createVarLenTagData( mhdf_FileHandle file_handle,
+                               const char* tag_name,
+                               long num_entities,
+                               long num_values,
+                               hid_t entities_and_values_out[3],
+                               mhdf_Status* status );
 
 /** \brief Create file objects to read sparse tag data 
  *
@@ -2148,13 +1989,12 @@ mhdf_createVarLenTagData( mhdf_FileHandle file_handle,
  *                      value is not set.
  *\param status         Passed back status of API call.
  */
-void
-mhdf_openSparseTagData( mhdf_FileHandle file_handle,
-                        const char* tag_name,
-                        long* num_entity_out,
-                        long* num_values_out,
-                        hid_t entities_and_values_out[3],
-                        mhdf_Status* status );
+void mhdf_openSparseTagData( mhdf_FileHandle file_handle,
+                             const char* tag_name,
+                             long* num_entity_out,
+                             long* num_values_out,
+                             hid_t entities_and_values_out[3],
+                             mhdf_Status* status );
 
 /** \brief Write Global ID list for sparse tag data
  *
@@ -2170,23 +2010,19 @@ mhdf_openSparseTagData( mhdf_FileHandle file_handle,
  *\param id_list     The list of global IDs to write.
  *\param status      Passed back status of API call.
  */
-void
-mhdf_writeSparseTagEntities( hid_t id_handle,
-                             long offset,
-                             long count,
-                             hid_t hdf_integer_type,
-                             const void* id_list,
-                             mhdf_Status* status );
-void
-mhdf_writeSparseTagEntitiesWithOpt( hid_t id_handle,
-                             long offset,
-                             long count,
-                             hid_t hdf_integer_type,
-                             const void* id_list,
-                             hid_t write_prop,
-                             mhdf_Status* status );
-
-
+void mhdf_writeSparseTagEntities( hid_t id_handle,
+                                  long offset,
+                                  long count,
+                                  hid_t hdf_integer_type,
+                                  const void* id_list,
+                                  mhdf_Status* status );
+void mhdf_writeSparseTagEntitiesWithOpt( hid_t id_handle,
+                                         long offset,
+                                         long count,
+                                         hid_t hdf_integer_type,
+                                         const void* id_list,
+                                         hid_t write_prop,
+                                         mhdf_Status* status );
 
 /** \brief Write tag values
  *
@@ -2204,21 +2040,19 @@ mhdf_writeSparseTagEntitiesWithOpt( hid_t id_handle,
  *\param tag_data      The list of tag values to write.
  *\param status        Passed back status of API call.
  */
-void
-mhdf_writeTagValues( hid_t value_handle,
-                     long offset,
-                     long count,
-                     hid_t hdf_tag_data_type,
-                     const void* tag_data,
-                     mhdf_Status* status );
-void
-mhdf_writeTagValuesWithOpt( hid_t value_handle,
-                     long offset,
-                     long count,
-                     hid_t hdf_tag_data_type,
-                     const void* tag_data,
-                     hid_t write_prop,
-                     mhdf_Status* status );
+void mhdf_writeTagValues( hid_t value_handle,
+                          long offset,
+                          long count,
+                          hid_t hdf_tag_data_type,
+                          const void* tag_data,
+                          mhdf_Status* status );
+void mhdf_writeTagValuesWithOpt( hid_t value_handle,
+                                 long offset,
+                                 long count,
+                                 hid_t hdf_tag_data_type,
+                                 const void* tag_data,
+                                 hid_t write_prop,
+                                 mhdf_Status* status );
 
 /**\brief Write sparse tag end indices for variable-length tag data
  *
@@ -2234,21 +2068,19 @@ mhdf_writeTagValuesWithOpt( hid_t value_handle,
  *\param end_indices  The values to store in the table.
  *\param status       Output: API result.
  */
-void 
-mhdf_writeSparseTagIndices( hid_t tag_handle,
-                            long offset,
-                            long count,
-                            hid_t hdf_integer_type,
-                            const void* end_indices,
-                            mhdf_Status* status );
-void 
-mhdf_writeSparseTagIndicesWithOpt( hid_t tag_handle,
-                            long offset,
-                            long count,
-                            hid_t hdf_integer_type,
-                            const void* end_indices,
-                            hid_t write_prop,
-                            mhdf_Status* status );
+void mhdf_writeSparseTagIndices( hid_t tag_handle,
+                                 long offset,
+                                 long count,
+                                 hid_t hdf_integer_type,
+                                 const void* end_indices,
+                                 mhdf_Status* status );
+void mhdf_writeSparseTagIndicesWithOpt( hid_t tag_handle,
+                                        long offset,
+                                        long count,
+                                        hid_t hdf_integer_type,
+                                        const void* end_indices,
+                                        hid_t write_prop,
+                                        mhdf_Status* status );
 
 /** \brief Read Global ID list for sparse tag data
  *
@@ -2264,21 +2096,19 @@ mhdf_writeSparseTagIndicesWithOpt( hid_t tag_handle,
  *\param id_list     The memory location at which to store the global IDs.
  *\param status      Passed back status of API call.
  */
-void
-mhdf_readSparseTagEntities( hid_t id_handle,
-                            long offset,
-                            long count,
-                            hid_t hdf_integer_type,
-                            void* id_list,
-                            mhdf_Status* status );
-void
-mhdf_readSparseTagEntitiesWithOpt( hid_t id_handle,
-                            long offset,
-                            long count,
-                            hid_t hdf_integer_type,
-                            void* id_list,
-                            hid_t read_prop,
-                            mhdf_Status* status );
+void mhdf_readSparseTagEntities( hid_t id_handle,
+                                 long offset,
+                                 long count,
+                                 hid_t hdf_integer_type,
+                                 void* id_list,
+                                 mhdf_Status* status );
+void mhdf_readSparseTagEntitiesWithOpt( hid_t id_handle,
+                                        long offset,
+                                        long count,
+                                        hid_t hdf_integer_type,
+                                        void* id_list,
+                                        hid_t read_prop,
+                                        mhdf_Status* status );
 
 /** \brief Read tag values
  *
@@ -2296,22 +2126,19 @@ mhdf_readSparseTagEntitiesWithOpt( hid_t id_handle,
  *\param memory     Memory location at which to store tag values.
  *\param status     Passed back status of API call.
  */
-void
-mhdf_readTagValues( hid_t value_handle,
-                    long offset,
-                    long count,
-                    hid_t hdf_type,
-                    void* memory,
-                    mhdf_Status* status );
-void
-mhdf_readTagValuesWithOpt( hid_t value_handle,
-                    long offset,
-                    long count,
-                    hid_t hdf_type,
-                    void* memory,
-                    hid_t read_prop,
-                    mhdf_Status* status );
-
+void mhdf_readTagValues( hid_t value_handle,
+                         long offset,
+                         long count,
+                         hid_t hdf_type,
+                         void* memory,
+                         mhdf_Status* status );
+void mhdf_readTagValuesWithOpt( hid_t value_handle,
+                                long offset,
+                                long count,
+                                hid_t hdf_type,
+                                void* memory,
+                                hid_t read_prop,
+                                mhdf_Status* status );
 
 /**\brief Read sparse tag end indices for variable-length tag data
  *
@@ -2327,27 +2154,23 @@ mhdf_readTagValuesWithOpt( hid_t value_handle,
  *\param end_indices  Memory in which to store the data read from the table.
  *\param status       Output: API result.
  */
-void 
-mhdf_readSparseTagIndices( hid_t tag_handle,
-                           long offset,
-                           long count,
-                           hid_t hdf_integer_type,
-                           void* end_indices,
-                           mhdf_Status* status );
-void 
-mhdf_readSparseTagIndicesWithOpt( hid_t tag_handle,
-                           long offset,
-                           long count,
-                           hid_t hdf_integer_type,
-                           void* end_indices,
-                           hid_t read_prop,
-                           mhdf_Status* status );
+void mhdf_readSparseTagIndices( hid_t tag_handle,
+                                long offset,
+                                long count,
+                                hid_t hdf_integer_type,
+                                void* end_indices,
+                                mhdf_Status* status );
+void mhdf_readSparseTagIndicesWithOpt( hid_t tag_handle,
+                                       long offset,
+                                       long count,
+                                       hid_t hdf_integer_type,
+                                       void* end_indices,
+                                       hid_t read_prop,
+                                       mhdf_Status* status );
 
 /*@}*/
 
-
 /*@}*/
-
 
 #ifdef __cplusplus
 } /* extern "C" */

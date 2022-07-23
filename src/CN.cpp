@@ -34,8 +34,7 @@ short int CN::revPermuteVec[MBMAXTYPE][3][MAX_SUB_ENTITIES + 1];
 const DimensionPair CN::TypeDimensionMap[] = {
     DimensionPair( MBVERTEX, MBVERTEX ),       DimensionPair( MBEDGE, MBEDGE ),
     DimensionPair( MBTRI, MBPOLYGON ),         DimensionPair( MBTET, MBPOLYHEDRON ),
-    DimensionPair( MBENTITYSET, MBENTITYSET ), DimensionPair( MBMAXTYPE, MBMAXTYPE )
-};
+    DimensionPair( MBENTITYSET, MBENTITYSET ), DimensionPair( MBMAXTYPE, MBMAXTYPE ) };
 
 short CN::increasingInts[] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
                                20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39 };
@@ -64,8 +63,12 @@ EntityType CN::EntityTypeFromName( const char* name )
     return MBMAXTYPE;
 }
 
-void CN::SubEntityNodeIndices( const EntityType this_topo, const int num_nodes, const int sub_dimension,
-                               const int sub_index, EntityType& subentity_topo, int& num_sub_entity_nodes,
+void CN::SubEntityNodeIndices( const EntityType this_topo,
+                               const int num_nodes,
+                               const int sub_dimension,
+                               const int sub_index,
+                               EntityType& subentity_topo,
+                               int& num_sub_entity_nodes,
                                int sub_entity_conn[] )
 {
     // If asked for a node, the special case...
@@ -113,8 +116,12 @@ void CN::SubEntityNodeIndices( const EntityType this_topo, const int num_nodes, 
 //! \param sub_entity_conn Connectivity of sub-entity, based on parent_conn and canonical
 //!           ordering for parent_type
 //! \param num_sub_vertices Number of vertices in sub-entity
-void CN::SubEntityConn( const void* parent_conn, const EntityType parent_type, const int sub_dimension,
-                        const int sub_index, void* sub_entity_conn, int& num_sub_vertices )
+void CN::SubEntityConn( const void* parent_conn,
+                        const EntityType parent_type,
+                        const int sub_dimension,
+                        const int sub_index,
+                        void* sub_entity_conn,
+                        int& num_sub_vertices )
 {
     static int sub_indices[MAX_SUB_ENTITY_VERTICES];
 
@@ -128,8 +135,12 @@ void CN::SubEntityConn( const void* parent_conn, const EntityType parent_type, c
 }
 
 //! given an entity and a target dimension & side number, get that entity
-short int CN::AdjacentSubEntities( const EntityType this_type, const int* source_indices, const int num_source_indices,
-                                   const int source_dim, const int target_dim, std::vector< int >& index_list,
+short int CN::AdjacentSubEntities( const EntityType this_type,
+                                   const int* source_indices,
+                                   const int num_source_indices,
+                                   const int source_dim,
+                                   const int target_dim,
+                                   std::vector< int >& index_list,
                                    const int operation_type )
 {
     // first get all the vertex indices
@@ -204,8 +215,14 @@ short int CN::AdjacentSubEntities( const EntityType this_type, const int* source
 }
 
 template < typename T >
-static short int side_number( const T* parent_conn, const EntityType parent_type, const T* child_conn,
-                              const int child_num_verts, const int child_dim, int& side_no, int& sense, int& offset )
+static short int side_number( const T* parent_conn,
+                              const EntityType parent_type,
+                              const T* child_conn,
+                              const int child_num_verts,
+                              const int child_dim,
+                              int& side_no,
+                              int& sense,
+                              int& offset )
 {
     int parent_num_verts = CN::VerticesPerEntity( parent_type );
     int side_indices[8];
@@ -220,45 +237,84 @@ static short int side_number( const T* parent_conn, const EntityType parent_type
     return CN::SideNumber( parent_type, &side_indices[0], child_num_verts, child_dim, side_no, sense, offset );
 }
 
-short int CN::SideNumber( const EntityType parent_type, const int* parent_conn, const int* child_conn,
-                          const int child_num_verts, const int child_dim, int& side_no, int& sense, int& offset )
+short int CN::SideNumber( const EntityType parent_type,
+                          const int* parent_conn,
+                          const int* child_conn,
+                          const int child_num_verts,
+                          const int child_dim,
+                          int& side_no,
+                          int& sense,
+                          int& offset )
 {
     return side_number( parent_conn, parent_type, child_conn, child_num_verts, child_dim, side_no, sense, offset );
 }
 
-short int CN::SideNumber( const EntityType parent_type, const unsigned int* parent_conn, const unsigned int* child_conn,
-                          const int child_num_verts, const int child_dim, int& side_no, int& sense, int& offset )
+short int CN::SideNumber( const EntityType parent_type,
+                          const unsigned int* parent_conn,
+                          const unsigned int* child_conn,
+                          const int child_num_verts,
+                          const int child_dim,
+                          int& side_no,
+                          int& sense,
+                          int& offset )
 {
     return side_number( parent_conn, parent_type, child_conn, child_num_verts, child_dim, side_no, sense, offset );
 }
-short int CN::SideNumber( const EntityType parent_type, const long* parent_conn, const long* child_conn,
-                          const int child_num_verts, const int child_dim, int& side_no, int& sense, int& offset )
+short int CN::SideNumber( const EntityType parent_type,
+                          const long* parent_conn,
+                          const long* child_conn,
+                          const int child_num_verts,
+                          const int child_dim,
+                          int& side_no,
+                          int& sense,
+                          int& offset )
 {
     return side_number( parent_conn, parent_type, child_conn, child_num_verts, child_dim, side_no, sense, offset );
 }
-short int CN::SideNumber( const EntityType parent_type, const unsigned long* parent_conn,
-                          const unsigned long* child_conn, const int child_num_verts, const int child_dim, int& side_no,
-                          int& sense, int& offset )
+short int CN::SideNumber( const EntityType parent_type,
+                          const unsigned long* parent_conn,
+                          const unsigned long* child_conn,
+                          const int child_num_verts,
+                          const int child_dim,
+                          int& side_no,
+                          int& sense,
+                          int& offset )
 {
     return side_number( parent_conn, parent_type, child_conn, child_num_verts, child_dim, side_no, sense, offset );
 }
 
-short int CN::SideNumber( const EntityType parent_type, const unsigned long long* parent_conn,
-                          const unsigned long long* child_conn, const int child_num_verts, const int child_dim,
-                          int& side_no, int& sense, int& offset )
+short int CN::SideNumber( const EntityType parent_type,
+                          const unsigned long long* parent_conn,
+                          const unsigned long long* child_conn,
+                          const int child_num_verts,
+                          const int child_dim,
+                          int& side_no,
+                          int& sense,
+                          int& offset )
 
 {
     return side_number( parent_conn, parent_type, child_conn, child_num_verts, child_dim, side_no, sense, offset );
 }
 
-short int CN::SideNumber( const EntityType parent_type, void* const* parent_conn, void* const* child_conn,
-                          const int child_num_verts, const int child_dim, int& side_no, int& sense, int& offset )
+short int CN::SideNumber( const EntityType parent_type,
+                          void* const* parent_conn,
+                          void* const* child_conn,
+                          const int child_num_verts,
+                          const int child_dim,
+                          int& side_no,
+                          int& sense,
+                          int& offset )
 {
     return side_number( parent_conn, parent_type, child_conn, child_num_verts, child_dim, side_no, sense, offset );
 }
 
-short int CN::SideNumber( const EntityType parent_type, const int* child_conn_indices, const int child_num_verts,
-                          const int child_dim, int& side_no, int& sense, int& offset )
+short int CN::SideNumber( const EntityType parent_type,
+                          const int* child_conn_indices,
+                          const int child_num_verts,
+                          const int child_dim,
+                          int& side_no,
+                          int& sense,
+                          int& offset )
 {
     int parent_dim       = Dimension( parent_type );
     int parent_num_verts = VerticesPerEntity( parent_type );
@@ -320,8 +376,11 @@ short int CN::SideNumber( const EntityType parent_type, const int* child_conn_in
 //! \param child_index The index of the child element
 //! \param opposite_index The index of the opposite element
 //! \return status Returns 0 if successful, -1 if not
-short int CN::OppositeSide( const EntityType parent_type, const int child_index, const int child_dim,
-                            int& opposite_index, int& opposite_dim )
+short int CN::OppositeSide( const EntityType parent_type,
+                            const int child_index,
+                            const int child_dim,
+                            int& opposite_index,
+                            int& opposite_dim )
 {
     switch( parent_type )
     {
@@ -469,7 +528,10 @@ inline bool connectivity_match( const T* conn1_i, const T* conn2_i, const int nu
                 break;
             }
         }
-        if( they_match ) { direct = -1; }
+        if( they_match )
+        {
+            direct = -1;
+        }
     }
 
     return they_match;
@@ -480,8 +542,11 @@ bool CN::ConnectivityMatch( const int* conn1_i, const int* conn2_i, const int nu
     return connectivity_match< int >( conn1_i, conn2_i, num_vertices, direct, offset );
 }
 
-bool CN::ConnectivityMatch( const unsigned int* conn1_i, const unsigned int* conn2_i, const int num_vertices,
-                            int& direct, int& offset )
+bool CN::ConnectivityMatch( const unsigned int* conn1_i,
+                            const unsigned int* conn2_i,
+                            const int num_vertices,
+                            int& direct,
+                            int& offset )
 {
     return connectivity_match< unsigned int >( conn1_i, conn2_i, num_vertices, direct, offset );
 }
@@ -491,19 +556,28 @@ bool CN::ConnectivityMatch( const long* conn1_i, const long* conn2_i, const int 
     return connectivity_match< long >( conn1_i, conn2_i, num_vertices, direct, offset );
 }
 
-bool CN::ConnectivityMatch( const unsigned long* conn1_i, const unsigned long* conn2_i, const int num_vertices,
-                            int& direct, int& offset )
+bool CN::ConnectivityMatch( const unsigned long* conn1_i,
+                            const unsigned long* conn2_i,
+                            const int num_vertices,
+                            int& direct,
+                            int& offset )
 {
     return connectivity_match< unsigned long >( conn1_i, conn2_i, num_vertices, direct, offset );
 }
 
-bool CN::ConnectivityMatch( const unsigned long long* conn1_i, const unsigned long long* conn2_i,
-                            const int num_vertices, int& direct, int& offset )
+bool CN::ConnectivityMatch( const unsigned long long* conn1_i,
+                            const unsigned long long* conn2_i,
+                            const int num_vertices,
+                            int& direct,
+                            int& offset )
 {
     return connectivity_match< unsigned long long >( conn1_i, conn2_i, num_vertices, direct, offset );
 }
 
-bool CN::ConnectivityMatch( void* const* conn1_i, void* const* conn2_i, const int num_vertices, int& direct,
+bool CN::ConnectivityMatch( void* const* conn1_i,
+                            void* const* conn2_i,
+                            const int num_vertices,
+                            int& direct,
                             int& offset )
 {
     return connectivity_match< void* >( conn1_i, conn2_i, num_vertices, direct, offset );
@@ -511,7 +585,9 @@ bool CN::ConnectivityMatch( void* const* conn1_i, void* const* conn2_i, const in
 
 //! for an entity of this type and a specified subfacet (dimension and index), return
 //! the index of the higher order node for that entity in this entity's connectivity array
-short int CN::HONodeIndex( const EntityType this_type, const int num_verts, const int subfacet_dim,
+short int CN::HONodeIndex( const EntityType this_type,
+                           const int num_verts,
+                           const int subfacet_dim,
                            const int subfacet_index )
 {
     int i;
@@ -659,7 +735,9 @@ void MBCN_SubEntityType( const int this_type, const int sub_dimension, const int
 //! \param sub_dimension Dimension of sub-entity
 //! \param sub_index Index of sub-entity
 //! \param sub_entity_conn Connectivity of sub-entity (returned to calling function)
-void MBCN_SubEntityVertexIndices( const int this_type, const int sub_dimension, const int sub_index,
+void MBCN_SubEntityVertexIndices( const int this_type,
+                                  const int sub_dimension,
+                                  const int sub_index,
                                   int sub_entity_conn[] )
 {
     CN::SubEntityVertexIndices( (EntityType)this_type, sub_dimension, sub_index, sub_entity_conn );
@@ -691,9 +769,15 @@ void MBCN_SubEntityVertexIndices( const int this_type, const int sub_dimension, 
 //! \param operation_type Specify either CN::INTERSECT (0) or CN::UNION (1) to get intersection
 //!        or union of target entity lists over source entities
 //! \param rval Error code indicating success or failure (returned)
-void MBCN_AdjacentSubEntities( const int this_type, const int* source_indices, const int num_source_indices,
-                               const int source_dim, const int target_dim, int* index_list, int* num_indices,
-                               const int operation_type, int* rval )
+void MBCN_AdjacentSubEntities( const int this_type,
+                               const int* source_indices,
+                               const int num_source_indices,
+                               const int source_dim,
+                               const int target_dim,
+                               int* index_list,
+                               int* num_indices,
+                               const int operation_type,
+                               int* rval )
 {
     std::vector< int > tmp_index_list;
     *rval = CN::AdjacentSubEntities( (EntityType)this_type, source_indices, num_source_indices, source_dim, target_dim,
@@ -712,40 +796,74 @@ void MBCN_AdjacentSubEntities( const int this_type, const int* source_indices, c
 //! \param sense Sense of child entity with respect to order in <em>child_conn</em> (returned)
 //! \param offset Offset of <em>child_conn</em> with respect to canonical ordering data (returned)
 //! \return status Returns zero if successful, -1 if not
-void MBCN_SideNumber( const int parent_type, const int* child_conn_indices, const int child_num_verts,
-                      const int child_dim, int* side_no, int* sense, int* offset )
+void MBCN_SideNumber( const int parent_type,
+                      const int* child_conn_indices,
+                      const int child_num_verts,
+                      const int child_dim,
+                      int* side_no,
+                      int* sense,
+                      int* offset )
 {
     CN::SideNumber( (EntityType)parent_type, child_conn_indices, child_num_verts, child_dim, *side_no, *sense,
                     *offset );
 }
 
-void MBCN_SideNumberInt( const int* parent_conn, const EntityType parent_type, const int* child_conn,
-                         const int child_num_verts, const int child_dim, int* side_no, int* sense, int* offset )
+void MBCN_SideNumberInt( const int* parent_conn,
+                         const EntityType parent_type,
+                         const int* child_conn,
+                         const int child_num_verts,
+                         const int child_dim,
+                         int* side_no,
+                         int* sense,
+                         int* offset )
 {
     moab::side_number( parent_conn, parent_type, child_conn, child_num_verts, child_dim, *side_no, *sense, *offset );
 }
 
-void MBCN_SideNumberUint( const unsigned int* parent_conn, const EntityType parent_type, const unsigned int* child_conn,
-                          const int child_num_verts, const int child_dim, int* side_no, int* sense, int* offset )
+void MBCN_SideNumberUint( const unsigned int* parent_conn,
+                          const EntityType parent_type,
+                          const unsigned int* child_conn,
+                          const int child_num_verts,
+                          const int child_dim,
+                          int* side_no,
+                          int* sense,
+                          int* offset )
 {
     moab::side_number( parent_conn, parent_type, child_conn, child_num_verts, child_dim, *side_no, *sense, *offset );
 }
 
-void MBCN_SideNumberLong( const long* parent_conn, const EntityType parent_type, const long* child_conn,
-                          const int child_num_verts, const int child_dim, int* side_no, int* sense, int* offset )
+void MBCN_SideNumberLong( const long* parent_conn,
+                          const EntityType parent_type,
+                          const long* child_conn,
+                          const int child_num_verts,
+                          const int child_dim,
+                          int* side_no,
+                          int* sense,
+                          int* offset )
 {
     moab::side_number( parent_conn, parent_type, child_conn, child_num_verts, child_dim, *side_no, *sense, *offset );
 }
 
-void MBCN_SideNumberUlong( const unsigned long* parent_conn, const EntityType parent_type,
-                           const unsigned long* child_conn, const int child_num_verts, const int child_dim,
-                           int* side_no, int* sense, int* offset )
+void MBCN_SideNumberUlong( const unsigned long* parent_conn,
+                           const EntityType parent_type,
+                           const unsigned long* child_conn,
+                           const int child_num_verts,
+                           const int child_dim,
+                           int* side_no,
+                           int* sense,
+                           int* offset )
 {
     moab::side_number( parent_conn, parent_type, child_conn, child_num_verts, child_dim, *side_no, *sense, *offset );
 }
 
-void MBCN_SideNumberVoid( void* const* parent_conn, const EntityType parent_type, void* const* child_conn,
-                          const int child_num_verts, const int child_dim, int* side_no, int* sense, int* offset )
+void MBCN_SideNumberVoid( void* const* parent_conn,
+                          const EntityType parent_type,
+                          void* const* child_conn,
+                          const int child_num_verts,
+                          const int child_dim,
+                          int* side_no,
+                          int* sense,
+                          int* offset )
 {
     moab::side_number( parent_conn, parent_type, child_conn, child_num_verts, child_dim, *side_no, *sense, *offset );
 }
@@ -763,8 +881,12 @@ void MBCN_SideNumberVoid( void* const* parent_conn, const EntityType parent_type
 //! \param child_index The index of the child element
 //! \param opposite_index The index of the opposite element
 //! \return status Returns 0 if successful, -1 if not
-void MBCN_OppositeSide( const int parent_type, const int child_index, const int child_dim, int* opposite_index,
-                        int* opposite_dim, int* rval )
+void MBCN_OppositeSide( const int parent_type,
+                        const int child_index,
+                        const int child_dim,
+                        int* opposite_index,
+                        int* opposite_dim,
+                        int* rval )
 {
     *rval = CN::OppositeSide( (EntityType)parent_type, child_index, child_dim, *opposite_index, *opposite_dim );
 }
@@ -776,32 +898,52 @@ void MBCN_OppositeSide( const int parent_type, const int child_index, const int 
 //! \param direct If positive, entities have the same sense (returned)
 //! \param offset Offset of <em>conn2</em>'s first vertex in <em>conn1</em>
 //! \return rval Returns true if <em>conn1</em> and <em>conn2</em> match
-void MBCN_ConnectivityMatchInt( const int* conn1, const int* conn2, const int num_vertices, int* direct, int* offset,
+void MBCN_ConnectivityMatchInt( const int* conn1,
+                                const int* conn2,
+                                const int num_vertices,
+                                int* direct,
+                                int* offset,
                                 int* rval )
 {
     *rval = CN::ConnectivityMatch( conn1, conn2, num_vertices, *direct, *offset );
 }
 
-void MBCN_ConnectivityMatchUint( const unsigned int* conn1, const unsigned int* conn2, const int num_vertices,
-                                 int* direct, int* offset, int* rval )
-{
-    *rval = CN::ConnectivityMatch( conn1, conn2, num_vertices, *direct, *offset );
-}
-
-void MBCN_ConnectivityMatchLong( const long* conn1, const long* conn2, const int num_vertices, int* direct, int* offset,
+void MBCN_ConnectivityMatchUint( const unsigned int* conn1,
+                                 const unsigned int* conn2,
+                                 const int num_vertices,
+                                 int* direct,
+                                 int* offset,
                                  int* rval )
 {
     *rval = CN::ConnectivityMatch( conn1, conn2, num_vertices, *direct, *offset );
 }
 
-void MBCN_ConnectivityMatchUlong( const unsigned long* conn1, const unsigned long* conn2, const int num_vertices,
-                                  int* direct, int* offset, int* rval )
+void MBCN_ConnectivityMatchLong( const long* conn1,
+                                 const long* conn2,
+                                 const int num_vertices,
+                                 int* direct,
+                                 int* offset,
+                                 int* rval )
 {
     *rval = CN::ConnectivityMatch( conn1, conn2, num_vertices, *direct, *offset );
 }
 
-void MBCN_ConnectivityMatchVoid( void* const* conn1, void* const* conn2, const int num_vertices, int* direct,
-                                 int* offset, int* rval )
+void MBCN_ConnectivityMatchUlong( const unsigned long* conn1,
+                                  const unsigned long* conn2,
+                                  const int num_vertices,
+                                  int* direct,
+                                  int* offset,
+                                  int* rval )
+{
+    *rval = CN::ConnectivityMatch( conn1, conn2, num_vertices, *direct, *offset );
+}
+
+void MBCN_ConnectivityMatchVoid( void* const* conn1,
+                                 void* const* conn2,
+                                 const int num_vertices,
+                                 int* direct,
+                                 int* offset,
+                                 int* rval )
 {
     *rval = CN::ConnectivityMatch( conn1, conn2, num_vertices, *direct, *offset );
 }
@@ -869,7 +1011,10 @@ void MBCN_HONodeParent( int elem_type, int num_nodes, int ho_node_index, int* pa
 //! \param subfacet_dim Dimension of sub-entity being queried
 //! \param subfacet_index Index of sub-entity being queried
 //! \return index Index of sub-entity's higher-order node
-void MBCN_HONodeIndex( const int this_type, const int num_verts, const int subfacet_dim, const int subfacet_index,
+void MBCN_HONodeIndex( const int this_type,
+                       const int num_verts,
+                       const int subfacet_dim,
+                       const int subfacet_index,
                        int* rval )
 
 {
@@ -945,8 +1090,11 @@ EntityType CN::SubEntityType( const EntityType this_type, const int sub_dimensio
                                     : mConnectivityMap[this_type][sub_dimension - 1].target_type[index] ) );
 }
 
-const short* CN::SubEntityVertexIndices( const EntityType this_type, const int sub_dimension, const int index,
-                                         EntityType& sub_type, int& n )
+const short* CN::SubEntityVertexIndices( const EntityType this_type,
+                                         const int sub_dimension,
+                                         const int index,
+                                         EntityType& sub_type,
+                                         int& n )
 {
     if( sub_dimension == 0 )
     {
@@ -968,39 +1116,60 @@ inline int CN::permuteThis( const EntityType t, const int dim, int* pvec, const 
 {
     return permute_this( t, dim, pvec, num_indices, num_entries );
 }
-inline int CN::permuteThis( const EntityType t, const int dim, unsigned int* pvec, const int num_indices,
+inline int CN::permuteThis( const EntityType t,
+                            const int dim,
+                            unsigned int* pvec,
+                            const int num_indices,
                             const int num_entries )
 {
     return permute_this( t, dim, pvec, num_indices, num_entries );
 }
-inline int CN::permuteThis( const EntityType t, const int dim, long* pvec, const int num_indices,
+inline int CN::permuteThis( const EntityType t,
+                            const int dim,
+                            long* pvec,
+                            const int num_indices,
                             const int num_entries )
 {
     return permute_this( t, dim, pvec, num_indices, num_entries );
 }
-inline int CN::permuteThis( const EntityType t, const int dim, void** pvec, const int num_indices,
+inline int CN::permuteThis( const EntityType t,
+                            const int dim,
+                            void** pvec,
+                            const int num_indices,
                             const int num_entries )
 {
     return permute_this( t, dim, pvec, num_indices, num_entries );
 }
 
 //! Reverse permute this vector
-inline int CN::revPermuteThis( const EntityType t, const int dim, int* pvec, const int num_indices,
+inline int CN::revPermuteThis( const EntityType t,
+                               const int dim,
+                               int* pvec,
+                               const int num_indices,
                                const int num_entries )
 {
     return rev_permute_this( t, dim, pvec, num_indices, num_entries );
 }
-inline int CN::revPermuteThis( const EntityType t, const int dim, unsigned int* pvec, const int num_indices,
+inline int CN::revPermuteThis( const EntityType t,
+                               const int dim,
+                               unsigned int* pvec,
+                               const int num_indices,
                                const int num_entries )
 {
     return rev_permute_this( t, dim, pvec, num_indices, num_entries );
 }
-inline int CN::revPermuteThis( const EntityType t, const int dim, long* pvec, const int num_indices,
+inline int CN::revPermuteThis( const EntityType t,
+                               const int dim,
+                               long* pvec,
+                               const int num_indices,
                                const int num_entries )
 {
     return rev_permute_this( t, dim, pvec, num_indices, num_entries );
 }
-inline int CN::revPermuteThis( const EntityType t, const int dim, void** pvec, const int num_indices,
+inline int CN::revPermuteThis( const EntityType t,
+                               const int dim,
+                               void** pvec,
+                               const int num_indices,
                                const int num_entries )
 {
     return rev_permute_this( t, dim, pvec, num_indices, num_entries );

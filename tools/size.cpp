@@ -542,7 +542,10 @@ static void print_time( int clk_per_sec, const char* prefix, clock_t ticks, std:
     clock_t centi   = ticks % 100;
     clock_t seconds = ticks / 100;
     stream << prefix;
-    if( seconds < 120 ) { stream << ( ticks / 100 ) << "." << centi << "s" << std::endl; }
+    if( seconds < 120 )
+    {
+        stream << ( ticks / 100 ) << "." << centi << "s" << std::endl;
+    }
     else
     {
         clock_t minutes = ( seconds / 60 ) % 60;
@@ -759,7 +762,10 @@ int main( int argc, char* argv[] )
             Range entities;
             Tag dim_tag = 0, id_tag = 0;
             rval = mb.tag_get_handle( GEOM_DIMENSION_TAG_NAME, 1, MB_TYPE_INTEGER, dim_tag );
-            if( MB_TAG_NOT_FOUND == rval ) { fprintf( stderr, "No geometry tag defined.\n" ); }
+            if( MB_TAG_NOT_FOUND == rval )
+            {
+                fprintf( stderr, "No geometry tag defined.\n" );
+            }
             else if( MB_SUCCESS != rval )
             {
                 fprintf( stderr, "Error retreiving geometry tag.\n" );
@@ -776,7 +782,10 @@ int main( int argc, char* argv[] )
                 }
             }
 
-            if( entities.empty() ) { fprintf( stderr, "No geometry entities defined in file.\n" ); }
+            if( entities.empty() )
+            {
+                fprintf( stderr, "No geometry entities defined in file.\n" );
+            }
 
             for( Range::iterator rit = entities.begin(); rit != entities.end(); ++rit )
             {
@@ -817,7 +826,10 @@ int main( int argc, char* argv[] )
                 Range entities;
                 Tag tag = 0;
                 rval    = mb.tag_get_handle( mesh_type_tags[t], 1, MB_TYPE_INTEGER, tag );
-                if( MB_TAG_NOT_FOUND == rval ) { continue; }
+                if( MB_TAG_NOT_FOUND == rval )
+                {
+                    continue;
+                }
                 else if( MB_SUCCESS != rval )
                 {
                     fprintf( stderr, "Error retreiving %s tag.\n", mesh_type_tags[t] );

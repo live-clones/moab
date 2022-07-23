@@ -38,9 +38,15 @@ WriteCGNS::~WriteCGNS()
 }
 
 //! writes out a file
-ErrorCode WriteCGNS::write_file( const char* file_name, const bool overwrite, const FileOptions& /*options*/,
-                                 const EntityHandle* /*output_list*/, const int /*num_sets*/,
-                                 const std::vector< std::string >&, const Tag*, int, int )
+ErrorCode WriteCGNS::write_file( const char* file_name,
+                                 const bool overwrite,
+                                 const FileOptions& /*options*/,
+                                 const EntityHandle* /*output_list*/,
+                                 const int /*num_sets*/,
+                                 const std::vector< std::string >&,
+                                 const Tag*,
+                                 int,
+                                 int )
 {
     ErrorCode rval;
 
@@ -56,16 +62,28 @@ ErrorCode WriteCGNS::write_file( const char* file_name, const bool overwrite, co
     // Get entities to write
     // Get and count vertex entities
     rval = get_vertex_entities( VrtSize, Nodes );
-    if( rval != MB_SUCCESS ) { return rval; }
+    if( rval != MB_SUCCESS )
+    {
+        return rval;
+    }
     // Get and count edge entities
     rval = get_edge_entities( EdgeSize, Edges );
-    if( rval != MB_SUCCESS ) { return rval; }
+    if( rval != MB_SUCCESS )
+    {
+        return rval;
+    }
     // Get and count face entities
     rval = get_face_entities( FaceSize, Faces );
-    if( rval != MB_SUCCESS ) { return rval; }
+    if( rval != MB_SUCCESS )
+    {
+        return rval;
+    }
     // Get and count cell entities
     rval = get_cell_entities( CellSize, Cells );
-    if( rval != MB_SUCCESS ) { return rval; }
+    if( rval != MB_SUCCESS )
+    {
+        return rval;
+    }
     std::cout << "\nThe Number of Vertex is " << VrtSize << ".\n";
     std::cout << "The Number of Edges is " << EdgeSize << ".\n";
     std::cout << "The Number of Faces is " << FaceSize << ".\n";
@@ -115,13 +133,19 @@ ErrorCode WriteCGNS::write_file( const char* file_name, const bool overwrite, co
     }
     // Write the vertex coordinates
     rval = write_coord_cgns( Nodes );
-    if( rval != MB_SUCCESS ) { return rval; }
+    if( rval != MB_SUCCESS )
+    {
+        return rval;
+    }
 
     // Create a vector to hold the Tags
     std::vector< moab::Tag > TagHandles;
     // Get Tags
     rval = mbImpl->tag_get_tags( TagHandles );
-    if( rval != MB_SUCCESS ) { return rval; }
+    if( rval != MB_SUCCESS )
+    {
+        return rval;
+    }
     // Get the number of Tags in the mesh
     int NbTags = TagHandles.size();
     std::cout << "\nThe mesh has " << NbTags << " Tags.\n";
@@ -411,7 +435,8 @@ ErrorCode WriteCGNS::write_coord_cgns( std::vector< moab::EntityHandle >& Nodes_
     return MB_SUCCESS;
 }
 
-ErrorCode WriteCGNS::set_tag_values( std::vector< Tag >& TagHandles, std::vector< moab::EntityHandle >& Edges_,
+ErrorCode WriteCGNS::set_tag_values( std::vector< Tag >& TagHandles,
+                                     std::vector< moab::EntityHandle >& Edges_,
                                      std::vector< moab::EntityHandle >& Faces_,
                                      std::vector< moab::EntityHandle >& Cells_,
                                      std::vector< WriteCGNS::SetStruct >& Sets )
@@ -504,7 +529,8 @@ ErrorCode WriteCGNS::set_tag_values( std::vector< Tag >& TagHandles, std::vector
 }
 
 // Get Entities in the set
-ErrorCode WriteCGNS::get_set_entities( int i, std::vector< Tag >& TagHandles,
+ErrorCode WriteCGNS::get_set_entities( int i,
+                                       std::vector< Tag >& TagHandles,
                                        std::vector< WriteCGNS::SetStruct >& Sets )
 {
     ErrorCode rval;
@@ -634,7 +660,10 @@ ErrorCode WriteCGNS::get_cgns_type( int i, std::vector< WriteCGNS::SetStruct >& 
     // if Sum > 1 then the Set is MIXED
     // if Sum = 0 then the Set is Homogeneous
     // else then the Set is empty
-    if( Sum > 1 ) { Sets[i].CGNSType = MIXED; }
+    if( Sum > 1 )
+    {
+        Sets[i].CGNSType = MIXED;
+    }
     else if( Sum == 1 )
     {
         int j = 0;
@@ -683,8 +712,10 @@ ErrorCode WriteCGNS::get_cgns_type( int i, std::vector< WriteCGNS::SetStruct >& 
 }
 
 // Fill the connectivity table
-ErrorCode WriteCGNS::get_conn_table( std::vector< moab::EntityHandle >& Elements, std::vector< int >& Begin,
-                                     std::vector< int >& End, std::vector< moab::Tag >& TagHandles,
+ErrorCode WriteCGNS::get_conn_table( std::vector< moab::EntityHandle >& Elements,
+                                     std::vector< int >& Begin,
+                                     std::vector< int >& End,
+                                     std::vector< moab::Tag >& TagHandles,
                                      std::vector< WriteCGNS::SetStruct >& Sets,
                                      std::vector< std::vector< cgsize_t > >& ConnTable )
 {
@@ -709,7 +740,10 @@ ErrorCode WriteCGNS::get_conn_table( std::vector< moab::EntityHandle >& Elements
             {
                 // Try to get data from entity
                 rval = mbImpl->tag_get_data( TagHandles[j], &*i, 1, &id );
-                if( MB_SUCCESS != rval ) { return rval; }
+                if( MB_SUCCESS != rval )
+                {
+                    return rval;
+                }
                 // If successful id==j
                 if( id == j )
                 {
@@ -718,7 +752,10 @@ ErrorCode WriteCGNS::get_conn_table( std::vector< moab::EntityHandle >& Elements
                     const EntityHandle* conn;  // Array in which connectivity of entity_handle is returned.
                     // Gets a pointer to constant connectivity data of entity_handle
                     rval = mbImpl->get_connectivity( *i, conn, num_vtx );
-                    if( MB_SUCCESS != rval ) { return rval; }
+                    if( MB_SUCCESS != rval )
+                    {
+                        return rval;
+                    }
                     // If the Set is MIXED type
                     // push CGNS ENUM type of the entity
                     // before the connectivity

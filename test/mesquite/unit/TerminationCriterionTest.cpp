@@ -68,14 +68,19 @@ class DummyOF : public ObjectiveFunction
     {
     }
 
-    bool initialize_block_coordinate_descent( MeshDomainAssoc* domain, const Settings* settings, PatchSet* user_set,
+    bool initialize_block_coordinate_descent( MeshDomainAssoc* domain,
+                                              const Settings* settings,
+                                              PatchSet* user_set,
                                               MsqError& err );
 
     void initialize_queue( MeshDomainAssoc*, const Settings*, MsqError& ) {}
 
     bool evaluate( EvalType type, PatchData& pd, double& value_out, bool free, MsqError& err );
 
-    bool evaluate_with_gradient( EvalType type, PatchData& pd, double& value_out, std::vector< Vector3D >& grad_out,
+    bool evaluate_with_gradient( EvalType type,
+                                 PatchData& pd,
+                                 double& value_out,
+                                 std::vector< Vector3D >& grad_out,
                                  MsqError& err );
 
     ObjectiveFunction* clone() const
@@ -858,7 +863,10 @@ bool DummyOF::evaluate( EvalType, PatchData&, double& value, bool, MsqError& )
     return mValid;
 }
 
-bool DummyOF::evaluate_with_gradient( EvalType, PatchData& pd, double& value_out, std::vector< Vector3D >& grad_out,
+bool DummyOF::evaluate_with_gradient( EvalType,
+                                      PatchData& pd,
+                                      double& value_out,
+                                      std::vector< Vector3D >& grad_out,
                                       MsqError& )
 {
     value_out = mValue;

@@ -35,10 +35,14 @@ class WriteHDF5Parallel : public WriteHDF5
 
     //! Called by normal (non-parallel) writer.  Sets up
     //! necessary data for parallel write.
-    virtual ErrorCode parallel_create_file( const char* filename, bool overwrite,
-                                            const std::vector< std::string >& qa_records, const FileOptions& opts,
-                                            const Tag* user_tag_list = 0, int user_tag_count = 0, int dimension = 3,
-                                            double* times = 0 );
+    virtual ErrorCode parallel_create_file( const char* filename,
+                                            bool overwrite,
+                                            const std::vector< std::string >& qa_records,
+                                            const FileOptions& opts,
+                                            const Tag* user_tag_list = 0,
+                                            int user_tag_count       = 0,
+                                            int dimension            = 3,
+                                            double* times            = 0 );
 
     //! Figure out which mesh local mesh is duplicated on
     //! remote processors and which processor will write
@@ -111,13 +115,16 @@ class WriteHDF5Parallel : public WriteHDF5
     ErrorCode append_serial_tag_data( std::vector< unsigned char >& buffer, const WriteHDF5::TagDesc& tag );
 
     //! helper function for create_tag_tables
-    ErrorCode check_serial_tag_data( const std::vector< unsigned char >& buffer, std::vector< TagDesc* >* missing = 0,
+    ErrorCode check_serial_tag_data( const std::vector< unsigned char >& buffer,
+                                     std::vector< TagDesc* >* missing = 0,
                                      std::vector< TagDesc* >* newlist = 0 );
 
     /**\brief Argument ot create_dataset */
     struct DataSetCreator
     {
-        virtual ErrorCode operator()( WriteHDF5* writer, long data_set_size, const ExportSet* group,
+        virtual ErrorCode operator()( WriteHDF5* writer,
+                                      long data_set_size,
+                                      const ExportSet* group,
                                       long& start_id_out ) const = 0;
     };
     struct NoopDescCreator : public DataSetCreator
@@ -156,10 +163,14 @@ class WriteHDF5Parallel : public WriteHDF5
      *                           first_id_out+offset_out
      *                           Array of length \c num_datasets or NULL.
      */
-    ErrorCode create_dataset( int num_datasets, const long* num_owned_entities, long* offsets_out,
-                              long* max_proc_ents_out, long* total_ents_out,
-                              const DataSetCreator& creator = NoopDescCreator(), ExportSet* groups[] = 0,
-                              wid_t* first_ids_out = NULL );
+    ErrorCode create_dataset( int num_datasets,
+                              const long* num_owned_entities,
+                              long* offsets_out,
+                              long* max_proc_ents_out,
+                              long* total_ents_out,
+                              const DataSetCreator& creator = NoopDescCreator(),
+                              ExportSet* groups[]           = 0,
+                              wid_t* first_ids_out          = NULL );
 
     void print_shared_sets();
     void print_set_sharing_data( const Range& range, const char* label, Tag idt );

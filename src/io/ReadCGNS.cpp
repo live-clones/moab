@@ -45,15 +45,20 @@ ReadCGNS::~ReadCGNS()
     }
 }
 
-ErrorCode ReadCGNS::read_tag_values( const char* /* file_name */, const char* /* tag_name */,
-                                     const FileOptions& /* opts */, std::vector< int >& /* tag_values_out */,
+ErrorCode ReadCGNS::read_tag_values( const char* /* file_name */,
+                                     const char* /* tag_name */,
+                                     const FileOptions& /* opts */,
+                                     std::vector< int >& /* tag_values_out */,
                                      const SubsetList* /* subset_list */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_set*/, const FileOptions& opts,
-                               const ReaderIface::SubsetList* subset_list, const Tag* file_id_tag )
+ErrorCode ReadCGNS::load_file( const char* filename,
+                               const EntityHandle* /*file_set*/,
+                               const FileOptions& opts,
+                               const ReaderIface::SubsetList* subset_list,
+                               const Tag* file_id_tag )
 {
     int num_material_sets        = 0;
     const int* material_set_list = 0;
@@ -96,7 +101,10 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
 
     cg_open( filename, CG_MODE_READ, &filePtr );
 
-    if( filePtr <= 0 ) { MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, fileName << ": fopen returned error" ); }
+    if( filePtr <= 0 )
+    {
+        MB_SET_ERR( MB_FILE_DOES_NOT_EXIST, fileName << ": fopen returned error" );
+    }
 
     // Read number of verts, elements, sets
     long num_verts = 0, num_elems = 0, num_sets = 0;
@@ -460,8 +468,12 @@ ErrorCode ReadCGNS::load_file( const char* filename, const EntityHandle* /*file_
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCGNS::create_elements( char* sectionName, const Tag* file_id_tag, const EntityType& ent_type,
-                                     const int& verts_per_elem, long& section_offset, int elems_count,
+ErrorCode ReadCGNS::create_elements( char* sectionName,
+                                     const Tag* file_id_tag,
+                                     const EntityType& ent_type,
+                                     const int& verts_per_elem,
+                                     long& section_offset,
+                                     int elems_count,
                                      const std::vector< cgsize_t >& elemsConn )
 {
     ErrorCode result;
@@ -510,8 +522,12 @@ ErrorCode ReadCGNS::create_elements( char* sectionName, const Tag* file_id_tag, 
     return MB_SUCCESS;
 }
 
-ErrorCode ReadCGNS::create_sets( char* sectionName, const Tag* file_id_tag, EntityType /*element_type*/,
-                                 const Range& elements, const std::vector< int >& set_ids, int /*set_type*/ )
+ErrorCode ReadCGNS::create_sets( char* sectionName,
+                                 const Tag* file_id_tag,
+                                 EntityType /*element_type*/,
+                                 const Range& elements,
+                                 const std::vector< int >& set_ids,
+                                 int /*set_type*/ )
 {
     ErrorCode result;
 

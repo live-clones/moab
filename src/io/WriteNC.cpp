@@ -47,9 +47,15 @@ WriteNC::~WriteNC()
 }
 
 //! Writes out a file
-ErrorCode WriteNC::write_file( const char* file_name, const bool overwrite, const FileOptions& options,
-                               const EntityHandle* file_set, const int num_set, const std::vector< std::string >&,
-                               const Tag*, int, int )
+ErrorCode WriteNC::write_file( const char* file_name,
+                               const bool overwrite,
+                               const FileOptions& options,
+                               const EntityHandle* file_set,
+                               const int num_set,
+                               const std::vector< std::string >&,
+                               const Tag*,
+                               int,
+                               int )
 {
     ErrorCode rval;
     // See if opts has variable(s) specified
@@ -112,7 +118,10 @@ ErrorCode WriteNC::write_file( const char* file_name, const bool overwrite, cons
 
     // Get appropriate helper instance for WriteNC class based on some info in the file set
     myHelper = NCWriteHelper::get_nc_helper( this, fileId, options, *file_set );
-    if( NULL == myHelper ) { MB_SET_ERR( MB_FAILURE, "Failed to get NCWriteHelper class instance" ); }
+    if( NULL == myHelper )
+    {
+        MB_SET_ERR( MB_FAILURE, "Failed to get NCWriteHelper class instance" );
+    }
 
     rval = myHelper->collect_mesh_info();MB_CHK_SET_ERR( rval, "Trouble collecting mesh information" );
 
@@ -128,8 +137,10 @@ ErrorCode WriteNC::write_file( const char* file_name, const bool overwrite, cons
     return MB_SUCCESS;
 }
 
-ErrorCode WriteNC::parse_options( const FileOptions& opts, std::vector< std::string >& var_names,
-                                  std::vector< std::string >& desired_names, std::vector< int >& tstep_nums,
+ErrorCode WriteNC::parse_options( const FileOptions& opts,
+                                  std::vector< std::string >& var_names,
+                                  std::vector< std::string >& desired_names,
+                                  std::vector< int >& tstep_nums,
                                   std::vector< double >& tstep_vals )
 {
     int tmpval;
@@ -202,10 +213,16 @@ ErrorCode WriteNC::parse_options( const FileOptions& opts, std::vector< std::str
 
     int pcomm_no = 0;
     rval         = opts.get_int_option( "PARALLEL_COMM", pcomm_no );
-    if( MB_TYPE_OUT_OF_RANGE == rval ) { MB_SET_ERR( rval, "Invalid value for PARALLEL_COMM option" ); }
+    if( MB_TYPE_OUT_OF_RANGE == rval )
+    {
+        MB_SET_ERR( rval, "Invalid value for PARALLEL_COMM option" );
+    }
 
     myPcomm = ParallelComm::get_pcomm( mbImpl, pcomm_no );
-    if( 0 == myPcomm ) { myPcomm = new ParallelComm( mbImpl, MPI_COMM_WORLD ); }
+    if( 0 == myPcomm )
+    {
+        myPcomm = new ParallelComm( mbImpl, MPI_COMM_WORLD );
+    }
 
 #ifndef MOAB_HAVE_PNETCDF
     const int procs = myPcomm->proc_config().proc_size();
@@ -435,7 +452,9 @@ ErrorCode WriteNC::process_conventional_tags( EntityHandle fileSet )
 }
 
 // Reverse process from create_attrib_string
-ErrorCode WriteNC::process_concatenated_attribute( const void* attPtr, int attSz, std::vector< int >& attLen,
+ErrorCode WriteNC::process_concatenated_attribute( const void* attPtr,
+                                                   int attSz,
+                                                   std::vector< int >& attLen,
                                                    std::map< std::string, AttData >& attributes )
 {
     std::size_t start       = 0;

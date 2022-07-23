@@ -225,6 +225,7 @@ int main( int argc, char* argv[] )
                 break;
             case 'h':
                 usage( false );
+                break;
             default:
                 usage();
         }
@@ -268,7 +269,10 @@ int main( int argc, char* argv[] )
         std::cout << "Building tree..." << std::endl;
         build_time = clock();
         Range elems;
-        if( !surf_elems ) { interface->get_entities_by_dimension( 0, 3, elems ); }
+        if( !surf_elems )
+        {
+            interface->get_entities_by_dimension( 0, 3, elems );
+        }
         else
         {
             interface->get_entities_by_dimension( 0, 2, elems );
@@ -397,7 +401,10 @@ void build_grid( Interface* interface, const double dims[3] )
     }
 
     rval = tool.get_tree_iterator( root, iter );
-    if( MB_SUCCESS != rval ) { std::cerr << "Failed to get tree iterator." << std::endl; }
+    if( MB_SUCCESS != rval )
+    {
+        std::cerr << "Failed to get tree iterator." << std::endl;
+    }
 
     do
     {

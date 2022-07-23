@@ -51,7 +51,10 @@ WriteUtil::WriteUtil( Core* mdb ) : WriteUtilIface(), mMB( mdb ) {}
 ErrorCode WriteUtil::check_doesnt_exist( const char* file_name )
 {
     struct stat s;
-    if( 0 == stat( file_name, &s ) ) { MB_SET_ERR( MB_ALREADY_ALLOCATED, file_name << ": file already exists" ); }
+    if( 0 == stat( file_name, &s ) )
+    {
+        MB_SET_ERR( MB_ALREADY_ALLOCATED, file_name << ": file already exists" );
+    }
     else if( errno == ENOENT )
         return MB_SUCCESS;
     else
@@ -68,7 +71,10 @@ ErrorCode WriteUtil::gather_entities( Range& all_ents,
 )
 {
     ErrorCode rval = MB_SUCCESS;
-    if( !ent_sets || num_sets == 0 ) { rval = mMB->get_entities_by_handle( 0, all_ents ); }
+    if( !ent_sets || num_sets == 0 )
+    {
+        rval = mMB->get_entities_by_handle( 0, all_ents );
+    }
     else
     {
         for( int i = 0; i < num_sets; i++ )
@@ -81,8 +87,12 @@ ErrorCode WriteUtil::gather_entities( Range& all_ents,
     return rval;
 }
 
-ErrorCode WriteUtil::get_node_coords( const int num_arrays, const int num_nodes, const Range& entities, Tag node_id_tag,
-                                      const int start_node_id, std::vector< double* >& arrays )
+ErrorCode WriteUtil::get_node_coords( const int num_arrays,
+                                      const int num_nodes,
+                                      const Range& entities,
+                                      Tag node_id_tag,
+                                      const int start_node_id,
+                                      std::vector< double* >& arrays )
 {
     // Check the data coming into the function
     // Dimension should be proper
@@ -125,8 +135,10 @@ ErrorCode WriteUtil::get_node_coords( const int num_arrays, const int num_nodes,
 }
 
 ErrorCode WriteUtil::get_node_coords( const int which_array, /* 0->X, 1->Y, 2->Z, -1->all */
-                                      Range::const_iterator iter, const Range::const_iterator& end,
-                                      const size_t output_array_len, double* const output_array )
+                                      Range::const_iterator iter,
+                                      const Range::const_iterator& end,
+                                      const size_t output_array_len,
+                                      double* const output_array )
 {
     // Check the data coming into the function
     // Dimension should be proper
@@ -200,9 +212,14 @@ ErrorCode WriteUtil::get_node_coords( const int which_array, /* 0->X, 1->Y, 2->Z
     return MB_SUCCESS;
 }
 
-ErrorCode WriteUtil::get_element_connect( const int num_elements, const int verts_per_element, Tag node_id_tag,
-                                          const Range& elements, Tag element_id_tag, int start_element_id,
-                                          int* element_array, bool add_sizes )
+ErrorCode WriteUtil::get_element_connect( const int num_elements,
+                                          const int verts_per_element,
+                                          Tag node_id_tag,
+                                          const Range& elements,
+                                          Tag element_id_tag,
+                                          int start_element_id,
+                                          int* element_array,
+                                          bool add_sizes )
 {
     // Check the data we got
     if( num_elements < 1 ) return MB_FAILURE;
@@ -289,9 +306,13 @@ ErrorCode WriteUtil::get_element_connect( const int num_elements, const int vert
     return MB_SUCCESS;
 }
 
-ErrorCode WriteUtil::get_element_connect( Range::const_iterator iter, const Range::const_iterator& end,
-                                          const int vertices_per_elem, Tag node_id_tag, const size_t elem_array_size,
-                                          int* const element_array, bool add_sizes )
+ErrorCode WriteUtil::get_element_connect( Range::const_iterator iter,
+                                          const Range::const_iterator& end,
+                                          const int vertices_per_elem,
+                                          Tag node_id_tag,
+                                          const size_t elem_array_size,
+                                          int* const element_array,
+                                          bool add_sizes )
 {
     // Check the data we got
     if( iter == end ) return MB_FAILURE;
@@ -383,8 +404,10 @@ ErrorCode WriteUtil::get_element_connect( Range::const_iterator iter, const Rang
     return MB_SUCCESS;
 }
 
-ErrorCode WriteUtil::get_element_connect( Range::const_iterator iter, const Range::const_iterator& end,
-                                          const int vertices_per_elem, const size_t elem_array_size,
+ErrorCode WriteUtil::get_element_connect( Range::const_iterator iter,
+                                          const Range::const_iterator& end,
+                                          const int vertices_per_elem,
+                                          const size_t elem_array_size,
                                           EntityHandle* const element_array )
 {
     // Check the data we got
@@ -448,7 +471,10 @@ ErrorCode WriteUtil::get_element_connect( Range::const_iterator iter, const Rang
             {  // Copy connectivity element by element
                 std::vector< EntityHandle > connect;
                 rval = static_cast< ElementSequence* >( *seq_iter )->get_connectivity( *iter, connect );
-                if( MB_SUCCESS != rval ) { return rval; }
+                if( MB_SUCCESS != rval )
+                {
+                    return rval;
+                }
                 memcpy( output_iter, &connect[0], temp_buff_size );
                 output_iter += conn_size;
                 ++iter;
@@ -467,16 +493,21 @@ ErrorCode WriteUtil::get_element_connect( Range::const_iterator iter, const Rang
     return MB_SUCCESS;
 }
 
-ErrorCode WriteUtil::get_poly_connect_size( Range::const_iterator /* begin */, const Range::const_iterator& /* end */,
+ErrorCode WriteUtil::get_poly_connect_size( Range::const_iterator /* begin */,
+                                            const Range::const_iterator& /* end */,
                                             int& /* connectivity_size */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
 
-ErrorCode WriteUtil::get_poly_connect( Range::const_iterator& /* iter */, const Range::const_iterator& /* end */,
-                                       const Tag /* node_id_tag */, size_t& /* handle_array_len */,
-                                       int* const /* handle_array */, size_t& /* index_array_len */,
-                                       int* const /* index_array */, int& /* index_offset */ )
+ErrorCode WriteUtil::get_poly_connect( Range::const_iterator& /* iter */,
+                                       const Range::const_iterator& /* end */,
+                                       const Tag /* node_id_tag */,
+                                       size_t& /* handle_array_len */,
+                                       int* const /* handle_array */,
+                                       size_t& /* index_array_len */,
+                                       int* const /* index_array */,
+                                       int& /* index_offset */ )
 {
     return MB_NOT_IMPLEMENTED;
 }
@@ -680,7 +711,9 @@ ErrorCode WriteUtil::get_adjacencies( EntityHandle entity, const EntityHandle*& 
     return mMB->a_entity_factory()->get_adjacencies( entity, adj_array, num_adj );
 }
 
-ErrorCode WriteUtil::get_tag_list( std::vector< Tag >& result_list, const Tag* user_tag_list, int user_tag_list_length,
+ErrorCode WriteUtil::get_tag_list( std::vector< Tag >& result_list,
+                                   const Tag* user_tag_list,
+                                   int user_tag_list_length,
                                    bool include_variable_length_tags )
 {
     ErrorCode rval;
@@ -694,7 +727,10 @@ ErrorCode WriteUtil::get_tag_list( std::vector< Tag >& result_list, const Tag* u
             std::string name;
             rval = mMB->tag_get_name( user_tag_list[i], name );MB_CHK_SET_ERR( rval, "Error " << (int)rval << " getting name for tag (Invalid input tag handle?)" );
 
-            if( name.empty() ) { MB_SET_ERR( MB_TAG_NOT_FOUND, "Explicit request to save anonymous tag" ); }
+            if( name.empty() )
+            {
+                MB_SET_ERR( MB_TAG_NOT_FOUND, "Explicit request to save anonymous tag" );
+            }
 
             int size;
             if( !include_variable_length_tags &&
@@ -737,8 +773,11 @@ ErrorCode WriteUtil::get_tag_list( std::vector< Tag >& result_list, const Tag* u
     return MB_SUCCESS;
 }
 
-ErrorCode WriteUtil::get_entity_list_pointers( Range::const_iterator begin, Range::const_iterator end,
-                                               EntityHandle const** pointers, EntityListType relation, int* lengths,
+ErrorCode WriteUtil::get_entity_list_pointers( Range::const_iterator begin,
+                                               Range::const_iterator end,
+                                               EntityHandle const** pointers,
+                                               EntityListType relation,
+                                               int* lengths,
                                                unsigned char* flags )
 {
     RangeSeqIntersectIter iter( mMB->sequence_manager() );
@@ -818,8 +857,11 @@ ErrorCode WriteUtil::get_entity_list_pointers( Range::const_iterator begin, Rang
         return rval;
 }
 
-ErrorCode WriteUtil::get_entity_list_pointers( EntityHandle const* entities, int num_entities,
-                                               EntityHandle const** pointers, EntityListType relation, int* lengths,
+ErrorCode WriteUtil::get_entity_list_pointers( EntityHandle const* entities,
+                                               int num_entities,
+                                               EntityHandle const** pointers,
+                                               EntityListType relation,
+                                               int* lengths,
                                                unsigned char* flags )
 {
     SequenceManager* sm = mMB->sequence_manager();

@@ -273,14 +273,18 @@ void MeshImplData::reset_vertex( size_t index, const Vector3D& coords, bool fixe
     vert.valid  = true;
 }
 
-void MeshImplData::reset_element( size_t index, const std::vector< long >& vertices, EntityTopology topology,
+void MeshImplData::reset_element( size_t index,
+                                  const std::vector< long >& vertices,
+                                  EntityTopology topology,
                                   MsqError& err )
 {
     clear_element( index, err );MSQ_ERRRTN( err );
     set_element( index, vertices, topology, err );MSQ_ERRRTN( err );
 }
 
-void MeshImplData::reset_element( size_t index, const std::vector< size_t >& vertices, EntityTopology topology,
+void MeshImplData::reset_element( size_t index,
+                                  const std::vector< size_t >& vertices,
+                                  EntityTopology topology,
                                   MsqError& err )
 {
     clear_element( index, err );MSQ_ERRRTN( err );
@@ -316,7 +320,9 @@ void MeshImplData::clear_element( size_t index, MsqError& err )
     conn.clear();
 }
 
-void MeshImplData::set_element( size_t index, const std::vector< long >& vertices, EntityTopology topology,
+void MeshImplData::set_element( size_t index,
+                                const std::vector< long >& vertices,
+                                EntityTopology topology,
                                 MsqError& err )
 {
     if( sizeof( long ) == sizeof( size_t ) )
@@ -329,7 +335,9 @@ void MeshImplData::set_element( size_t index, const std::vector< long >& vertice
     }
 }
 
-void MeshImplData::set_element( size_t index, const std::vector< size_t >& vertices, EntityTopology topology,
+void MeshImplData::set_element( size_t index,
+                                const std::vector< size_t >& vertices,
+                                EntityTopology topology,
                                 MsqError& err )
 {
     if( index >= elementList.size() )
@@ -438,7 +446,9 @@ void MeshImplData::delete_element( size_t index, MsqError& err )
     deletedElementList.push_back( index );
 }
 
-void MeshImplData::copy_mesh( size_t* vertex_handle_array, size_t* element_handle_array, size_t* element_conn_offsets,
+void MeshImplData::copy_mesh( size_t* vertex_handle_array,
+                              size_t* element_handle_array,
+                              size_t* element_conn_offsets,
                               size_t* element_conn_indices )
 {
     std::vector< size_t > vertex_map( vertexList.size() );
@@ -493,8 +503,10 @@ void MeshImplData::copy_mesh( size_t* vertex_handle_array, size_t* element_handl
     *element_conn_offsets = offset;
 }
 
-void MeshImplData::copy_higher_order( std::vector< size_t >& mid_nodes, std::vector< size_t >& vertices,
-                                      std::vector< size_t >& vertex_indices, std::vector< size_t >& index_offsets,
+void MeshImplData::copy_higher_order( std::vector< size_t >& mid_nodes,
+                                      std::vector< size_t >& vertices,
+                                      std::vector< size_t >& vertex_indices,
+                                      std::vector< size_t >& index_offsets,
                                       MsqError& err )
 {
     mid_nodes.clear();
@@ -598,7 +610,8 @@ void MeshImplData::all_elements( std::vector< size_t >& list, MsqError& ) const
 }
 
 void MeshImplData::get_adjacent_elements( std::vector< size_t >::const_iterator node_iter,
-                                          std::vector< size_t >::const_iterator node_end, std::vector< size_t >& elems,
+                                          std::vector< size_t >::const_iterator node_end,
+                                          std::vector< size_t >& elems,
                                           MsqError& err )
 {
     if( node_iter == node_end || !is_vertex_valid( *node_iter ) )

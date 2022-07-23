@@ -67,8 +67,12 @@ namespace GeomUtil
         return fabs( u[0] * v[0] ) + fabs( u[1] * v[1] ) + fabs( u[2] * v[2] );
     }
 
-    bool segment_box_intersect( CartVect box_min, CartVect box_max, const CartVect& seg_pt,
-                                const CartVect& seg_unit_dir, double& seg_start, double& seg_end )
+    bool segment_box_intersect( CartVect box_min,
+                                CartVect box_max,
+                                const CartVect& seg_pt,
+                                const CartVect& seg_unit_dir,
+                                double& seg_start,
+                                double& seg_end )
     {
         // translate so that seg_pt is at origin
         box_min -= seg_pt;
@@ -109,13 +113,22 @@ namespace GeomUtil
        coordinates... */
     inline bool first( const CartVect& a, const CartVect& b )
     {
-        if( a[0] < b[0] ) { return true; }
+        if( a[0] < b[0] )
+        {
+            return true;
+        }
         else if( a[0] == b[0] )
         {
-            if( a[1] < b[1] ) { return true; }
+            if( a[1] < b[1] )
+            {
+                return true;
+            }
             else if( a[1] == b[1] )
             {
-                if( a[2] < b[2] ) { return true; }
+                if( a[2] < b[2] )
+                {
+                    return true;
+                }
                 else
                 {
                     return false;
@@ -132,7 +145,9 @@ namespace GeomUtil
         }
     }
 
-    double plucker_edge_test( const CartVect& vertexa, const CartVect& vertexb, const CartVect& ray,
+    double plucker_edge_test( const CartVect& vertexa,
+                              const CartVect& vertexb,
+                              const CartVect& ray,
                               const CartVect& ray_normal )
     {
 
@@ -175,9 +190,14 @@ namespace GeomUtil
 
        N. Platis and T. Theoharis, "Fast Ray-Tetrahedron Intersection using Plücker
        Coordinates", Journal of Graphics Tools, Vol. 8, Part 4, Pages 37-48 (2003). */
-    bool plucker_ray_tri_intersect( const CartVect vertices[3], const CartVect& origin, const CartVect& direction,
-                                    double& dist_out, const double* nonneg_ray_len, const double* neg_ray_len,
-                                    const int* orientation, intersection_type* type )
+    bool plucker_ray_tri_intersect( const CartVect vertices[3],
+                                    const CartVect& origin,
+                                    const CartVect& direction,
+                                    double& dist_out,
+                                    const double* nonneg_ray_len,
+                                    const double* neg_ray_len,
+                                    const int* orientation,
+                                    intersection_type* type )
     {
 
         const CartVect raya = direction;
@@ -188,7 +208,10 @@ namespace GeomUtil
 
         // If orientation is set, confirm that sign of plucker_coordinate indicate
         // correct orientation of intersection
-        if( orientation && ( *orientation ) * plucker_coord0 > 0 ) { EXIT_EARLY }
+        if( orientation && ( *orientation ) * plucker_coord0 > 0 )
+        {
+            EXIT_EARLY
+        }
 
         // Determine the value of the second Plucker coordinate from edge 1
         double plucker_coord1 = plucker_edge_test( vertices[1], vertices[2], raya, rayb );
@@ -197,7 +220,10 @@ namespace GeomUtil
         // correct orientation of intersection
         if( orientation )
         {
-            if( ( *orientation ) * plucker_coord1 > 0 ) { EXIT_EARLY }
+            if( ( *orientation ) * plucker_coord1 > 0 )
+            {
+                EXIT_EARLY
+            }
             // If the orientation is not specified, all plucker_coords must be the same sign or
             // zero.
         }
@@ -213,7 +239,10 @@ namespace GeomUtil
         // correct orientation of intersection
         if( orientation )
         {
-            if( ( *orientation ) * plucker_coord2 > 0 ) { EXIT_EARLY }
+            if( ( *orientation ) * plucker_coord2 > 0 )
+            {
+                EXIT_EARLY
+            }
             // If the orientation is not specified, all plucker_coords must be the same sign or
             // zero.
         }
@@ -224,7 +253,10 @@ namespace GeomUtil
         }
 
         // check for coplanar case to avoid dividing by zero
-        if( 0.0 == plucker_coord0 && 0.0 == plucker_coord1 && 0.0 == plucker_coord2 ) { EXIT_EARLY }
+        if( 0.0 == plucker_coord0 && 0.0 == plucker_coord1 && 0.0 == plucker_coord2 )
+        {
+            EXIT_EARLY
+        }
 
         // get the distance to intersection
         const double inverse_sum = 1.0 / ( plucker_coord0 + plucker_coord1 + plucker_coord2 );
@@ -264,7 +296,10 @@ namespace GeomUtil
     }
 
     /* Implementation copied from cgmMC ray_tri_contact (overlap.C) */
-    bool ray_tri_intersect( const CartVect vertices[3], const CartVect& b, const CartVect& v, double& t_out,
+    bool ray_tri_intersect( const CartVect vertices[3],
+                            const CartVect& b,
+                            const CartVect& v,
+                            double& t_out,
                             const double* ray_length )
     {
         const CartVect p0 = vertices[0] - vertices[1];  // abc
@@ -309,8 +344,12 @@ namespace GeomUtil
         return true;
     }
 
-    bool ray_box_intersect( const CartVect& box_min, const CartVect& box_max, const CartVect& ray_pt,
-                            const CartVect& ray_dir, double& t_enter, double& t_exit )
+    bool ray_box_intersect( const CartVect& box_min,
+                            const CartVect& box_max,
+                            const CartVect& ray_pt,
+                            const CartVect& ray_dir,
+                            double& t_enter,
+                            double& t_exit )
     {
         const double epsilon = 1e-12;
         double t1, t2;
@@ -467,16 +506,21 @@ namespace GeomUtil
         return box_plane_overlap( n, -( n % v0 ), -box_dims, box_dims );
     }
 
-    bool box_tri_overlap( const CartVect triangle_corners[3], const CartVect& box_min_corner,
-                          const CartVect& box_max_corner, double tolerance )
+    bool box_tri_overlap( const CartVect triangle_corners[3],
+                          const CartVect& box_min_corner,
+                          const CartVect& box_max_corner,
+                          double tolerance )
     {
         const CartVect box_center = 0.5 * ( box_max_corner + box_min_corner );
         const CartVect box_hf_dim = 0.5 * ( box_max_corner - box_min_corner );
         return box_tri_overlap( triangle_corners, box_center, box_hf_dim + CartVect( tolerance ) );
     }
 
-    bool box_elem_overlap( const CartVect* elem_corners, EntityType elem_type, const CartVect& center,
-                           const CartVect& dims, int nodecount )
+    bool box_elem_overlap( const CartVect* elem_corners,
+                           EntityType elem_type,
+                           const CartVect& center,
+                           const CartVect& dims,
+                           int nodecount )
     {
 
         switch( elem_type )
@@ -517,7 +561,9 @@ namespace GeomUtil
         return ( v2 - v1 ) * ( v3 - v1 );
     }
 
-    bool box_linear_elem_overlap( const CartVect* elem_corners, EntityType type, const CartVect& box_center,
+    bool box_linear_elem_overlap( const CartVect* elem_corners,
+                                  EntityType type,
+                                  const CartVect& box_center,
                                   const CartVect& box_halfdims )
     {
         CartVect corners[8];
@@ -852,8 +898,11 @@ namespace GeomUtil
         return true;
     }
 
-    static inline bool box_tet_overlap_edge( const CartVect& dims, const CartVect& edge, const CartVect& ve,
-                                             const CartVect& v1, const CartVect& v2 )
+    static inline bool box_tet_overlap_edge( const CartVect& dims,
+                                             const CartVect& edge,
+                                             const CartVect& ve,
+                                             const CartVect& v1,
+                                             const CartVect& v2 )
     {
         double dot, dot1, dot2, dot3, min, max;
 
@@ -1153,8 +1202,11 @@ namespace GeomUtil
         }
     }
 
-    void closest_location_on_tri( const CartVect& location, const CartVect* vertices, double tolerance,
-                                  CartVect& closest_out, int& closest_topo )
+    void closest_location_on_tri( const CartVect& location,
+                                  const CartVect* vertices,
+                                  double tolerance,
+                                  CartVect& closest_out,
+                                  int& closest_topo )
     {
         const double tsqr = tolerance * tolerance;
         int i;
@@ -1189,7 +1241,9 @@ namespace GeomUtil
     }
 
     // We assume polygon is *convex*, but *not* planar.
-    void closest_location_on_polygon( const CartVect& location, const CartVect* vertices, int num_vertices,
+    void closest_location_on_polygon( const CartVect& location,
+                                      const CartVect* vertices,
+                                      int num_vertices,
                                       CartVect& closest_out )
     {
         const int n = num_vertices;
@@ -1265,7 +1319,9 @@ namespace GeomUtil
         closest[2] = point[2] < min[2] ? min[2] : point[2] > max[2] ? max[2] : point[2];
     }
 
-    bool box_point_overlap( const CartVect& box_min_corner, const CartVect& box_max_corner, const CartVect& point,
+    bool box_point_overlap( const CartVect& box_min_corner,
+                            const CartVect& box_max_corner,
+                            const CartVect& point,
                             double tolerance )
     {
         CartVect closest;
@@ -1274,8 +1330,11 @@ namespace GeomUtil
         return closest % closest < tolerance * tolerance;
     }
 
-    bool boxes_overlap( const CartVect& box_min1, const CartVect& box_max1, const CartVect& box_min2,
-                        const CartVect& box_max2, double tolerance )
+    bool boxes_overlap( const CartVect& box_min1,
+                        const CartVect& box_max1,
+                        const CartVect& box_min2,
+                        const CartVect& box_max2,
+                        double tolerance )
     {
 
         for( int k = 0; k < 3; k++ )

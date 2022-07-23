@@ -42,8 +42,12 @@ int main( int argc, char* argv[] )
     return result;
 }
 
-static void print_ent_desc( const char* name, const char* subname, MHDF_EntDesc* data, const char* vals_label,
-                            const char* extra_label, MHDF_FileDesc* all )
+static void print_ent_desc( const char* name,
+                            const char* subname,
+                            MHDF_EntDesc* data,
+                            const char* vals_label,
+                            const char* extra_label,
+                            MHDF_FileDesc* all )
 {
     int i, len = 10;
 
@@ -142,7 +146,10 @@ static const char* string_tag_value( const void* value, MHDF_TagDataType type, i
             }
             break;
         case mhdf_INTEGER:
-            if( size == 1 ) { offset += sprintf( offset, "%d", intptr[0] ); }
+            if( size == 1 )
+            {
+                offset += sprintf( offset, "%d", intptr[0] );
+            }
             else
             {
                 offset += sprintf( offset, "{%d", intptr[0] );
@@ -152,7 +159,10 @@ static const char* string_tag_value( const void* value, MHDF_TagDataType type, i
             }
             break;
         case mhdf_FLOAT:
-            if( size == 1 ) { offset += sprintf( offset, "%g", dblptr[0] ); }
+            if( size == 1 )
+            {
+                offset += sprintf( offset, "%g", dblptr[0] );
+            }
             else
             {
                 offset += sprintf( offset, "{%g", dblptr[0] );
@@ -172,7 +182,10 @@ static const char* string_tag_value( const void* value, MHDF_TagDataType type, i
             }
             break;
         case mhdf_BOOLEAN:
-            if( size == 1 ) { offset += sprintf( offset, "%s", data[0] ? "true" : "false" ); }
+            if( size == 1 )
+            {
+                offset += sprintf( offset, "%s", data[0] ? "true" : "false" );
+            }
             else
             {
                 offset += sprintf( offset, "{%s", data[0] ? "true" : "false" );
@@ -182,7 +195,10 @@ static const char* string_tag_value( const void* value, MHDF_TagDataType type, i
             }
             break;
         case mhdf_ENTITY_ID:
-            if( size == 1 ) { offset += sprintf( offset, "%lu", idptr[0] ); }
+            if( size == 1 )
+            {
+                offset += sprintf( offset, "%lu", idptr[0] );
+            }
             else
             {
                 offset += sprintf( offset, "{%lu", idptr[0] );

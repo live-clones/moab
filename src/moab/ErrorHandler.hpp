@@ -35,8 +35,13 @@ bool MBErrorHandler_Initialized();
 void MBErrorHandler_GetLastError( std::string& error );
 
 //! Routine that is called to create a new error or handle an existing one
-ErrorCode MBError( int line, const char* func, const char* file, const char* dir, ErrorCode err_code,
-                   const char* err_msg, ErrorType err_type );
+ErrorCode MBError( int line,
+                   const char* func,
+                   const char* file,
+                   const char* dir,
+                   ErrorCode err_code,
+                   const char* err_msg,
+                   ErrorType err_type );
 
 }  // namespace moab
 

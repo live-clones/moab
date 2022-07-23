@@ -87,30 +87,50 @@ class Core : public Interface
 
     //! load mesh from data in file
     //! NOTE: if there is mesh already present, the new mesh will be added
-    virtual ErrorCode load_mesh( const char* file_name, const int* active_block_id_list = NULL,
-                                 const int num_blocks = 0 );
+    virtual ErrorCode load_mesh( const char* file_name,
+                                 const int* active_block_id_list = NULL,
+                                 const int num_blocks            = 0 );
 
     /**Load or import a file. */
-    virtual ErrorCode load_file( const char* file_name, const EntityHandle* file_set = 0, const char* options = 0,
-                                 const char* set_tag_name = 0, const int* set_tag_vals = 0, int num_set_tag_vals = 0 );
+    virtual ErrorCode load_file( const char* file_name,
+                                 const EntityHandle* file_set = 0,
+                                 const char* options          = 0,
+                                 const char* set_tag_name     = 0,
+                                 const int* set_tag_vals      = 0,
+                                 int num_set_tag_vals         = 0 );
 
     /**Load or import a file. */
-    ErrorCode serial_load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
-                                const ReaderIface::SubsetList* subsets = 0, const Tag* file_id_tag = 0 );
+    ErrorCode serial_load_file( const char* file_name,
+                                const EntityHandle* file_set,
+                                const FileOptions& opts,
+                                const ReaderIface::SubsetList* subsets = 0,
+                                const Tag* file_id_tag                 = 0 );
 
-    ErrorCode serial_read_tag( const char* file_name, const char* tag_name, const FileOptions& opts,
-                               std::vector< int >& tag_vals, const ReaderIface::SubsetList* subsets = 0 );
+    ErrorCode serial_read_tag( const char* file_name,
+                               const char* tag_name,
+                               const FileOptions& opts,
+                               std::vector< int >& tag_vals,
+                               const ReaderIface::SubsetList* subsets = 0 );
 
-    virtual ErrorCode write_mesh( const char* file_name, const EntityHandle* output_list = NULL,
-                                  const int num_sets = 0 );
+    virtual ErrorCode write_mesh( const char* file_name,
+                                  const EntityHandle* output_list = NULL,
+                                  const int num_sets              = 0 );
     /** Write or export a file. */
-    virtual ErrorCode write_file( const char* file_name, const char* file_type = 0, const char* options = 0,
-                                  const EntityHandle* output_sets = 0, int num_output_sets = 0, const Tag* tag_list = 0,
-                                  int num_tags = 0 );
+    virtual ErrorCode write_file( const char* file_name,
+                                  const char* file_type           = 0,
+                                  const char* options             = 0,
+                                  const EntityHandle* output_sets = 0,
+                                  int num_output_sets             = 0,
+                                  const Tag* tag_list             = 0,
+                                  int num_tags                    = 0 );
 
     /** Write or export a file */
-    virtual ErrorCode write_file( const char* file_name, const char* file_type, const char* options,
-                                  const Range& output_sets, const Tag* tag_list = 0, int num_tags = 0 );
+    virtual ErrorCode write_file( const char* file_name,
+                                  const char* file_type,
+                                  const char* options,
+                                  const Range& output_sets,
+                                  const Tag* tag_list = 0,
+                                  int num_tags        = 0 );
 
     //! deletes all mesh entities from this datastore
     virtual ErrorCode delete_mesh();
@@ -130,8 +150,12 @@ class Core : public Interface
     virtual ErrorCode get_vertex_coordinates( std::vector< double >& coords ) const;
 
     //! get pointers to coordinate data
-    virtual ErrorCode coords_iterate( Range::const_iterator iter, Range::const_iterator end, double*& xcoords_ptr,
-                                      double*& ycoords_ptr, double*& zcoords_ptr, int& count );
+    virtual ErrorCode coords_iterate( Range::const_iterator iter,
+                                      Range::const_iterator end,
+                                      double*& xcoords_ptr,
+                                      double*& ycoords_ptr,
+                                      double*& zcoords_ptr,
+                                      int& count );
 
     //! get the coordinate information for this handle if it is of type Vertex
     //! otherwise, return an error
@@ -139,7 +163,9 @@ class Core : public Interface
 
     virtual ErrorCode get_coords( const EntityHandle* entities, const int num_entities, double* coords ) const;
 
-    virtual ErrorCode get_coords( const EntityHandle entity_handle, const double*& x, const double*& y,
+    virtual ErrorCode get_coords( const EntityHandle entity_handle,
+                                  const double*& x,
+                                  const double*& y,
                                   const double*& z ) const;
 
     virtual ErrorCode get_coords( const Range& entities, double* x_coords, double* y_coords, double* z_coords ) const;
@@ -158,8 +184,11 @@ class Core : public Interface
     virtual ErrorCode get_connectivity_by_type( const EntityType type, std::vector< EntityHandle >& connect ) const;
 
     //! get pointer to connectivity data
-    virtual ErrorCode connect_iterate( Range::const_iterator iter, Range::const_iterator end, EntityHandle*& connect,
-                                       int& verts_per_entity, int& count );
+    virtual ErrorCode connect_iterate( Range::const_iterator iter,
+                                       Range::const_iterator end,
+                                       EntityHandle*& connect,
+                                       int& verts_per_entity,
+                                       int& count );
 
     //! Gets the connectivity for an element EntityHandle.
     /** For non-element handles (ie, MeshSets),
@@ -175,20 +204,25 @@ class Core : public Interface
      *   std::vector<EntityHandle> conn;
      *   get_connectivity( entity_handle, conn ); \endcode
      */
-    virtual ErrorCode get_connectivity( const EntityHandle* entity_handles, const int num_handles,
-                                        std::vector< EntityHandle >& connectivity, bool corners_only = false,
+    virtual ErrorCode get_connectivity( const EntityHandle* entity_handles,
+                                        const int num_handles,
+                                        std::vector< EntityHandle >& connectivity,
+                                        bool corners_only           = false,
                                         std::vector< int >* offsets = NULL ) const;
 
     //! Gets the connectivity for a vector of elements
     /** Same as vector-based version except range is returned (unordered!)
      */
-    virtual ErrorCode get_connectivity( const EntityHandle* entity_handles, const int num_handles, Range& connectivity,
+    virtual ErrorCode get_connectivity( const EntityHandle* entity_handles,
+                                        const int num_handles,
+                                        Range& connectivity,
                                         bool corners_only = false ) const;
 
     //! Gets the connectivity for elements
     /** Same as vector-based version except range is returned (unordered!)
      */
-    virtual ErrorCode get_connectivity( const Range& from_entities, Range& adj_entities,
+    virtual ErrorCode get_connectivity( const Range& from_entities,
+                                        Range& adj_entities,
                                         bool corners_only = false ) const;
 
     //! Gets a pointer to constant connectivity data of <em>entity_handle</em>
@@ -214,8 +248,10 @@ class Core : public Interface
           std::cout << "Structured mesh element" << std::endl;
         \endcode
       */
-    virtual ErrorCode get_connectivity( const EntityHandle entity_handle, const EntityHandle*& connectivity,
-                                        int& number_nodes, bool corners_only = false,
+    virtual ErrorCode get_connectivity( const EntityHandle entity_handle,
+                                        const EntityHandle*& connectivity,
+                                        int& number_nodes,
+                                        bool corners_only                    = false,
                                         std::vector< EntityHandle >* storage = 0 ) const;
 
     //! Sets the connectivity for an EntityHandle.  For non-element handles, return an error.
@@ -230,7 +266,8 @@ class Core : public Interface
         conn[1] = node2;
         conn[2] = node3;
         set_connectivity( entity_handle, conn, 3 ); \endcode */
-    virtual ErrorCode set_connectivity( const EntityHandle entity_handle, EntityHandle* connect,
+    virtual ErrorCode set_connectivity( const EntityHandle entity_handle,
+                                        EntityHandle* connect,
                                         const int num_connect );
 
     //! get the adjacencies associated with a set of entities
@@ -250,17 +287,25 @@ class Core : public Interface
           get_adjacencies( from_entities, MB_1D_ENTITY, adjacencies );
           \endcode */
 
-    virtual ErrorCode get_adjacencies( const EntityHandle* from_entities, const int num_entities,
-                                       const int to_dimension, const bool create_if_missing,
+    virtual ErrorCode get_adjacencies( const EntityHandle* from_entities,
+                                       const int num_entities,
+                                       const int to_dimension,
+                                       const bool create_if_missing,
                                        std::vector< EntityHandle >& adj_entities,
                                        const int operation_type = Interface::INTERSECT );
 
-    virtual ErrorCode get_adjacencies( const EntityHandle* from_entities, const int num_entities,
-                                       const int to_dimension, const bool create_if_missing, Range& adj_entities,
+    virtual ErrorCode get_adjacencies( const EntityHandle* from_entities,
+                                       const int num_entities,
+                                       const int to_dimension,
+                                       const bool create_if_missing,
+                                       Range& adj_entities,
                                        const int operation_type = Interface::INTERSECT );
 
-    virtual ErrorCode get_adjacencies( const Range& from_entities, const int to_dimension, const bool create_if_missing,
-                                       Range& adj_entities, const int operation_type = Interface::INTERSECT );
+    virtual ErrorCode get_adjacencies( const Range& from_entities,
+                                       const int to_dimension,
+                                       const bool create_if_missing,
+                                       Range& adj_entities,
+                                       const int operation_type = Interface::INTERSECT );
 
     /**\brief Get a ptr to adjacency lists
      * Get a pointer to adjacency lists.  These lists are std::vector<EntityHandle>, which are
@@ -274,8 +319,10 @@ class Core : public Interface
      * array is the vector of adjacencies for this entity \param count Number of entities in the
      * contiguous chunk starting from *iter
      */
-    ErrorCode adjacencies_iterate( Range::const_iterator iter, Range::const_iterator end,
-                                   const std::vector< EntityHandle >**& adjs_ptr, int& count );
+    ErrorCode adjacencies_iterate( Range::const_iterator iter,
+                                   Range::const_iterator end,
+                                   const std::vector< EntityHandle >**& adjs_ptr,
+                                   int& count );
 
     /**\brief Get all vertices for input entities
      *
@@ -293,8 +340,10 @@ class Core : public Interface
 
         Example: \code
     */
-    virtual ErrorCode add_adjacencies( const EntityHandle entity_handle, const EntityHandle* adjacencies,
-                                       const int num_handles, bool both_ways );
+    virtual ErrorCode add_adjacencies( const EntityHandle entity_handle,
+                                       const EntityHandle* adjacencies,
+                                       const int num_handles,
+                                       bool both_ways );
 
     //! Adds adjacencies; same as vector-based, but with range instead
     virtual ErrorCode add_adjacencies( const EntityHandle entity_handle, Range& adjacencies, bool both_ways );
@@ -304,7 +353,8 @@ class Core : public Interface
 
     Example: \code
     */
-    virtual ErrorCode remove_adjacencies( const EntityHandle entity_handle, const EntityHandle* adjacencies,
+    virtual ErrorCode remove_adjacencies( const EntityHandle entity_handle,
+                                          const EntityHandle* adjacencies,
                                           const int num_handles );
 
     //! Retrieves all entities in the database of given dimension.
@@ -316,10 +366,13 @@ class Core : public Interface
         Range entities;
         get_entities_by_dimension( dimension, entities ); //get 2D EntityHandles in the database
         \endcode */
-    virtual ErrorCode get_entities_by_dimension( const EntityHandle meshset, const int dimension, Range& entities,
+    virtual ErrorCode get_entities_by_dimension( const EntityHandle meshset,
+                                                 const int dimension,
+                                                 Range& entities,
                                                  const bool recursive = false ) const;
 
-    virtual ErrorCode get_entities_by_dimension( const EntityHandle meshset, const int dimension,
+    virtual ErrorCode get_entities_by_dimension( const EntityHandle meshset,
+                                                 const int dimension,
                                                  std::vector< EntityHandle >& entities,
                                                  const bool recursive = false ) const;
 
@@ -332,7 +385,9 @@ class Core : public Interface
         Range entities;
         get_entities_by_dimension( type, entities ); //get MBTET type EntityHandles in the database
         \endcode */
-    virtual ErrorCode get_entities_by_type( const EntityHandle meshset, const EntityType type, Range& entities,
+    virtual ErrorCode get_entities_by_type( const EntityHandle meshset,
+                                            const EntityType type,
+                                            Range& entities,
                                             const bool recursive = false ) const;
 
     //! Retrieves all entities in the data base of given type.
@@ -344,11 +399,17 @@ class Core : public Interface
         Range entities;
         get_entities_by_dimension( type, entities ); //get MBTET type EntityHandles in the database
         \endcode */
-    virtual ErrorCode get_entities_by_type( const EntityHandle meshset, const EntityType type,
-                                            std::vector< EntityHandle >& entities, const bool recursive = false ) const;
+    virtual ErrorCode get_entities_by_type( const EntityHandle meshset,
+                                            const EntityType type,
+                                            std::vector< EntityHandle >& entities,
+                                            const bool recursive = false ) const;
 
-    virtual ErrorCode get_entities_by_type_and_tag( const EntityHandle meshset, const EntityType type, const Tag* tags,
-                                                    const void* const* values, const int num_tags, Range& entities,
+    virtual ErrorCode get_entities_by_type_and_tag( const EntityHandle meshset,
+                                                    const EntityType type,
+                                                    const Tag* tags,
+                                                    const void* const* values,
+                                                    const int num_tags,
+                                                    Range& entities,
                                                     const int condition  = Interface::INTERSECT,
                                                     const bool recursive = false ) const;
 
@@ -359,7 +420,8 @@ class Core : public Interface
     Range entities;
     get_entities( entities ); //get MBTET type EntityHandles in the database
     \endcode */
-    virtual ErrorCode get_entities_by_handle( const EntityHandle meshset, Range& entities,
+    virtual ErrorCode get_entities_by_handle( const EntityHandle meshset,
+                                              Range& entities,
                                               const bool recursive = false ) const;
 
     //! Retrieves all entities in the data base
@@ -369,7 +431,8 @@ class Core : public Interface
     Range entities;
     get_entities( entities ); //get MBTET type EntityHandles in the database
     \endcode */
-    virtual ErrorCode get_entities_by_handle( const EntityHandle meshset, std::vector< EntityHandle >& entities,
+    virtual ErrorCode get_entities_by_handle( const EntityHandle meshset,
+                                              std::vector< EntityHandle >& entities,
                                               const bool recursive = false ) const;
 
     //! Retrieves all entities in the database of given dimension.
@@ -381,7 +444,9 @@ class Core : public Interface
         Range entities;
         get_entities_by_dimension( dimension, entities ); //get 2D EntityHandles in the database
         \endcode */
-    virtual ErrorCode get_number_entities_by_dimension( const EntityHandle meshset, const int dimension, int& number,
+    virtual ErrorCode get_number_entities_by_dimension( const EntityHandle meshset,
+                                                        const int dimension,
+                                                        int& number,
                                                         const bool recursive = false ) const;
 
     //! Retrieves all entities in the data base of given type.
@@ -393,12 +458,17 @@ class Core : public Interface
         Range entities;
         get_entities_by_dimension( type, entities ); //get MBTET type EntityHandles in the database
         \endcode */
-    virtual ErrorCode get_number_entities_by_type( const EntityHandle meshset, const EntityType type, int& num_entities,
+    virtual ErrorCode get_number_entities_by_type( const EntityHandle meshset,
+                                                   const EntityType type,
+                                                   int& num_entities,
                                                    const bool recursive = false ) const;
 
-    virtual ErrorCode get_number_entities_by_type_and_tag( const EntityHandle meshset, const EntityType type,
-                                                           const Tag* tag_handles, const void* const* values,
-                                                           const int num_tags, int& num_entities,
+    virtual ErrorCode get_number_entities_by_type_and_tag( const EntityHandle meshset,
+                                                           const EntityType type,
+                                                           const Tag* tag_handles,
+                                                           const void* const* values,
+                                                           const int num_tags,
+                                                           int& num_entities,
                                                            const int condition  = Interface::INTERSECT,
                                                            const bool recursive = false ) const;
 
@@ -409,7 +479,8 @@ class Core : public Interface
     Range entities;
     get_entities( entities ); //get MBTET type EntityHandles in the database
     \endcode */
-    virtual ErrorCode get_number_entities_by_handle( const EntityHandle meshset, int& num_entities,
+    virtual ErrorCode get_number_entities_by_handle( const EntityHandle meshset,
+                                                     int& num_entities,
                                                      const bool recursive = false ) const;
 
     //! Creates an element based on the type and connectivity.
@@ -428,7 +499,9 @@ class Core : public Interface
         quad_conn[3] = vertex3;
         EntityHandle element_handle;
         create_element( type, connectivity, element_handle ); \endcode */
-    virtual ErrorCode create_element( const EntityType type, const EntityHandle* connectivity, const int num_nodes,
+    virtual ErrorCode create_element( const EntityType type,
+                                      const EntityHandle* connectivity,
+                                      const int num_nodes,
                                       EntityHandle& element_handle );
 
     //! Creates a vertex based on coordinates.
@@ -454,7 +527,9 @@ class Core : public Interface
     virtual ErrorCode create_vertices( const double* coordinates, const int nverts, Range& entity_handles );
 
     //! merges two entities
-    virtual ErrorCode merge_entities( EntityHandle entity_to_keep, EntityHandle entity_to_remove, bool auto_merge,
+    virtual ErrorCode merge_entities( EntityHandle entity_to_keep,
+                                      EntityHandle entity_to_remove,
+                                      bool auto_merge,
                                       bool delete_removed_entity );
 
     //! Removes entities in a vector from the data base.
@@ -495,22 +570,32 @@ class Core : public Interface
         virtual void node_removed( EntityHandle node );
     };
 
-    virtual ErrorCode convert_entities( const EntityHandle meshset, const bool mid_side, const bool mid_face,
-                                        const bool mid_volume, Interface::HONodeAddedRemoved* function_object = 0 );
+    virtual ErrorCode convert_entities( const EntityHandle meshset,
+                                        const bool mid_side,
+                                        const bool mid_face,
+                                        const bool mid_volume,
+                                        Interface::HONodeAddedRemoved* function_object = 0 );
 
     //! function to get the side number given two elements; returns
     //! MB_FAILURE if child not related to parent; does *not* create adjacencies
     //! between parent and child
-    virtual ErrorCode side_number( const EntityHandle parent, const EntityHandle child, int& sd_number, int& sense,
+    virtual ErrorCode side_number( const EntityHandle parent,
+                                   const EntityHandle child,
+                                   int& sd_number,
+                                   int& sense,
                                    int& offset ) const;
 
     //! given an entity and the connectivity and type of one of its subfacets, find the
     //! high order node on that subfacet, if any
-    virtual ErrorCode high_order_node( const EntityHandle parent_handle, const EntityHandle* subfacet_conn,
-                                       const EntityType subfacet_type, EntityHandle& hon ) const;
+    virtual ErrorCode high_order_node( const EntityHandle parent_handle,
+                                       const EntityHandle* subfacet_conn,
+                                       const EntityType subfacet_type,
+                                       EntityHandle& hon ) const;
 
     //! given an entity and a target dimension & side number, get that entity
-    virtual ErrorCode side_element( const EntityHandle source_entity, const int dim, const int sd_number,
+    virtual ErrorCode side_element( const EntityHandle source_entity,
+                                    const int dim,
+                                    const int sd_number,
                                     EntityHandle& target_entity ) const;
 
     //-------------------------Tag Stuff-------------------------------------//
@@ -543,11 +628,20 @@ class Core : public Interface
      *        - \c MB_VARIABLE_DATA_LENGTH  if \c MB_TAG_VARLEN and \c default_value is non-null and
      *                                      \c default_value_size is not specified.
      */
-    virtual ErrorCode tag_get_handle( const char* name, int size, DataType type, Tag& tag_handle, unsigned flags = 0,
-                                      const void* default_value = 0, bool* created = 0 );
+    virtual ErrorCode tag_get_handle( const char* name,
+                                      int size,
+                                      DataType type,
+                                      Tag& tag_handle,
+                                      unsigned flags            = 0,
+                                      const void* default_value = 0,
+                                      bool* created             = 0 );
 
     /**\brief same as non-const version, except that TAG_CREAT flag is ignored. */
-    virtual ErrorCode tag_get_handle( const char* name, int size, DataType type, Tag& tag_handle, unsigned flags = 0,
+    virtual ErrorCode tag_get_handle( const char* name,
+                                      int size,
+                                      DataType type,
+                                      Tag& tag_handle,
+                                      unsigned flags            = 0,
                                       const void* default_value = 0 ) const;
 
     //! Gets the tag name string of the tag_handle.
@@ -599,7 +693,9 @@ class Core : public Interface
     //! get handles for all tags defined
     virtual ErrorCode tag_get_tags( std::vector< Tag >& tag_handles ) const;
 
-    virtual ErrorCode tag_get_data( const Tag tag_handle, const EntityHandle* entity_handles, const int num_entities,
+    virtual ErrorCode tag_get_data( const Tag tag_handle,
+                                    const EntityHandle* entity_handles,
+                                    const int num_entities,
                                     void* tag_data ) const;
 
     virtual ErrorCode tag_get_data( const Tag tag_handle, const Range& entity_handles, void* tag_data ) const;
@@ -615,7 +711,9 @@ class Core : public Interface
         Example: \code
         int tag_data = 1004;
         tag_set_data( tag_handle, entity_handle, &tag_data ); \endcode */
-    virtual ErrorCode tag_set_data( Tag tag_handle, const EntityHandle* entity_handles, int num_entities,
+    virtual ErrorCode tag_set_data( Tag tag_handle,
+                                    const EntityHandle* entity_handles,
+                                    int num_entities,
                                     const void* tag_data );
 
     virtual ErrorCode tag_set_data( Tag tag_handle, const Range& entity_handles, const void* tag_data );
@@ -634,8 +732,11 @@ class Core : public Interface
      *\param tag_sizes      The length of each tag value.  Optional for
      *                      fixed-length tags.  Required for variable-length tags.
      */
-    virtual ErrorCode tag_get_by_ptr( const Tag tag_handle, const EntityHandle* entity_handles, int num_entities,
-                                      const void** tag_data, int* tag_sizes = 0 ) const;
+    virtual ErrorCode tag_get_by_ptr( const Tag tag_handle,
+                                      const EntityHandle* entity_handles,
+                                      int num_entities,
+                                      const void** tag_data,
+                                      int* tag_sizes = 0 ) const;
 
     /**\brief Get pointers to tag data
      *
@@ -649,7 +750,9 @@ class Core : public Interface
      *\param tag_sizes      The length of each tag value.  Optional for
      *                      fixed-length tags.  Required for variable-length tags.
      */
-    virtual ErrorCode tag_get_by_ptr( const Tag tag_handle, const Range& entity_handles, const void** tag_data,
+    virtual ErrorCode tag_get_by_ptr( const Tag tag_handle,
+                                      const Range& entity_handles,
+                                      const void** tag_data,
                                       int* tag_sizes = 0 ) const;
 
     /**\brief Set tag data given an array of pointers to tag values.
@@ -666,8 +769,11 @@ class Core : public Interface
      *\param tag_sizes      The length of each tag value.  Optional for
      *                      fixed-length tags.  Required for variable-length tags.
      */
-    virtual ErrorCode tag_set_by_ptr( Tag tag_handle, const EntityHandle* entity_handles, int num_entities,
-                                      void const* const* tag_data, const int* tag_sizes = 0 );
+    virtual ErrorCode tag_set_by_ptr( Tag tag_handle,
+                                      const EntityHandle* entity_handles,
+                                      int num_entities,
+                                      void const* const* tag_data,
+                                      const int* tag_sizes = 0 );
 
     /**\brief Set tag data given an array of pointers to tag values.
      *
@@ -681,7 +787,9 @@ class Core : public Interface
      *\param tag_sizes      The length of each tag value.  Optional for
      *                      fixed-length tags.  Required for variable-length tags.
      */
-    virtual ErrorCode tag_set_by_ptr( Tag tag_handle, const Range& entity_handles, void const* const* tag_data,
+    virtual ErrorCode tag_set_by_ptr( Tag tag_handle,
+                                      const Range& entity_handles,
+                                      void const* const* tag_data,
                                       const int* tag_sizes = 0 );
 
     /**\brief Set tag data given value.
@@ -696,7 +804,9 @@ class Core : public Interface
      *                      tag value.  This argument will be ignored for
      *                      fixed-length tags.
      */
-    virtual ErrorCode tag_clear_data( Tag tag_handle, const Range& entity_handles, const void* tag_data,
+    virtual ErrorCode tag_clear_data( Tag tag_handle,
+                                      const Range& entity_handles,
+                                      const void* tag_data,
                                       int tag_size = 0 );
 
     /**\brief Set tag data given value.
@@ -711,8 +821,11 @@ class Core : public Interface
      *                      tag value.  This argument will be ignored for
      *                      fixed-length tags.
      */
-    virtual ErrorCode tag_clear_data( Tag tag_handle, const EntityHandle* entity_handles, int num_entities,
-                                      const void* tag_data, int tag_size = 0 );
+    virtual ErrorCode tag_clear_data( Tag tag_handle,
+                                      const EntityHandle* entity_handles,
+                                      int num_entities,
+                                      const void* tag_data,
+                                      int tag_size = 0 );
 
     //! Delete the data of a vector of entity handles and sparse tag
     /** Delete the data of a tag on a vector of entity handles.  Only sparse tag data are deleted
@@ -780,8 +893,12 @@ class Core : public Interface
      * }
      *\endcode
      */
-    virtual ErrorCode tag_iterate( Tag tag_handle, Range::const_iterator iter, Range::const_iterator end, int& count,
-                                   void*& data_ptr, bool allocate = true );
+    virtual ErrorCode tag_iterate( Tag tag_handle,
+                                   Range::const_iterator iter,
+                                   Range::const_iterator end,
+                                   int& count,
+                                   void*& data_ptr,
+                                   bool allocate = true );
 
     //! creates a mesh set
     virtual ErrorCode create_meshset( const unsigned int options, EntityHandle& ms_handle, int start_id = 0 );
@@ -827,35 +944,43 @@ class Core : public Interface
     virtual ErrorCode remove_entities( EntityHandle meshset, const EntityHandle* entities, const int num_entities );
 
     //! return true if all entities are contained in set
-    virtual bool contains_entities( EntityHandle meshset, const EntityHandle* entities, int num_entities,
+    virtual bool contains_entities( EntityHandle meshset,
+                                    const EntityHandle* entities,
+                                    int num_entities,
                                     const int operation_type = Interface::INTERSECT );
 
     //! replace entities
-    virtual ErrorCode replace_entities( EntityHandle meshset, const EntityHandle* old_entities,
-                                        const EntityHandle* new_entities, int num_entities );
+    virtual ErrorCode replace_entities( EntityHandle meshset,
+                                        const EntityHandle* old_entities,
+                                        const EntityHandle* new_entities,
+                                        int num_entities );
 
     //------MeshSet Parent/Child functions------
 
     //! get parent meshsets
-    virtual ErrorCode get_parent_meshsets( const EntityHandle meshset, std::vector< EntityHandle >& parents,
+    virtual ErrorCode get_parent_meshsets( const EntityHandle meshset,
+                                           std::vector< EntityHandle >& parents,
                                            const int num_hops = 1 ) const;
 
     //! get parent meshsets
     virtual ErrorCode get_parent_meshsets( const EntityHandle meshset, Range& parents, const int num_hops = 1 ) const;
 
     //! get child meshsets
-    virtual ErrorCode get_child_meshsets( const EntityHandle meshset, std::vector< EntityHandle >& children,
+    virtual ErrorCode get_child_meshsets( const EntityHandle meshset,
+                                          std::vector< EntityHandle >& children,
                                           const int num_hops = 1 ) const;
 
     //! get child meshsets
     virtual ErrorCode get_child_meshsets( const EntityHandle meshset, Range& children, const int num_hops = 1 ) const;
 
     //! get contained meshsets
-    virtual ErrorCode get_contained_meshsets( const EntityHandle meshset, std::vector< EntityHandle >& children,
+    virtual ErrorCode get_contained_meshsets( const EntityHandle meshset,
+                                              std::vector< EntityHandle >& children,
                                               const int num_hops = 1 ) const;
 
     //! get contained meshsets
-    virtual ErrorCode get_contained_meshsets( const EntityHandle meshset, Range& children,
+    virtual ErrorCode get_contained_meshsets( const EntityHandle meshset,
+                                              Range& children,
                                               const int num_hops = 1 ) const;
 
     //! gets number of parent meshsets
@@ -921,13 +1046,24 @@ class Core : public Interface
     }
 
     /// create structured sequence
-    ErrorCode create_scd_sequence( const HomCoord& coord_min, const HomCoord& coord_max, EntityType type,
-                                   EntityID start_id_hint, EntityHandle& first_handle_out,
+    ErrorCode create_scd_sequence( const HomCoord& coord_min,
+                                   const HomCoord& coord_max,
+                                   EntityType type,
+                                   EntityID start_id_hint,
+                                   EntityHandle& first_handle_out,
                                    EntitySequence*& sequence_out );
 
-    ErrorCode add_vsequence( EntitySequence* vert_seq, EntitySequence* elem_seq, const HomCoord& p1, const HomCoord& q1,
-                             const HomCoord& p2, const HomCoord& q2, const HomCoord& p3, const HomCoord& q3,
-                             bool bb_input = false, const HomCoord* bb_min = NULL, const HomCoord* bb_max = NULL );
+    ErrorCode add_vsequence( EntitySequence* vert_seq,
+                             EntitySequence* elem_seq,
+                             const HomCoord& p1,
+                             const HomCoord& q1,
+                             const HomCoord& p2,
+                             const HomCoord& q2,
+                             const HomCoord& p3,
+                             const HomCoord& q3,
+                             bool bb_input          = false,
+                             const HomCoord* bb_min = NULL,
+                             const HomCoord* bb_max = NULL );
 
     //! return the a_entity_factory pointer
     AEntityFactory* a_entity_factory()
@@ -992,8 +1128,12 @@ class Core : public Interface
      * \param chunk_size Chunk size of the iterator
      * \param check_valid If true, entities are checked for validity before being returned
      */
-    virtual ErrorCode create_set_iterator( EntityHandle meshset, EntityType ent_type, int ent_dim, int chunk_size,
-                                           bool check_valid, SetIterator*& set_iter );
+    virtual ErrorCode create_set_iterator( EntityHandle meshset,
+                                           EntityType ent_type,
+                                           int ent_dim,
+                                           int chunk_size,
+                                           bool check_valid,
+                                           SetIterator*& set_iter );
 
     /** \brief Remove the set iterator from the instance's list
      * \param set_iter Set iterator being removed
@@ -1040,13 +1180,18 @@ class Core : public Interface
      *                   location at which to store the total memory used for
      *                   all tags.
      */
-    void estimated_memory_use( const EntityHandle* ent_array = 0, unsigned long num_ents = 0,
-                               unsigned long long* total_storage = 0, unsigned long long* total_amortized_storage = 0,
-                               unsigned long long* entity_storage = 0, unsigned long long* amortized_entity_storage = 0,
+    void estimated_memory_use( const EntityHandle* ent_array                   = 0,
+                               unsigned long num_ents                          = 0,
+                               unsigned long long* total_storage               = 0,
+                               unsigned long long* total_amortized_storage     = 0,
+                               unsigned long long* entity_storage              = 0,
+                               unsigned long long* amortized_entity_storage    = 0,
                                unsigned long long* adjacency_storage           = 0,
-                               unsigned long long* amortized_adjacency_storage = 0, const Tag* tag_array = 0,
-                               unsigned num_tags = 0, unsigned long long* tag_storage = 0,
-                               unsigned long long* amortized_tag_storage = 0 );
+                               unsigned long long* amortized_adjacency_storage = 0,
+                               const Tag* tag_array                            = 0,
+                               unsigned num_tags                               = 0,
+                               unsigned long long* tag_storage                 = 0,
+                               unsigned long long* amortized_tag_storage       = 0 );
 
     /**\brief Calculate amount of memory used to store MOAB data
      *
@@ -1074,13 +1219,17 @@ class Core : public Interface
      *                   location at which to store the total memory used for
      *                   all tags.
      */
-    void estimated_memory_use( const Range& ents, unsigned long long* total_storage = 0,
-                               unsigned long long* total_amortized_storage = 0, unsigned long long* entity_storage = 0,
+    void estimated_memory_use( const Range& ents,
+                               unsigned long long* total_storage               = 0,
+                               unsigned long long* total_amortized_storage     = 0,
+                               unsigned long long* entity_storage              = 0,
                                unsigned long long* amortized_entity_storage    = 0,
                                unsigned long long* adjacency_storage           = 0,
-                               unsigned long long* amortized_adjacency_storage = 0, const Tag* tag_array = 0,
-                               unsigned num_tags = 0, unsigned long long* tag_storage = 0,
-                               unsigned long long* amortized_tag_storage = 0 );
+                               unsigned long long* amortized_adjacency_storage = 0,
+                               const Tag* tag_array                            = 0,
+                               unsigned num_tags                               = 0,
+                               unsigned long long* tag_storage                 = 0,
+                               unsigned long long* amortized_tag_storage       = 0 );
 
     void print_database() const;
 
@@ -1116,12 +1265,16 @@ class Core : public Interface
     /**\brief Do not allow copying */
     Core& operator=( const Core& copy );
 
-    void estimated_memory_use_internal( const Range* ents, unsigned long long* total_storage,
-                                        unsigned long long* total_amortized_storage, unsigned long long* entity_storage,
+    void estimated_memory_use_internal( const Range* ents,
+                                        unsigned long long* total_storage,
+                                        unsigned long long* total_amortized_storage,
+                                        unsigned long long* entity_storage,
                                         unsigned long long* amortized_entity_storage,
                                         unsigned long long* adjacency_storage,
-                                        unsigned long long* amortized_adjacency_storage, const Tag* tag_array,
-                                        unsigned num_tags, unsigned long long* tag_storage,
+                                        unsigned long long* amortized_adjacency_storage,
+                                        const Tag* tag_array,
+                                        unsigned num_tags,
+                                        unsigned long long* tag_storage,
                                         unsigned long long* amortized_tag_storage );
 
     //! database init and de-init routines

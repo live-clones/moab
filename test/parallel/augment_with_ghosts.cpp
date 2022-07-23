@@ -56,7 +56,7 @@ void test_read_with_ghost()
 
     char read_opts[] = "PARALLEL=READ_PART;PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=3.0.1.3;"
                        "PARTITION=PARALLEL_PARTITION";
-    rval = mb->load_file( filename.c_str(), 0, read_opts );CHECK_ERR( rval );
+    rval             = mb->load_file( filename.c_str(), 0, read_opts );CHECK_ERR( rval );
 
     report_sets( mb, rank, nproc );
     // write in serial the database , on each rank
@@ -114,7 +114,7 @@ void test_read_with_ghost_no_augment()
 
     char read_opts[] = "PARALLEL=READ_PART;PARALLEL_RESOLVE_SHARED_ENTS;PARALLEL_GHOSTS=3.0.1.3;"
                        "PARTITION=PARALLEL_PARTITION;SKIP_AUGMENT_WITH_GHOSTS";
-    rval = mb->load_file( filename.c_str(), 0, read_opts );CHECK_ERR( rval );
+    rval             = mb->load_file( filename.c_str(), 0, read_opts );CHECK_ERR( rval );
 
     report_sets( mb, rank, nproc );
     // write in serial the database , on each rank

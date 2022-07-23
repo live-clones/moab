@@ -109,8 +109,14 @@ ScdBox* ScdInterface::get_scd_box( EntityHandle eh )
     return scd_box;
 }
 
-ErrorCode ScdInterface::construct_box( HomCoord low, HomCoord high, const double* const coords, unsigned int num_coords,
-                                       ScdBox*& new_box, int* const lperiodic, ScdParData* par_data, bool assign_gids,
+ErrorCode ScdInterface::construct_box( HomCoord low,
+                                       HomCoord high,
+                                       const double* const coords,
+                                       unsigned int num_coords,
+                                       ScdBox*& new_box,
+                                       int* const lperiodic,
+                                       ScdParData* par_data,
+                                       bool assign_gids,
                                        int tag_shared_ents )
 {
     // create a rectangular structured mesh block
@@ -234,7 +240,10 @@ ErrorCode ScdInterface::construct_box( HomCoord low, HomCoord high, const double
     }
 
 #ifdef MOAB_HAVE_MPI
-    if( par_data && -1 != tag_shared_ents ) { rval = tag_shared_vertices( par_data->pComm, new_box ); }
+    if( par_data && -1 != tag_shared_ents )
+    {
+        rval = tag_shared_vertices( par_data->pComm, new_box );
+    }
 #endif
 
     return MB_SUCCESS;
@@ -272,8 +281,12 @@ ErrorCode ScdInterface::assign_global_ids( ScdBox* box )
     return MB_SUCCESS;
 }
 
-ErrorCode ScdInterface::create_scd_sequence( const HomCoord& low, const HomCoord& high, EntityType tp, int starting_id,
-                                             ScdBox*& new_box, int* is_periodic )
+ErrorCode ScdInterface::create_scd_sequence( const HomCoord& low,
+                                             const HomCoord& high,
+                                             EntityType tp,
+                                             int starting_id,
+                                             ScdBox*& new_box,
+                                             int* is_periodic )
 {
     HomCoord tmp_size = high - low + HomCoord( 1, 1, 1, 0 );
     if( ( tp == MBHEX && 1 >= tmp_size[2] ) || ( tp == MBQUAD && 1 >= tmp_size[1] ) ||
@@ -301,7 +314,10 @@ ErrorCode ScdInterface::create_scd_sequence( const HomCoord& low, const HomCoord
 
     // set the start vertex/element
     Range new_range;
-    if( MBVERTEX == tp ) { new_range.insert( start_ent, start_ent + new_box->num_vertices() - 1 ); }
+    if( MBVERTEX == tp )
+    {
+        new_range.insert( start_ent, start_ent + new_box->num_vertices() - 1 );
+    }
     else
     {
         new_range.insert( start_ent, start_ent + new_box->num_elements() - 1 );
@@ -318,7 +334,9 @@ ErrorCode ScdInterface::create_scd_sequence( const HomCoord& low, const HomCoord
     return MB_SUCCESS;
 }
 
-ErrorCode ScdInterface::create_box_set( const HomCoord& low, const HomCoord& high, EntityHandle& scd_set,
+ErrorCode ScdInterface::create_box_set( const HomCoord& low,
+                                        const HomCoord& high,
+                                        EntityHandle& scd_set,
                                         int* is_periodic )
 {
     // create the set and put the entities in it
@@ -559,8 +577,16 @@ int ScdBox::box_dimension() const
     return ( startElem ? scImpl->mbImpl->dimension_from_handle( startElem ) : -1 );
 }
 
-ErrorCode ScdBox::add_vbox( ScdBox* vbox, HomCoord from1, HomCoord to1, HomCoord from2, HomCoord to2, HomCoord from3,
-                            HomCoord to3, bool bb_input, const HomCoord& bb_min, const HomCoord& bb_max )
+ErrorCode ScdBox::add_vbox( ScdBox* vbox,
+                            HomCoord from1,
+                            HomCoord to1,
+                            HomCoord from2,
+                            HomCoord to2,
+                            HomCoord from3,
+                            HomCoord to3,
+                            bool bb_input,
+                            const HomCoord& bb_min,
+                            const HomCoord& bb_max )
 {
     if( !vbox->vertDat ) return MB_FAILURE;
     ScdVertexData* dum_data = dynamic_cast< ScdVertexData* >( vbox->vertDat );
@@ -640,7 +666,12 @@ ErrorCode ScdBox::get_params( EntityHandle ent, HomCoord& ijkd ) const
  * \param ent EntityHandle of adjacent entity
  * \param create_if_missing If true, creates the entity if it doesn't already exist
  */
-ErrorCode ScdBox::get_adj_edge_or_face( int dim, int i, int j, int k, int dir, EntityHandle& ent,
+ErrorCode ScdBox::get_adj_edge_or_face( int dim,
+                                        int i,
+                                        int j,
+                                        int k,
+                                        int dir,
+                                        EntityHandle& ent,
                                         bool create_if_missing ) const
 {
     // describe connectivity of sub-element in static array
@@ -788,7 +819,10 @@ ErrorCode ScdInterface::tag_shared_vertices( ParallelComm* pcomm, ScdBox* box )
     // still need to wait for the send requests
     std::vector< MPI_Status > mult_status( procs.size() );
     int success = MPI_Waitall( procs.size(), &send_reqs[0], &mult_status[0] );
-    if( MPI_SUCCESS != success ) { MB_SET_ERR( MB_FAILURE, "Failed in waitall in ScdInterface::tag_shared_vertices" ); }
+    if( MPI_SUCCESS != success )
+    {
+        MB_SET_ERR( MB_FAILURE, "Failed in waitall in ScdInterface::tag_shared_vertices" );
+    }
     // sort by local handle
     TupleList::buffer sort_buffer;
     sort_buffer.buffer_init( shared_indices.size() / 2 );
@@ -824,8 +858,14 @@ ErrorCode ScdInterface::tag_shared_vertices( ParallelComm* pcomm, ScdBox* box )
 #endif
 }
 
-ErrorCode ScdInterface::get_neighbor_alljkbal( int np, int pfrom, const int* const gdims, const int* const gperiodic,
-                                               const int* const dijk, int& pto, int* rdims, int* facedims,
+ErrorCode ScdInterface::get_neighbor_alljkbal( int np,
+                                               int pfrom,
+                                               const int* const gdims,
+                                               const int* const gperiodic,
+                                               const int* const dijk,
+                                               int& pto,
+                                               int* rdims,
+                                               int* facedims,
                                                int* across_bdy )
 {
     if( dijk[0] != 0 )
@@ -934,8 +974,15 @@ ErrorCode ScdInterface::get_neighbor_alljkbal( int np, int pfrom, const int* con
     return MB_SUCCESS;
 }
 
-ErrorCode ScdInterface::get_neighbor_sqij( int np, int pfrom, const int* const gdims, const int* const gperiodic,
-                                           const int* const dijk, int& pto, int* rdims, int* facedims, int* across_bdy )
+ErrorCode ScdInterface::get_neighbor_sqij( int np,
+                                           int pfrom,
+                                           const int* const gdims,
+                                           const int* const gperiodic,
+                                           const int* const dijk,
+                                           int& pto,
+                                           int* rdims,
+                                           int* facedims,
+                                           int* across_bdy )
 {
     if( dijk[2] != 0 )
     {
@@ -1072,8 +1119,15 @@ ErrorCode ScdInterface::get_neighbor_sqij( int np, int pfrom, const int* const g
     return MB_SUCCESS;
 }
 
-ErrorCode ScdInterface::get_neighbor_sqjk( int np, int pfrom, const int* const gdims, const int* const gperiodic,
-                                           const int* const dijk, int& pto, int* rdims, int* facedims, int* across_bdy )
+ErrorCode ScdInterface::get_neighbor_sqjk( int np,
+                                           int pfrom,
+                                           const int* const gdims,
+                                           const int* const gperiodic,
+                                           const int* const dijk,
+                                           int& pto,
+                                           int* rdims,
+                                           int* facedims,
+                                           int* across_bdy )
 {
     if( dijk[0] != 0 )
     {
@@ -1183,8 +1237,14 @@ ErrorCode ScdInterface::get_neighbor_sqjk( int np, int pfrom, const int* const g
     return MB_SUCCESS;
 }
 
-ErrorCode ScdInterface::get_neighbor_sqijk( int np, int pfrom, const int* const gdims, const int* const gperiodic,
-                                            const int* const dijk, int& pto, int* rdims, int* facedims,
+ErrorCode ScdInterface::get_neighbor_sqijk( int np,
+                                            int pfrom,
+                                            const int* const gdims,
+                                            const int* const gperiodic,
+                                            const int* const dijk,
+                                            int& pto,
+                                            int* rdims,
+                                            int* facedims,
                                             int* across_bdy )
 {
     if( gperiodic[0] || gperiodic[1] || gperiodic[2] ) return MB_FAILURE;
@@ -1278,8 +1338,14 @@ ErrorCode ScdInterface::get_neighbor_sqijk( int np, int pfrom, const int* const 
     return MB_SUCCESS;
 }
 
-ErrorCode ScdInterface::get_neighbor_alljorkori( int np, int pfrom, const int* const gdims, const int* const gperiodic,
-                                                 const int* const dijk, int& pto, int* rdims, int* facedims,
+ErrorCode ScdInterface::get_neighbor_alljorkori( int np,
+                                                 int pfrom,
+                                                 const int* const gdims,
+                                                 const int* const gperiodic,
+                                                 const int* const dijk,
+                                                 int& pto,
+                                                 int* rdims,
+                                                 int* facedims,
                                                  int* across_bdy )
 {
     ErrorCode rval = MB_SUCCESS;
@@ -1373,13 +1439,19 @@ ErrorCode ScdInterface::get_neighbor_alljorkori( int np, int pfrom, const int* c
 
 //! get shared vertices for alljorkori partition scheme
 #ifndef MOAB_HAVE_MPI
-ErrorCode ScdInterface::get_shared_vertices( ParallelComm*, ScdBox*, std::vector< int >&, std::vector< int >&,
+ErrorCode ScdInterface::get_shared_vertices( ParallelComm*,
+                                             ScdBox*,
+                                             std::vector< int >&,
+                                             std::vector< int >&,
                                              std::vector< int >& )
 {
     return MB_FAILURE;
 #else
-ErrorCode ScdInterface::get_shared_vertices( ParallelComm* pcomm, ScdBox* box, std::vector< int >& procs,
-                                             std::vector< int >& offsets, std::vector< int >& shared_indices )
+ErrorCode ScdInterface::get_shared_vertices( ParallelComm* pcomm,
+                                             ScdBox* box,
+                                             std::vector< int >& procs,
+                                             std::vector< int >& offsets,
+                                             std::vector< int >& shared_indices )
 {
     // get index of partitioned dimension
     const int* ldims = box->box_dims();

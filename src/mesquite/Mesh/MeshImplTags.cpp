@@ -67,7 +67,10 @@ size_t MeshImplTags::size_from_tag_type( Mesh::TagType type )
     }
 }
 
-size_t MeshImplTags::create( const std::string& name, Mesh::TagType type, unsigned length, const void* defval,
+size_t MeshImplTags::create( const std::string& name,
+                             Mesh::TagType type,
+                             unsigned length,
+                             const void* defval,
                              MsqError& err )
 {
     size_t h = handle( name, err );
@@ -160,8 +163,11 @@ const TagDescription& MeshImplTags::properties( size_t tag_index, MsqError& err 
     return tagList[tag_index]->desc;
 }
 
-void MeshImplTags::set_element_data( size_t tag_index, size_t num_indices, const size_t* index_array,
-                                     const void* values, MsqError& err )
+void MeshImplTags::set_element_data( size_t tag_index,
+                                     size_t num_indices,
+                                     const size_t* index_array,
+                                     const void* values,
+                                     MsqError& err )
 {
     size_t i;
     char* data;
@@ -212,7 +218,10 @@ void MeshImplTags::set_element_data( size_t tag_index, size_t num_indices, const
     }
 }
 
-void MeshImplTags::get_element_data( size_t tag_index, size_t num_indices, const size_t* index_array, void* values,
+void MeshImplTags::get_element_data( size_t tag_index,
+                                     size_t num_indices,
+                                     const size_t* index_array,
+                                     void* values,
                                      MsqError& err ) const
 {
     --tag_index;
@@ -250,7 +259,10 @@ void MeshImplTags::get_element_data( size_t tag_index, size_t num_indices, const
     }
 }
 
-void MeshImplTags::set_vertex_data( size_t tag_index, size_t num_indices, const size_t* index_array, const void* values,
+void MeshImplTags::set_vertex_data( size_t tag_index,
+                                    size_t num_indices,
+                                    const size_t* index_array,
+                                    const void* values,
                                     MsqError& err )
 {
     size_t i;
@@ -302,7 +314,10 @@ void MeshImplTags::set_vertex_data( size_t tag_index, size_t num_indices, const 
     }
 }
 
-void MeshImplTags::get_vertex_data( size_t tag_index, size_t num_indices, const size_t* index_array, void* values,
+void MeshImplTags::get_vertex_data( size_t tag_index,
+                                    size_t num_indices,
+                                    const size_t* index_array,
+                                    void* values,
                                     MsqError& err ) const
 {
     --tag_index;

@@ -49,8 +49,11 @@ class ReadUtilIface
     //! \param sequence_size If specified, allocate this sequence size instead of
     //!      SequenceManager::DEFAULT_VERTEX_SEQUENCE_SIZE
     //! \return status Success/failure of this call
-    virtual ErrorCode get_node_coords( const int num_arrays, const int num_nodes, const int preferred_start_id,
-                                       EntityHandle& actual_start_handle, std::vector< double* >& arrays,
+    virtual ErrorCode get_node_coords( const int num_arrays,
+                                       const int num_nodes,
+                                       const int preferred_start_id,
+                                       EntityHandle& actual_start_handle,
+                                       std::vector< double* >& arrays,
                                        const int sequence_size = -1 ) = 0;
 
     //! Given requested number of elements, element type, and number of
@@ -65,9 +68,12 @@ class ReadUtilIface
     //! \param sequence_size If specified, allocate this sequence size instead of
     //!      SequenceManager::DEFAULT_VERTEX_SEQUENCE_SIZE
     //! \return status Success/failure of this call
-    virtual ErrorCode get_element_connect( const int num_elements, const int verts_per_element,
-                                           const EntityType mdb_type, const int preferred_start_id,
-                                           EntityHandle& actual_start_handle, EntityHandle*& array,
+    virtual ErrorCode get_element_connect( const int num_elements,
+                                           const int verts_per_element,
+                                           const EntityType mdb_type,
+                                           const int preferred_start_id,
+                                           EntityHandle& actual_start_handle,
+                                           EntityHandle*& array,
                                            int sequence_size = -1 ) = 0;
 
     /**
@@ -81,7 +87,9 @@ class ReadUtilIface
      */
     virtual ErrorCode gather_related_ents( Range& partition, Range& related_ents, EntityHandle* file_set = NULL ) = 0;
 
-    virtual ErrorCode create_entity_sets( EntityID num_sets, const unsigned* set_flags, EntityID preffered_start_id,
+    virtual ErrorCode create_entity_sets( EntityID num_sets,
+                                          const unsigned* set_flags,
+                                          EntityID preffered_start_id,
                                           EntityHandle& actual_start_handle ) = 0;
 
     //! Update adjacencies
@@ -93,8 +101,10 @@ class ReadUtilIface
     //! \param number_vertices_per_element Number of vertices in each new element
     //! \param conn_array Connectivity of new elements
     //! \return status Success/failure of this call
-    virtual ErrorCode update_adjacencies( const EntityHandle start_handle, const int number_elements,
-                                          const int number_vertices_per_element, const EntityHandle* conn_array ) = 0;
+    virtual ErrorCode update_adjacencies( const EntityHandle start_handle,
+                                          const int number_elements,
+                                          const int number_vertices_per_element,
+                                          const EntityHandle* conn_array ) = 0;
 
     /**\brief Re-order incoming element connectivity
      *
@@ -112,8 +122,12 @@ class ReadUtilIface
 
     //! Given an ordered list of bounding entities and the sense of
     //! those entities, return an ordered list of vertices
-    virtual ErrorCode get_ordered_vertices( EntityHandle* bound_ents, int* sense, int num_bound, int dim,
-                                            EntityHandle* bound_verts, EntityType& etype ) = 0;
+    virtual ErrorCode get_ordered_vertices( EntityHandle* bound_ents,
+                                            int* sense,
+                                            int num_bound,
+                                            int dim,
+                                            EntityHandle* bound_verts,
+                                            EntityType& etype ) = 0;
 
     //! Assign sequential IDS to entities in range and store IDs in tag
     virtual ErrorCode assign_ids( Tag id_tag, const Range& ents, int start = 0 ) = 0;

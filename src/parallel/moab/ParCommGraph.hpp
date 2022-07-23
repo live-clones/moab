@@ -191,7 +191,9 @@ class ParCommGraph
     // this is called on receiver side
     ErrorCode receive_comm_graph( MPI_Comm jcomm, ParallelComm* pco, std::vector< int >& pack_array );
 
-    ErrorCode receive_mesh( MPI_Comm jcomm, ParallelComm* pco, EntityHandle local_set,
+    ErrorCode receive_mesh( MPI_Comm jcomm,
+                            ParallelComm* pco,
+                            EntityHandle local_set,
                             std::vector< int >& senders_local );
 
     ErrorCode release_send_buffers();
@@ -222,13 +224,23 @@ class ParCommGraph
     void settle_comm_by_ids( int comp, TupleList& TLBackToComp, std::vector< int >& valuesComp );
 
     // after map read, we need to know what entities we need to send to receiver
-    ErrorCode set_split_ranges( int comp, TupleList& TLBackToComp1, std::vector< int >& valuesComp1, int lenTag,
-                                Range& ents_of_interest, int type );
+    ErrorCode set_split_ranges( int comp,
+                                TupleList& TLBackToComp1,
+                                std::vector< int >& valuesComp1,
+                                int lenTag,
+                                Range& ents_of_interest,
+                                int type );
 
     // new methods to migrate mesh after reading map
     ErrorCode form_tuples_to_migrate_mesh( Interface* mb, TupleList& TLv, TupleList& TLc, int type, int lenTagType1 );
-    ErrorCode form_mesh_from_tuples( Interface* mb, TupleList& TLv, TupleList& TLc, int type, int lenTagType1,
-                                     EntityHandle fset, Range& primary_ents, std::vector< int >& values_entities );
+    ErrorCode form_mesh_from_tuples( Interface* mb,
+                                     TupleList& TLv,
+                                     TupleList& TLc,
+                                     int type,
+                                     int lenTagType1,
+                                     EntityHandle fset,
+                                     Range& primary_ents,
+                                     std::vector< int >& values_entities );
 
     // new partition calculation
     ErrorCode compute_partition( ParallelComm* pco, Range& owned, int met );

@@ -305,7 +305,10 @@ int parse_tag_create( char* name, TagSpec& result, Interface* iface )
     *size_str = '\0';
     ++size_str;
     DataType type;
-    if( !strcmp( type_str, "int" ) ) { type = MB_TYPE_INTEGER; }
+    if( !strcmp( type_str, "int" ) )
+    {
+        type = MB_TYPE_INTEGER;
+    }
     else if( !strcmp( type_str, "double" ) )
     {
         type = MB_TYPE_DOUBLE;

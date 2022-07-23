@@ -75,7 +75,9 @@ class Remapper
     }
 #endif
 
-    ErrorCode LoadNativeMesh( std::string filename, moab::EntityHandle& meshset, std::vector< int >& metadata,
+    ErrorCode LoadNativeMesh( std::string filename,
+                              moab::EntityHandle& meshset,
+                              std::vector< int >& metadata,
                               const char* readopts = 0 )
     {
 #ifdef MOAB_HAVE_MPI
@@ -116,7 +118,7 @@ class Remapper
             int dimSizes[3];
             moab::EntityHandle rootset = 0;
             rval                       = m_interface->tag_get_data( rectilinearTag, &rootset, 1,
-                                              dimSizes );  // MB_CHK_SET_ERR( rval, "Error geting tag data" );
+                                                                    dimSizes );  // MB_CHK_SET_ERR( rval, "Error geting tag data" );
             metadata.push_back( dimSizes[0] );
             metadata.push_back( dimSizes[1] );
             metadata.push_back( dimSizes[2] );

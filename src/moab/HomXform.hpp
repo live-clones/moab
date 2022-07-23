@@ -167,15 +167,39 @@ class HomXform
     HomXform( const int rotate[9], const int scale[3], const int translate[3] );
 
     //! constructor taking 16 ints, useful for efficient operators
-    HomXform( int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9, int i10, int i11, int i12,
-              int i13, int i14, int i15, int i16 );
+    HomXform( int i1,
+              int i2,
+              int i3,
+              int i4,
+              int i5,
+              int i6,
+              int i7,
+              int i8,
+              int i9,
+              int i10,
+              int i11,
+              int i12,
+              int i13,
+              int i14,
+              int i15,
+              int i16 );
+
+    //! copy constructor
+    HomXform( HomXform const& from )
+    {
+        std::copy( from.xForm, from.xForm + 16, xForm );
+    }
 
     //! return this.inverse
     inline HomXform inverse() const;
 
     //! compute a transform from three points
-    void three_pt_xform( const HomCoord& p1, const HomCoord& q1, const HomCoord& p2, const HomCoord& q2,
-                         const HomCoord& p3, const HomCoord& q3 );
+    void three_pt_xform( const HomCoord& p1,
+                         const HomCoord& q1,
+                         const HomCoord& p2,
+                         const HomCoord& q2,
+                         const HomCoord& p3,
+                         const HomCoord& q3 );
 
     //! operators
     int operator[]( const int& count ) const;
@@ -494,8 +518,22 @@ inline HomXform::HomXform( const int rotate[9], const int scale[3], const int tr
     xForm[15] = 1;
 }
 
-inline HomXform::HomXform( int i1, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9, int i10, int i11,
-                           int i12, int i13, int i14, int i15, int i16 )
+inline HomXform::HomXform( int i1,
+                           int i2,
+                           int i3,
+                           int i4,
+                           int i5,
+                           int i6,
+                           int i7,
+                           int i8,
+                           int i9,
+                           int i10,
+                           int i11,
+                           int i12,
+                           int i13,
+                           int i14,
+                           int i15,
+                           int i16 )
 {
     xForm[0]  = i1;
     xForm[1]  = i2;

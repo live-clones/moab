@@ -27,11 +27,17 @@ class ReadTemplate : public ReaderIface
     //! factory method
     static ReaderIface* factory( Interface* );
 
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
-                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name,
+                         const EntityHandle* file_set,
+                         const FileOptions& opts,
+                         const SubsetList* subset_list = 0,
+                         const Tag* file_id_tag        = 0 );
 
-    ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                               std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
+    ErrorCode read_tag_values( const char* file_name,
+                               const char* tag_name,
+                               const FileOptions& opts,
+                               std::vector< int >& tag_values_out,
+                               const SubsetList* subset_list = 0 );
 
     //! Constructor
     ReadTemplate( Interface* impl = NULL );
@@ -63,8 +69,12 @@ class ReadTemplate : public ReaderIface
      * \param num_elems Total number of elements read from file
      * \param read_ents Range storing all entities read from this file
      */
-    ErrorCode create_sets( int num_sets, EntityHandle start_vertex, int num_verts, EntityHandle start_elem,
-                           int num_elems, Range& read_ents );
+    ErrorCode create_sets( int num_sets,
+                           EntityHandle start_vertex,
+                           int num_verts,
+                           EntityHandle start_elem,
+                           int num_elems,
+                           Range& read_ents );
 
     /** \brief Process options passed into the reader
      * \param opts Options passed into this read

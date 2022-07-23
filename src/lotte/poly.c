@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <math.h> /* for cos, fabs */
+#include <math.h>   /* for cos, fabs */
 #include <string.h> /* for memcpy */
 #include <float.h>
 
@@ -29,17 +29,17 @@
  */
 void legendre_matrix( const realType* x, int m, realType* P, int n )
 {
-    int       i, j;
+    int i, j;
     realType *Pjm1 = P, *Pj = Pjm1 + m, *Pjp1 = Pj + m;
     for( i = 0; i < m; ++i )
-        Pjm1[ i ] = 1;
+        Pjm1[i] = 1;
     for( i = 0; i < m; ++i )
-        Pj[ i ] = x[ i ];
+        Pj[i] = x[i];
     for( j = 1; j < n; ++j )
     {
-        realType c = 1 / ( realType )( j + 1 ), a = c * ( 2 * j + 1 ), b = c * j;
+        realType c = 1 / (realType)( j + 1 ), a = c * ( 2 * j + 1 ), b = c * j;
         for( i = 0; i < m; ++i )
-            Pjp1[ i ] = a * x[ i ] * Pj[ i ] - b * Pjm1[ i ];
+            Pjp1[i] = a * x[i] * Pj[i] - b * Pjm1[i];
         Pjp1 += m, Pj += m, Pjm1 += m;
     }
 }
@@ -48,24 +48,24 @@ void legendre_matrix( const realType* x, int m, realType* P, int n )
 static void legendre_row_even( realType x, realType* P, int n )
 {
     int i;
-    P[ 0 ] = 1, P[ 1 ] = x;
+    P[0] = 1, P[1] = x;
     for( i = 1; i <= n - 2; i += 2 )
     {
-        P[ i + 1 ] = ( ( 2 * i + 1 ) * x * P[ i ] - i * P[ i - 1 ] ) / ( i + 1 );
-        P[ i + 2 ] = ( ( 2 * i + 3 ) * x * P[ i - 1 ] - ( i + 1 ) * P[ i ] ) / ( i + 2 );
+        P[i + 1] = ( ( 2 * i + 1 ) * x * P[i] - i * P[i - 1] ) / ( i + 1 );
+        P[i + 2] = ( ( 2 * i + 3 ) * x * P[i - 1] - ( i + 1 ) * P[i] ) / ( i + 2 );
     }
-    P[ n ] = ( ( 2 * n - 1 ) * x * P[ n - 1 ] - ( n - 1 ) * P[ n - 2 ] ) / n;
+    P[n] = ( ( 2 * n - 1 ) * x * P[n - 1] - ( n - 1 ) * P[n - 2] ) / n;
 }
 
 /* precondition: n >= 1, n odd */
 static void legendre_row_odd( realType x, realType* P, int n )
 {
     int i;
-    P[ 0 ] = 1, P[ 1 ] = x;
+    P[0] = 1, P[1] = x;
     for( i = 1; i <= n - 2; i += 2 )
     {
-        P[ i + 1 ] = ( ( 2 * i + 1 ) * x * P[ i ] - i * P[ i - 1 ] ) / ( i + 1 );
-        P[ i + 2 ] = ( ( 2 * i + 3 ) * x * P[ i - 1 ] - ( i + 1 ) * P[ i ] ) / ( i + 2 );
+        P[i + 1] = ( ( 2 * i + 1 ) * x * P[i] - i * P[i - 1] ) / ( i + 1 );
+        P[i + 2] = ( ( 2 * i + 3 ) * x * P[i - 1] - ( i + 1 ) * P[i] ) / ( i + 2 );
     }
 }
 
@@ -89,10 +89,10 @@ void legendre_matrix_t( const realType* x, int m, realType* P, int n )
     int i;
     if( n & 1 )
         for( i = 0; i < m; ++i, P += n + 1 )
-            legendre_row_odd( x[ i ], P, n );
+            legendre_row_odd( x[i], P, n );
     else
         for( i = 0; i < m; ++i, P += n + 1 )
-            legendre_row_even( x[ i ], P, n );
+            legendre_row_even( x[i], P, n );
 }
 
 /*--------------------------------------------------------------------------
@@ -103,46 +103,46 @@ void legendre_matrix_t( const realType* x, int m, realType* P, int n )
 /* precondition: n >= 0 */
 static realType legendre( int n, realType x )
 {
-    realType p[ 2 ];
-    int      i;
-    p[ 0 ] = 1;
-    p[ 1 ] = x;
+    realType p[2];
+    int i;
+    p[0] = 1;
+    p[1] = x;
     for( i = 1; i < n; i += 2 )
     {
-        p[ 0 ] = ( ( 2 * i + 1 ) * x * p[ 1 ] - i * p[ 0 ] ) / ( i + 1 );
-        p[ 1 ] = ( ( 2 * i + 3 ) * x * p[ 0 ] - ( i + 1 ) * p[ 1 ] ) / ( i + 2 );
+        p[0] = ( ( 2 * i + 1 ) * x * p[1] - i * p[0] ) / ( i + 1 );
+        p[1] = ( ( 2 * i + 3 ) * x * p[0] - ( i + 1 ) * p[1] ) / ( i + 2 );
     }
-    return p[ n & 1 ];
+    return p[n & 1];
 }
 
 /* precondition: n > 0 */
 static realType legendre_d1( int n, realType x )
 {
-    realType p[ 2 ];
-    int      i;
-    p[ 0 ] = 3 * x;
-    p[ 1 ] = 1;
+    realType p[2];
+    int i;
+    p[0] = 3 * x;
+    p[1] = 1;
     for( i = 2; i < n; i += 2 )
     {
-        p[ 1 ] = ( ( 2 * i + 1 ) * x * p[ 0 ] - ( i + 1 ) * p[ 1 ] ) / i;
-        p[ 0 ] = ( ( 2 * i + 3 ) * x * p[ 1 ] - ( i + 2 ) * p[ 0 ] ) / ( i + 1 );
+        p[1] = ( ( 2 * i + 1 ) * x * p[0] - ( i + 1 ) * p[1] ) / i;
+        p[0] = ( ( 2 * i + 3 ) * x * p[1] - ( i + 2 ) * p[0] ) / ( i + 1 );
     }
-    return p[ n & 1 ];
+    return p[n & 1];
 }
 
 /* precondition: n > 1 */
 static realType legendre_d2( int n, realType x )
 {
-    realType p[ 2 ];
-    int      i;
-    p[ 0 ] = 3;
-    p[ 1 ] = 15 * x;
+    realType p[2];
+    int i;
+    p[0] = 3;
+    p[1] = 15 * x;
     for( i = 3; i < n; i += 2 )
     {
-        p[ 0 ] = ( ( 2 * i + 1 ) * x * p[ 1 ] - ( i + 2 ) * p[ 0 ] ) / ( i - 1 );
-        p[ 1 ] = ( ( 2 * i + 3 ) * x * p[ 0 ] - ( i + 3 ) * p[ 1 ] ) / i;
+        p[0] = ( ( 2 * i + 1 ) * x * p[1] - ( i + 2 ) * p[0] ) / ( i - 1 );
+        p[1] = ( ( 2 * i + 3 ) * x * p[0] - ( i + 3 ) * p[1] ) / i;
     }
-    return p[ n & 1 ];
+    return p[n & 1];
 }
 
 /*--------------------------------------------------------------------------
@@ -163,11 +163,11 @@ void gauss_nodes( realType* z, int n )
             ox = x;
             x -= legendre( n, x ) / legendre_d1( n, x );
         } while( mbabs( x - ox ) > -x * MOAB_POLY_EPS );
-        z[ i ] = x - legendre( n, x ) / legendre_d1( n, x );
+        z[i] = x - legendre( n, x ) / legendre_d1( n, x );
     }
-    if( n & 1 ) z[ n / 2 ] = 0;
+    if( n & 1 ) z[n / 2] = 0;
     for( j = ( n + 1 ) / 2, i = n / 2 - 1; j < n; ++j, --i )
-        z[ j ] = -z[ i ];
+        z[j] = -z[i];
 }
 
 /* n inner lobatto nodes (excluding -1,1) */
@@ -182,18 +182,18 @@ static void lobatto_nodes_aux( realType* z, int n )
             ox = x;
             x -= legendre_d1( np, x ) / legendre_d2( np, x );
         } while( mbabs( x - ox ) > -x * MOAB_POLY_EPS );
-        z[ i ] = x - legendre_d1( np, x ) / legendre_d2( np, x );
+        z[i] = x - legendre_d1( np, x ) / legendre_d2( np, x );
     }
-    if( n & 1 ) z[ n / 2 ] = 0;
+    if( n & 1 ) z[n / 2] = 0;
     for( j = ( n + 1 ) / 2, i = n / 2 - 1; j < n; ++j, --i )
-        z[ j ] = -z[ i ];
+        z[j] = -z[i];
 }
 
 /* n lobatto nodes */
 void lobatto_nodes( realType* z, int n )
 {
-    z[ 0 ] = -1, z[ n - 1 ] = 1;
-    lobatto_nodes_aux( &z[ 1 ], n - 2 );
+    z[0] = -1, z[n - 1] = 1;
+    lobatto_nodes_aux( &z[1], n - 2 );
 }
 
 void gauss_weights( const realType* z, realType* w, int n )
@@ -201,11 +201,11 @@ void gauss_weights( const realType* z, realType* w, int n )
     int i, j;
     for( i = 0; i <= ( n - 1 ) / 2; ++i )
     {
-        realType d = ( n + 1 ) * legendre( n + 1, z[ i ] );
-        w[ i ] = 2 * ( 1 - z[ i ] * z[ i ] ) / ( d * d );
+        realType d = ( n + 1 ) * legendre( n + 1, z[i] );
+        w[i]       = 2 * ( 1 - z[i] * z[i] ) / ( d * d );
     }
     for( j = ( n + 1 ) / 2, i = n / 2 - 1; j < n; ++j, --i )
-        w[ j ] = w[ i ];
+        w[j] = w[i];
 }
 
 void lobatto_weights( const realType* z, realType* w, int n )
@@ -213,11 +213,11 @@ void lobatto_weights( const realType* z, realType* w, int n )
     int i, j;
     for( i = 0; i <= ( n - 1 ) / 2; ++i )
     {
-        realType d = legendre( n - 1, z[ i ] );
-        w[ i ] = 2 / ( ( n - 1 ) * n * d * d );
+        realType d = legendre( n - 1, z[i] );
+        w[i]       = 2 / ( ( n - 1 ) * n * d * d );
     }
     for( j = ( n + 1 ) / 2, i = n / 2 - 1; j < n; ++j, --i )
-        w[ j ] = w[ i ];
+        w[j] = w[i];
 }
 
 /*--------------------------------------------------------------------------
@@ -242,7 +242,7 @@ void gauss_to_legendre( const realType* z, const realType* w, int n, realType* J
     legendre_matrix_t( z, n, J, n - 1 );
     for( j = 0; j < n; ++j )
     {
-        realType ww = w[ j ];
+        realType ww = w[j];
         for( i = 0; i < n; ++i )
             *J++ *= ( 2 * i + 1 ) * ww / 2;
     }
@@ -258,9 +258,9 @@ void gauss_to_legendre_t( const realType* z, const realType* w, int n, realType*
     legendre_matrix( z, n, J, n - 1 );
     for( i = 0; i < n; ++i )
     {
-        realType ii = ( realType )( 2 * i + 1 ) / 2;
+        realType ii = (realType)( 2 * i + 1 ) / 2;
         for( j = 0; j < n; ++j )
-            *J++ *= ii * w[ j ];
+            *J++ *= ii * w[j];
     }
 }
 
@@ -274,19 +274,19 @@ void gauss_to_legendre_t( const realType* z, const realType* w, int n, realType*
  */
 void lobatto_to_legendre( const realType* z, const realType* w, int n, realType* J )
 {
-    int       i, j, m = ( n + 1 ) / 2;
+    int i, j, m = ( n + 1 ) / 2;
     realType *p = J, *q;
-    realType  ww, sum;
+    realType ww, sum;
     if( n & 1 )
         for( j = 0; j < m; ++j, p += n )
-            legendre_row_odd( z[ j ], p, n - 2 );
+            legendre_row_odd( z[j], p, n - 2 );
     else
         for( j = 0; j < m; ++j, p += n )
-            legendre_row_even( z[ j ], p, n - 2 );
+            legendre_row_even( z[j], p, n - 2 );
     p = J;
     for( j = 0; j < m; ++j )
     {
-        ww = w[ j ], sum = 0;
+        ww = w[j], sum = 0;
         for( i = 0; i < n - 1; ++i )
             *p *= ( 2 * i + 1 ) * ww / 2, sum += *p++;
         *p++ = -sum;
@@ -296,14 +296,14 @@ void lobatto_to_legendre( const realType* z, const realType* w, int n, realType*
         for( ; j < n; ++j, p += n, q -= n )
         {
             for( i = 0; i < n - 1; i += 2 )
-                p[ i ] = q[ i ], p[ i + 1 ] = -q[ i + 1 ];
-            p[ i ] = q[ i ];
+                p[i] = q[i], p[i + 1] = -q[i + 1];
+            p[i] = q[i];
         }
     else
         for( ; j < n; ++j, p += n, q -= n )
         {
             for( i = 0; i < n - 1; i += 2 )
-                p[ i ] = q[ i ], p[ i + 1 ] = -q[ i + 1 ];
+                p[i] = q[i], p[i + 1] = -q[i + 1];
         }
 }
 
@@ -319,29 +319,29 @@ void lobatto_to_legendre( const realType* z, const realType* w, int n, realType*
  */
 void lagrange_weights( const realType* z, unsigned n, const realType* x, unsigned m, realType* J, realType* work )
 {
-    unsigned  i, j;
+    unsigned i, j;
     realType *w = work, *d = w + n, *u = d + n, *v = u + n;
     for( i = 0; i < n; ++i )
     {
-        realType ww = 1, zi = z[ i ];
+        realType ww = 1, zi = z[i];
         for( j = 0; j < i; ++j )
-            ww *= zi - z[ j ];
+            ww *= zi - z[j];
         for( ++j; j < n; ++j )
-            ww *= zi - z[ j ];
-        w[ i ] = 1 / ww;
+            ww *= zi - z[j];
+        w[i] = 1 / ww;
     }
-    u[ 0 ] = v[ n - 1 ] = 1;
+    u[0] = v[n - 1] = 1;
     for( i = 0; i < m; ++i )
     {
-        realType xi = x[ i ];
+        realType xi = x[i];
         for( j = 0; j < n; ++j )
-            d[ j ] = xi - z[ j ];
+            d[j] = xi - z[j];
         for( j = 0; j < n - 1; ++j )
-            u[ j + 1 ] = d[ j ] * u[ j ];
+            u[j + 1] = d[j] * u[j];
         for( j = n - 1; j; --j )
-            v[ j - 1 ] = d[ j ] * v[ j ];
+            v[j - 1] = d[j] * v[j];
         for( j = 0; j < n; ++j )
-            *J++ = w[ j ] * u[ j ] * v[ j ];
+            *J++ = w[j] * u[j] * v[j];
     }
 }
 
@@ -351,33 +351,38 @@ void lagrange_weights( const realType* z, unsigned n, const realType* x, unsigne
    inner index of outputs J,D is the basis function index (row-major format)
    provide work array with space for 6*n reals
  */
-void lagrange_weights_deriv( const realType* z, unsigned n, const realType* x, unsigned m, realType* J, realType* D,
+void lagrange_weights_deriv( const realType* z,
+                             unsigned n,
+                             const realType* x,
+                             unsigned m,
+                             realType* J,
+                             realType* D,
                              realType* work )
 {
-    unsigned  i, j;
+    unsigned i, j;
     realType *w = work, *d = w + n, *u = d + n, *v = u + n, *up = v + n, *vp = up + n;
     for( i = 0; i < n; ++i )
     {
-        realType ww = 1, zi = z[ i ];
+        realType ww = 1, zi = z[i];
         for( j = 0; j < i; ++j )
-            ww *= zi - z[ j ];
+            ww *= zi - z[j];
         for( ++j; j < n; ++j )
-            ww *= zi - z[ j ];
-        w[ i ] = 1 / ww;
+            ww *= zi - z[j];
+        w[i] = 1 / ww;
     }
-    u[ 0 ] = v[ n - 1 ] = 1;
-    up[ 0 ] = vp[ n - 1 ] = 0;
+    u[0] = v[n - 1] = 1;
+    up[0] = vp[n - 1] = 0;
     for( i = 0; i < m; ++i )
     {
-        realType xi = x[ i ];
+        realType xi = x[i];
         for( j = 0; j < n; ++j )
-            d[ j ] = xi - z[ j ];
+            d[j] = xi - z[j];
         for( j = 0; j < n - 1; ++j )
-            u[ j + 1 ] = d[ j ] * u[ j ], up[ j + 1 ] = d[ j ] * up[ j ] + u[ j ];
+            u[j + 1] = d[j] * u[j], up[j + 1] = d[j] * up[j] + u[j];
         for( j = n - 1; j; --j )
-            v[ j - 1 ] = d[ j ] * v[ j ], vp[ j - 1 ] = d[ j ] * vp[ j ] + v[ j ];
+            v[j - 1] = d[j] * v[j], vp[j - 1] = d[j] * vp[j] + v[j];
         for( j = 0; j < n; ++j )
-            *J++ = w[ j ] * u[ j ] * v[ j ], *D++ = w[ j ] * ( up[ j ] * v[ j ] + u[ j ] * vp[ j ] );
+            *J++ = w[j] * u[j] * v[j], *D++ = w[j] * ( up[j] * v[j] + u[j] * vp[j] );
     }
 }
 
@@ -410,56 +415,53 @@ void lagrange_0( lagrange_data* p, realType x )
 {
     unsigned i, n = p->n;
     for( i = 0; i < n; ++i )
-        p->d[ i ] = x - p->z[ i ];
+        p->d[i] = x - p->z[i];
     for( i = 0; i < n - 1; ++i )
-        p->u0[ i + 1 ] = p->d[ i ] * p->u0[ i ];
+        p->u0[i + 1] = p->d[i] * p->u0[i];
     for( i = n - 1; i; --i )
-        p->v0[ i - 1 ] = p->d[ i ] * p->v0[ i ];
+        p->v0[i - 1] = p->d[i] * p->v0[i];
     for( i = 0; i < n; ++i )
-        p->J[ i ] = p->w[ i ] * p->u0[ i ] * p->v0[ i ];
+        p->J[i] = p->w[i] * p->u0[i] * p->v0[i];
 }
 
 void lagrange_1( lagrange_data* p, realType x )
 {
     unsigned i, n = p->n;
     for( i = 0; i < n; ++i )
-        p->d[ i ] = x - p->z[ i ];
+        p->d[i] = x - p->z[i];
     for( i = 0; i < n - 1; ++i )
-        p->u0[ i + 1 ] = p->d[ i ] * p->u0[ i ], p->u1[ i + 1 ] = p->d[ i ] * p->u1[ i ] + p->u0[ i ];
+        p->u0[i + 1] = p->d[i] * p->u0[i], p->u1[i + 1] = p->d[i] * p->u1[i] + p->u0[i];
     for( i = n - 1; i; --i )
-        p->v0[ i - 1 ] = p->d[ i ] * p->v0[ i ], p->v1[ i - 1 ] = p->d[ i ] * p->v1[ i ] + p->v0[ i ];
+        p->v0[i - 1] = p->d[i] * p->v0[i], p->v1[i - 1] = p->d[i] * p->v1[i] + p->v0[i];
     for( i = 0; i < n; ++i )
-        p->J[ i ] = p->w[ i ] * p->u0[ i ] * p->v0[ i ],
-                p->D[ i ] = p->w[ i ] * ( p->u1[ i ] * p->v0[ i ] + p->u0[ i ] * p->v1[ i ] );
+        p->J[i] = p->w[i] * p->u0[i] * p->v0[i], p->D[i] = p->w[i] * ( p->u1[i] * p->v0[i] + p->u0[i] * p->v1[i] );
 }
 
 void lagrange_2( lagrange_data* p, realType x )
 {
     unsigned i, n = p->n;
     for( i = 0; i < n; ++i )
-        p->d[ i ] = x - p->z[ i ];
+        p->d[i] = x - p->z[i];
     for( i = 0; i < n - 1; ++i )
-        p->u0[ i + 1 ] = p->d[ i ] * p->u0[ i ], p->u1[ i + 1 ] = p->d[ i ] * p->u1[ i ] + p->u0[ i ],
-                     p->u2[ i + 1 ] = p->d[ i ] * p->u2[ i ] + 2 * p->u1[ i ];
+        p->u0[i + 1] = p->d[i] * p->u0[i], p->u1[i + 1] = p->d[i] * p->u1[i] + p->u0[i],
+                  p->u2[i + 1] = p->d[i] * p->u2[i] + 2 * p->u1[i];
     for( i = n - 1; i; --i )
-        p->v0[ i - 1 ] = p->d[ i ] * p->v0[ i ], p->v1[ i - 1 ] = p->d[ i ] * p->v1[ i ] + p->v0[ i ],
-                     p->v2[ i - 1 ] = p->d[ i ] * p->v2[ i ] + 2 * p->v1[ i ];
+        p->v0[i - 1] = p->d[i] * p->v0[i], p->v1[i - 1] = p->d[i] * p->v1[i] + p->v0[i],
+                  p->v2[i - 1] = p->d[i] * p->v2[i] + 2 * p->v1[i];
     for( i = 0; i < n; ++i )
-        p->J[ i ] = p->w[ i ] * p->u0[ i ] * p->v0[ i ],
-                p->D[ i ] = p->w[ i ] * ( p->u1[ i ] * p->v0[ i ] + p->u0[ i ] * p->v1[ i ] ),
-                p->D2[ i ] =
-                    p->w[ i ] * ( p->u2[ i ] * p->v0[ i ] + 2 * p->u1[ i ] * p->v1[ i ] + p->u0[ i ] * p->v2[ i ] );
+        p->J[i] = p->w[i] * p->u0[i] * p->v0[i], p->D[i] = p->w[i] * ( p->u1[i] * p->v0[i] + p->u0[i] * p->v1[i] ),
+        p->D2[i] = p->w[i] * ( p->u2[i] * p->v0[i] + 2 * p->u1[i] * p->v1[i] + p->u0[i] * p->v2[i] );
 }
 
 void lagrange_2u( lagrange_data* p )
 {
     unsigned i, n = p->n;
     for( i = 0; i < n - 1; ++i )
-        p->u2[ i + 1 ] = p->d[ i ] * p->u2[ i ] + 2 * p->u1[ i ];
+        p->u2[i + 1] = p->d[i] * p->u2[i] + 2 * p->u1[i];
     for( i = n - 1; i; --i )
-        p->v2[ i - 1 ] = p->d[ i ] * p->v2[ i ] + 2 * p->v1[ i ];
+        p->v2[i - 1] = p->d[i] * p->v2[i] + 2 * p->v1[i];
     for( i = 0; i < n; ++i )
-        p->D2[ i ] = p->w[ i ] * ( p->u2[ i ] * p->v0[ i ] + 2 * p->u1[ i ] * p->v1[ i ] + p->u0[ i ] * p->v2[ i ] );
+        p->D2[i] = p->w[i] * ( p->u2[i] * p->v0[i] + 2 * p->u1[i] * p->v1[i] + p->u0[i] * p->v2[i] );
 }
 
 void lagrange_setup( lagrange_data* p, const realType* z, unsigned n )
@@ -476,19 +478,19 @@ void lagrange_setup( lagrange_data* p, const realType* z, unsigned n )
     p->J_zn = p->D2_z0 + n, p->D_zn = p->J_zn + n, p->D2_zn = p->D_zn + n;
     for( i = 0; i < n; ++i )
     {
-        realType ww = 1, zi = z[ i ];
+        realType ww = 1, zi = z[i];
         for( j = 0; j < i; ++j )
-            ww *= zi - z[ j ];
+            ww *= zi - z[j];
         for( ++j; j < n; ++j )
-            ww *= zi - z[ j ];
-        p->w[ i ] = 1 / ww;
+            ww *= zi - z[j];
+        p->w[i] = 1 / ww;
     }
-    p->u0[ 0 ] = p->v0[ n - 1 ] = 1;
-    p->u1[ 0 ] = p->v1[ n - 1 ] = 0;
-    p->u2[ 0 ] = p->v2[ n - 1 ] = 0;
-    lagrange_2( p, z[ 0 ] );
+    p->u0[0] = p->v0[n - 1] = 1;
+    p->u1[0] = p->v1[n - 1] = 0;
+    p->u2[0] = p->v2[n - 1] = 0;
+    lagrange_2( p, z[0] );
     memcpy( p->J_z0, p->J, 3 * n * sizeof( realType ) );
-    lagrange_2( p, z[ n - 1 ] );
+    lagrange_2( p, z[n - 1] );
     memcpy( p->J_zn, p->J, 3 * n * sizeof( realType ) );
 }
 

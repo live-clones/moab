@@ -169,18 +169,50 @@ class HigherOrderTest : public CppUnit::TestFixture
 
     void test_tri_open_domain( double& x1, double& x3, double& x4, double y2, double y5, double& y4 );
 
-    void basic_tri_test( double& x2, double& y2, double& x3, double& y3, double& x4, double& y4, double& x5, double& y5,
+    void basic_tri_test( double& x2,
+                         double& y2,
+                         double& x3,
+                         double& y3,
+                         double& x4,
+                         double& y4,
+                         double& x5,
+                         double& y5,
                          MsqError& err );
 
-    void basic_tet_test( Vector3D& p3, Vector3D& p4, Vector3D& p5, Vector3D& p6, Vector3D& p7, Vector3D& p8,
-                         Vector3D& p9, MsqError& err );
+    void basic_tet_test( Vector3D& p3,
+                         Vector3D& p4,
+                         Vector3D& p5,
+                         Vector3D& p6,
+                         Vector3D& p7,
+                         Vector3D& p8,
+                         Vector3D& p9,
+                         MsqError& err );
 
-    void basic_quad_test( Vector3D& p2, Vector3D& p3, Vector3D& p4, Vector3D& p5, Vector3D& p6, Vector3D& p7,
+    void basic_quad_test( Vector3D& p2,
+                          Vector3D& p3,
+                          Vector3D& p4,
+                          Vector3D& p5,
+                          Vector3D& p6,
+                          Vector3D& p7,
                           MsqError& err );
 
-    void basic_hex_test( Vector3D& p4, Vector3D& p5, Vector3D& p6, Vector3D& p7, Vector3D& p8, Vector3D& p9,
-                         Vector3D& p10, Vector3D& p11, Vector3D& p12, Vector3D& p13, Vector3D& p14, Vector3D& p15,
-                         Vector3D& p16, Vector3D& p17, Vector3D& p18, Vector3D& p19, MsqError& err );
+    void basic_hex_test( Vector3D& p4,
+                         Vector3D& p5,
+                         Vector3D& p6,
+                         Vector3D& p7,
+                         Vector3D& p8,
+                         Vector3D& p9,
+                         Vector3D& p10,
+                         Vector3D& p11,
+                         Vector3D& p12,
+                         Vector3D& p13,
+                         Vector3D& p14,
+                         Vector3D& p15,
+                         Vector3D& p16,
+                         Vector3D& p17,
+                         Vector3D& p18,
+                         Vector3D& p19,
+                         MsqError& err );
 };
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( HigherOrderTest, "HigherOrderTest" );
@@ -195,8 +227,15 @@ static inline double dist( double x1, double y1, double x2, double y2 )
 const double IDEAL_TRI_SIDE   = sqrt( 2.0 / sqrt( 3.0 ) );
 const double IDEAL_TRI_HEIGHT = 1 / IDEAL_TRI_SIDE;
 
-int tri_mid_edge_nodes_edge_center( double x2, double y2, double x3, double y3, double x4, double y4, double x5,
-                                    double y5, double epsilon )
+int tri_mid_edge_nodes_edge_center( double x2,
+                                    double y2,
+                                    double x3,
+                                    double y3,
+                                    double x4,
+                                    double y4,
+                                    double x5,
+                                    double y5,
+                                    double epsilon )
 {
     double x0 = 0.0, y0 = 0.0;
     double x1 = IDEAL_TRI_SIDE, y1 = 0.0;
@@ -372,8 +411,13 @@ void HigherOrderTest::test_tri_basic_peak_over()
     CPPUNIT_ASSERT_EQUAL( 0, midok );
 }
 
-int quad_all_in_xy_plane( const Vector3D& p2, const Vector3D& p3, const Vector3D& p4, const Vector3D& p5,
-                          const Vector3D& p6, const Vector3D& p7, double epsilon )
+int quad_all_in_xy_plane( const Vector3D& p2,
+                          const Vector3D& p3,
+                          const Vector3D& p4,
+                          const Vector3D& p5,
+                          const Vector3D& p6,
+                          const Vector3D& p7,
+                          double epsilon )
 {
     Vector3D list[] = { p2, p3, p4, p5, p6, p7 };
     const int n     = sizeof( list ) / sizeof( list[0] );
@@ -383,8 +427,13 @@ int quad_all_in_xy_plane( const Vector3D& p2, const Vector3D& p3, const Vector3D
     return result;
 }
 
-int quad_mid_edge_nodes_edge_center( const Vector3D& p2, const Vector3D& p3, const Vector3D& p4, const Vector3D& p5,
-                                     const Vector3D& p6, const Vector3D& p7, double epsilon )
+int quad_mid_edge_nodes_edge_center( const Vector3D& p2,
+                                     const Vector3D& p3,
+                                     const Vector3D& p4,
+                                     const Vector3D& p5,
+                                     const Vector3D& p6,
+                                     const Vector3D& p7,
+                                     double epsilon )
 {
     const Vector3D p0( 0.0, 0.0, 0.0 );
     const Vector3D p1( QEL, 0.0, 0.0 );
@@ -586,8 +635,14 @@ const double IDEAL_TET_SIDE   = 2.0 / pow( 33, 1.0 / 6.0 );
 const double IDEAL_TET_BASE   = sqrt( 3.0 ) * 0.5 * IDEAL_TET_SIDE;
 const double IDEAL_TET_HEIGHT = sqrt( 2.0 / 3.0 ) * IDEAL_TET_SIDE;
 
-int tet_mid_edge_nodes_edge_center( const Vector3D& p3, const Vector3D& p4, const Vector3D& p5, const Vector3D& p6,
-                                    const Vector3D& p7, const Vector3D& p8, const Vector3D& p9, double epsilon )
+int tet_mid_edge_nodes_edge_center( const Vector3D& p3,
+                                    const Vector3D& p4,
+                                    const Vector3D& p5,
+                                    const Vector3D& p6,
+                                    const Vector3D& p7,
+                                    const Vector3D& p8,
+                                    const Vector3D& p9,
+                                    double epsilon )
 {
     const Vector3D p0( 0.0, 0.0, 0.0 );
     const Vector3D p1( IDEAL_TET_SIDE, 0.0, 0.0 );
@@ -610,7 +665,12 @@ int tet_mid_edge_nodes_edge_center( const Vector3D& p3, const Vector3D& p4, cons
     return result;
 }
 
-inline static void get_ideal_tet( Vector3D& p3, Vector3D& p4, Vector3D& p5, Vector3D& p6, Vector3D& p7, Vector3D& p8,
+inline static void get_ideal_tet( Vector3D& p3,
+                                  Vector3D& p4,
+                                  Vector3D& p5,
+                                  Vector3D& p6,
+                                  Vector3D& p7,
+                                  Vector3D& p8,
                                   Vector3D& p9 )
 {
     const Vector3D p0( 0.0, 0.0, 0.0 );
@@ -795,8 +855,7 @@ void HigherOrderTest::test_hex_basic()
                                    // bottom and top mid-face
                                    P, Q, 0, Q, P, 1,
                                    // mid-element
-                                   P, Q, P
-    };
+                                   P, Q, P };
     unsigned long conn[num_vtx];
     for( unsigned i = 0; i < num_vtx; i++ )
         conn[i] = i;
@@ -866,8 +925,15 @@ void HigherOrderTest::test_hex_basic()
 
    -- Pat
 */
-void HigherOrderTest::basic_tri_test( double& x2, double& y2, double& x3, double& y3, double& x4, double& y4,
-                                      double& x5, double& y5, MsqError& err )
+void HigherOrderTest::basic_tri_test( double& x2,
+                                      double& y2,
+                                      double& x3,
+                                      double& y3,
+                                      double& x4,
+                                      double& y4,
+                                      double& x5,
+                                      double& y5,
+                                      MsqError& err )
 {
     // Construct Mesh instance
     const int DIM             = 3;
@@ -896,8 +962,14 @@ void HigherOrderTest::basic_tri_test( double& x2, double& y2, double& x3, double
     y5 = coords[5 * DIM + 1];
 }
 
-void HigherOrderTest::basic_tet_test( Vector3D& p3, Vector3D& p4, Vector3D& p5, Vector3D& p6, Vector3D& p7,
-                                      Vector3D& p8, Vector3D& p9, MsqError& err )
+void HigherOrderTest::basic_tet_test( Vector3D& p3,
+                                      Vector3D& p4,
+                                      Vector3D& p5,
+                                      Vector3D& p6,
+                                      Vector3D& p7,
+                                      Vector3D& p8,
+                                      Vector3D& p9,
+                                      MsqError& err )
 {
     // Construct Mesh instance
     const int DIM   = 3;
@@ -927,8 +999,13 @@ void HigherOrderTest::basic_tet_test( Vector3D& p3, Vector3D& p4, Vector3D& p5, 
     p9.set( coords + 9 * DIM );
 }
 
-void HigherOrderTest::basic_quad_test( Vector3D& p2, Vector3D& p3, Vector3D& p4, Vector3D& p5, Vector3D& p6,
-                                       Vector3D& p7, MsqError& err )
+void HigherOrderTest::basic_quad_test( Vector3D& p2,
+                                       Vector3D& p3,
+                                       Vector3D& p4,
+                                       Vector3D& p5,
+                                       Vector3D& p6,
+                                       Vector3D& p7,
+                                       MsqError& err )
 {
     // Construct Mesh instance
     const int DIM             = 3;
@@ -958,10 +1035,23 @@ void HigherOrderTest::basic_quad_test( Vector3D& p2, Vector3D& p3, Vector3D& p4,
     p7.set( coords + 7 * DIM );
 }
 
-void HigherOrderTest::basic_hex_test( Vector3D& p4, Vector3D& p5, Vector3D& p6, Vector3D& p7, Vector3D& p8,
-                                      Vector3D& p9, Vector3D& p10, Vector3D& p11, Vector3D& p12, Vector3D& p13,
-                                      Vector3D& p14, Vector3D& p15, Vector3D& p16, Vector3D& p17, Vector3D& p18,
-                                      Vector3D& p19, MsqError& err )
+void HigherOrderTest::basic_hex_test( Vector3D& p4,
+                                      Vector3D& p5,
+                                      Vector3D& p6,
+                                      Vector3D& p7,
+                                      Vector3D& p8,
+                                      Vector3D& p9,
+                                      Vector3D& p10,
+                                      Vector3D& p11,
+                                      Vector3D& p12,
+                                      Vector3D& p13,
+                                      Vector3D& p14,
+                                      Vector3D& p15,
+                                      Vector3D& p16,
+                                      Vector3D& p17,
+                                      Vector3D& p18,
+                                      Vector3D& p19,
+                                      MsqError& err )
 {
     // Construct Mesh instance
     const int DIM             = 3;

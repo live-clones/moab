@@ -30,7 +30,7 @@ There are several hooks to online continuous integration systems, nightly and co
 [![Buildbot Status](http://gnep.mcs.anl.gov:8010/badges/moab-all.svg)](https://gnep.mcs.anl.gov:8010)
 [![Bitbucket Pipelines Status](https://img.shields.io/bitbucket/pipelines/fathomteam/moab/master?label=bitbucket&style=plastic)](https://bitbucket.org/fathomteam/moab/addon/pipelines/home#!/results/branch/master/page/1)
 [![CircleCI Status](https://circleci.com/bb/fathomteam/moab/tree/master.svg?style=shield)](https://circleci.com/bb/fathomteam/moab) 
-[![Codeship Status](https://codeship.com/projects/286b0e80-5715-0132-1105-0e0cfcc5dfb4/status?branch=master)](https://codeship.com/projects/49743)
+[![Buddy Pipeline](https://app.buddy.works/vijaym/moab/pipelines/pipeline/398746/badge.svg?token=6b9e040bcd31cd1d8d2f409795f7896548b8604925af3de730aea2499d59520c "buddy pipeline")](https://app.buddy.works/vijaym/moab/pipelines/pipeline/398746)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/6201/badge.svg)](https://scan.coverity.com/projects/moab)
 [![codcov](https://codecov.io/bb/fathomteam/moab/branch/master/graph/badge.svg)](https://codecov.io/bb/fathomteam/moab)
 [![Codacy grade](https://app.codacy.com/project/badge/Grade/a796f9d9f5f44d628de15ab95717b1d1)](https://www.codacy.com/bb/fathomteam/moab/dashboard?utm_source=vijaysm@bitbucket.org&amp;utm_medium=referral&amp;utm_content=fathomteam/moab&amp;utm_campaign=Badge_Grade)

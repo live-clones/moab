@@ -117,8 +117,11 @@ class ReadRTT : public ReaderIface
     static ReaderIface* factory( Interface* );
 
     // generic overloaded core -> load_file
-    ErrorCode load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
-                         const SubsetList* subset_list = 0, const Tag* file_id_tag = 0 );
+    ErrorCode load_file( const char* file_name,
+                         const EntityHandle* file_set,
+                         const FileOptions& opts,
+                         const SubsetList* subset_list = 0,
+                         const Tag* file_id_tag        = 0 );
     // constructor
     ReadRTT( Interface* impl = NULL );
 
@@ -126,8 +129,11 @@ class ReadRTT : public ReaderIface
     virtual ~ReadRTT();
 
     // implementation empty
-    ErrorCode read_tag_values( const char* file_name, const char* tag_name, const FileOptions& opts,
-                               std::vector< int >& tag_values_out, const SubsetList* subset_list = 0 );
+    ErrorCode read_tag_values( const char* file_name,
+                               const char* tag_name,
+                               const FileOptions& opts,
+                               std::vector< int >& tag_values_out,
+                               const SubsetList* subset_list = 0 );
 
   protected:
     // private functions
@@ -217,7 +223,8 @@ class ReadRTT : public ReaderIface
      * @param surface_map, reference to the surface map of data
      *
      */
-    ErrorCode generate_topology( std::vector< side > side_data, std::vector< cell > cell_data,
+    ErrorCode generate_topology( std::vector< side > side_data,
+                                 std::vector< cell > cell_data,
                                  std::map< int, EntityHandle >& surface_map );
     /**
      * Generate parent child links to create DAGMC like structure of surface meshsets being children
@@ -231,8 +238,10 @@ class ReadRTT : public ReaderIface
      * @param cell_data, vector of the cell data in the problem
      *
      */
-    void generate_parent_child_links( int num_ents[4], std::vector< EntityHandle > entity_map[4],
-                                      std::vector< side > side_data, std::vector< cell > cell_data );
+    void generate_parent_child_links( int num_ents[4],
+                                      std::vector< EntityHandle > entity_map[4],
+                                      std::vector< side > side_data,
+                                      std::vector< cell > cell_data );
     /**
      * Sets the appropriate surface senses for each surface in the problem. By looping through all
      * the surfaces, we determine from the side_data vector, the volume id's that are shared, then
@@ -244,7 +253,9 @@ class ReadRTT : public ReaderIface
      * @param cell_data, vector of the cell data in the problem
      *
      */
-    void set_surface_senses( int num_ents[4], std::vector< EntityHandle > entity_map[4], std::vector< side > side_data,
+    void set_surface_senses( int num_ents[4],
+                             std::vector< EntityHandle > entity_map[4],
+                             std::vector< side > side_data,
                              std::vector< cell > cell_data );
 
     /**
@@ -278,7 +289,9 @@ class ReadRTT : public ReaderIface
      *
      * @return moab::ErrorCode
      */
-    ErrorCode build_moab( std::vector< node > node_data, std::vector< facet > facet_data, std::vector< tet > tet_data,
+    ErrorCode build_moab( std::vector< node > node_data,
+                          std::vector< facet > facet_data,
+                          std::vector< tet > tet_data,
                           std::map< int, EntityHandle > surface_map );
 
     /**

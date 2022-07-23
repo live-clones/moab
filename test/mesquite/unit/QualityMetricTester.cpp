@@ -80,7 +80,8 @@ static std::vector< EntityTopology > types_in_group( QualityMetricTester::ElemTy
     return types;
 }
 
-QualityMetricTester::QualityMetricTester( const EntityTopology* supported_elem_types, size_t len,
+QualityMetricTester::QualityMetricTester( const EntityTopology* supported_elem_types,
+                                          size_t len,
                                           const Settings* settings )
     : degenHexPyramid( false ), types( len ), mSettings( settings ),
       geomPlane( Vector3D( 0, 0, 1 ), Vector3D( 0, 0, 0 ) )
@@ -207,7 +208,9 @@ void QualityMetricTester::get_ideal_element( EntityTopology type, bool unit_area
     delete[] fixed;
     CPPUNIT_ASSERT( !MSQ_CHKERR( err ) );
 }
-void QualityMetricTester::get_ideal_element( EntityTopology type, bool unit_area, PatchData& pd,
+void QualityMetricTester::get_ideal_element( EntityTopology type,
+                                             bool unit_area,
+                                             PatchData& pd,
                                              bool first_vertex_fixed )
 {
     get_ideal_element( type, unit_area, pd, first_vertex_fixed ? -2 : -1 );
@@ -756,7 +759,10 @@ void QualityMetricTester::test_get_indices_fixed( QualityMetric* qm )
     // (shoudn't be affected by fixed/non-fixed)
     CPPUNIT_ASSERT_DOUBLES_EQUAL( qm_val1, qm_val2, 1e-6 );
     // should have gotten back one less index (for element-based metrics)
-    if( handles1.size() == 1 ) { CPPUNIT_ASSERT_EQUAL( indices1.size(), indices2.size() + 1 ); }
+    if( handles1.size() == 1 )
+    {
+        CPPUNIT_ASSERT_EQUAL( indices1.size(), indices2.size() + 1 );
+    }
     // indices2 shouldn't contain any fixed vertices
     std::sort( indices2.begin(), indices2.end() );
     CPPUNIT_ASSERT( indices2.back() < pd2.num_free_vertices() );
@@ -1542,7 +1548,8 @@ void PatchRotate::xform_grad( std::vector< Vector3D >& grad )
         grad[i] = rotation * grad[i];
 }
 
-void QualityMetricTester::test_transform_invariant( QualityMetric* qm, QualityMetricTester::PatchXform& xform,
+void QualityMetricTester::test_transform_invariant( QualityMetric* qm,
+                                                    QualityMetricTester::PatchXform& xform,
                                                     bool untangle )
 {
     MsqPrintError err( std::cout );
@@ -1586,7 +1593,8 @@ void QualityMetricTester::test_transform_invariant( QualityMetric* qm, QualityMe
     }
 }
 
-void QualityMetricTester::test_grad_transform_invariant( QualityMetric* qm, QualityMetricTester::PatchXform& xform,
+void QualityMetricTester::test_grad_transform_invariant( QualityMetric* qm,
+                                                         QualityMetricTester::PatchXform& xform,
                                                          bool untangle )
 {
     MsqPrintError err( std::cout );
@@ -1642,7 +1650,8 @@ void QualityMetricTester::test_grad_transform_invariant( QualityMetric* qm, Qual
     }
 }
 
-void QualityMetricTester::test_hessian_transform_invariant( QualityMetric* qm, QualityMetricTester::PatchXform& xform,
+void QualityMetricTester::test_hessian_transform_invariant( QualityMetric* qm,
+                                                            QualityMetricTester::PatchXform& xform,
                                                             bool untangle )
 {
     MsqPrintError err( std::cout );
@@ -1738,7 +1747,8 @@ void QualityMetricTester::test_grad_orient_invariant( QualityMetric* qm, bool un
     test_grad_transform_invariant( qm, xform, untangle );
 }
 
-void QualityMetricTester::test_measures_transform( QualityMetric* qm, QualityMetricTester::PatchXform& xform,
+void QualityMetricTester::test_measures_transform( QualityMetric* qm,
+                                                   QualityMetricTester::PatchXform& xform,
                                                    bool unit_area )
 {
     MsqPrintError err( std::cout );
@@ -1804,8 +1814,11 @@ void QualityMetricTester::test_measures_out_of_plane_orientation( QualityMetric*
 }
 
 typedef void ( QualityMetricTester::*patch_func_t )( EntityTopology, PatchData& );
-static void test_bad_element( QualityMetricTester* instance, QualityMetric* qm, patch_func_t type_func,
-                              bool should_succeed, const std::vector< EntityTopology >& types,
+static void test_bad_element( QualityMetricTester* instance,
+                              QualityMetric* qm,
+                              patch_func_t type_func,
+                              bool should_succeed,
+                              const std::vector< EntityTopology >& types,
                               const Settings* mSettings )
 {
     MsqPrintError err( std::cout );
@@ -1888,7 +1901,10 @@ void QualityMetricTester::test_measures_quality( QualityMetric* qm )
         CPPUNIT_ASSERT( !MSQ_CHKERR( err ) );
         CPPUNIT_ASSERT( rval );
         // check values
-        if( decreasing ) { CPPUNIT_ASSERT( qmval2 < qmval1 ); }
+        if( decreasing )
+        {
+            CPPUNIT_ASSERT( qmval2 < qmval1 );
+        }
         else
         {
             CPPUNIT_ASSERT( qmval2 > qmval1 );
@@ -1899,7 +1915,10 @@ void QualityMetricTester::test_measures_quality( QualityMetric* qm )
         CPPUNIT_ASSERT( !MSQ_CHKERR( err ) );
         CPPUNIT_ASSERT( rval );
         // check values
-        if( decreasing ) { CPPUNIT_ASSERT( qmval2 < qmval1 ); }
+        if( decreasing )
+        {
+            CPPUNIT_ASSERT( qmval2 < qmval1 );
+        }
         else
         {
             CPPUNIT_ASSERT( qmval2 > qmval1 );
@@ -1952,7 +1971,10 @@ void QualityMetricTester::test_domain_deviation_quality( QualityMetric* qm )
         CPPUNIT_ASSERT( !MSQ_CHKERR( err ) );
         CPPUNIT_ASSERT( rval );
         // check quality
-        if( decreasing ) { CPPUNIT_ASSERT( qmval1 > qmval2 ); }
+        if( decreasing )
+        {
+            CPPUNIT_ASSERT( qmval1 > qmval2 );
+        }
         else
         {
             CPPUNIT_ASSERT( qmval1 < qmval2 );
@@ -1986,7 +2008,10 @@ void QualityMetricTester::test_domain_deviation_quality( QualityMetric* qm )
         CPPUNIT_ASSERT( !MSQ_CHKERR( err ) );
         CPPUNIT_ASSERT( rval );
         // check quality
-        if( decreasing ) { CPPUNIT_ASSERT( qmval1 > qmval2 ); }
+        if( decreasing )
+        {
+            CPPUNIT_ASSERT( qmval1 > qmval2 );
+        }
         else
         {
             CPPUNIT_ASSERT( qmval1 < qmval2 );
@@ -2156,7 +2181,10 @@ void QualityMetricTester::test_measures_vertex_quality( QualityMetric* qm )
         CPPUNIT_ASSERT( !MSQ_CHKERR( err ) );
         CPPUNIT_ASSERT( rval );
         // check values
-        if( increasing ) { CPPUNIT_ASSERT( qmval2 > qmval1 ); }
+        if( increasing )
+        {
+            CPPUNIT_ASSERT( qmval2 > qmval1 );
+        }
         else
         {
             CPPUNIT_ASSERT( qmval2 < qmval1 );
@@ -2472,7 +2500,8 @@ void QualityMetricTester::test_diagonal_with_fixed_vertex( QualityMetric* qm, co
         test_diagonal_with_fixed_vertex( types[i], qm, settings );
 }
 
-void QualityMetricTester::test_gradient_with_fixed_vertex( EntityTopology type, QualityMetric* qm,
+void QualityMetricTester::test_gradient_with_fixed_vertex( EntityTopology type,
+                                                           QualityMetric* qm,
                                                            const Settings* settings )
 {
     MsqPrintError err( std::cout );
@@ -2526,7 +2555,8 @@ void QualityMetricTester::test_gradient_with_fixed_vertex( EntityTopology type, 
     }
 }
 
-void QualityMetricTester::test_hessian_with_fixed_vertex( EntityTopology type, QualityMetric* qm,
+void QualityMetricTester::test_hessian_with_fixed_vertex( EntityTopology type,
+                                                          QualityMetric* qm,
                                                           const Settings* settings )
 {
     MsqPrintError err( std::cout );
@@ -2559,7 +2589,7 @@ void QualityMetricTester::test_hessian_with_fixed_vertex( EntityTopology type, Q
     CPPUNIT_ASSERT( rval );
     CPPUNIT_ASSERT_EQUAL( (size_t)n, indices.size() );
     CPPUNIT_ASSERT_EQUAL( (size_t)n, grad.size() );
-    CPPUNIT_ASSERT_EQUAL( ( size_t )( n * ( n + 1 ) / 2 ), hess.size() );
+    CPPUNIT_ASSERT_EQUAL( (size_t)( n * ( n + 1 ) / 2 ), hess.size() );
 
     for( int i = 0; i < n; ++i )
     {
@@ -2584,7 +2614,8 @@ void QualityMetricTester::test_hessian_with_fixed_vertex( EntityTopology type, Q
     }
 }
 
-void QualityMetricTester::test_diagonal_with_fixed_vertex( EntityTopology type, QualityMetric* qm,
+void QualityMetricTester::test_diagonal_with_fixed_vertex( EntityTopology type,
+                                                           QualityMetric* qm,
                                                            const Settings* settings )
 {
     MsqPrintError err( std::cout );

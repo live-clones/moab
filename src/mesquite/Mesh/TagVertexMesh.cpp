@@ -161,7 +161,9 @@ void TagVertexMesh::clear( MsqError& err )
     }
 }
 
-void TagVertexMesh::vertices_get_coordinates( const VertexHandle vert_array[], MsqVertex* coordinates, size_t num_vtx,
+void TagVertexMesh::vertices_get_coordinates( const VertexHandle vert_array[],
+                                              MsqVertex* coordinates,
+                                              size_t num_vtx,
                                               MsqError& err )
 {
     if( !num_vtx ) return;
@@ -198,8 +200,11 @@ void TagVertexMesh::vertex_set_coordinates( VertexHandle vertex, const Vector3D&
 
 //***************  Tags  ***********
 
-TagHandle TagVertexMesh::tag_create( const std::string& tag_name, TagType type, unsigned length,
-                                     const void* default_value, MsqError& err )
+TagHandle TagVertexMesh::tag_create( const std::string& tag_name,
+                                     TagType type,
+                                     unsigned length,
+                                     const void* default_value,
+                                     MsqError& err )
 {
     // Don't allow access to internal tag for vertex coordinates.
     // This prevents accidental layering of multiple instances of

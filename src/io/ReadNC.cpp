@@ -32,8 +32,11 @@ ReadNC::~ReadNC()
     if( myHelper != NULL ) delete myHelper;
 }
 
-ErrorCode ReadNC::load_file( const char* file_name, const EntityHandle* file_set, const FileOptions& opts,
-                             const ReaderIface::SubsetList* /*subset_list*/, const Tag* file_id_tag )
+ErrorCode ReadNC::load_file( const char* file_name,
+                             const EntityHandle* file_set,
+                             const FileOptions& opts,
+                             const ReaderIface::SubsetList* /*subset_list*/,
+                             const Tag* file_id_tag )
 {
     // See if opts has variable(s) specified
     std::vector< std::string > var_names;
@@ -68,7 +71,10 @@ ErrorCode ReadNC::load_file( const char* file_name, const EntityHandle* file_set
 
     // Make sure there's a file set to put things in
     EntityHandle tmp_set;
-    if( noMesh && !file_set ) { MB_SET_ERR( MB_FAILURE, "NOMESH option requires non-NULL file set on input" ); }
+    if( noMesh && !file_set )
+    {
+        MB_SET_ERR( MB_FAILURE, "NOMESH option requires non-NULL file set on input" );
+    }
     else if( !file_set || ( file_set && *file_set == 0 ) )
     {
         rval = mbImpl->create_meshset( MESHSET_SET, tmp_set );MB_CHK_SET_ERR( rval, "Trouble creating file set" );
@@ -85,7 +91,10 @@ ErrorCode ReadNC::load_file( const char* file_name, const EntityHandle* file_set
 
     // Get appropriate NC helper instance based on information read from the header
     myHelper = NCHelper::get_nc_helper( this, fileId, opts, tmp_set );
-    if( NULL == myHelper ) { MB_SET_ERR( MB_FAILURE, "Failed to get NCHelper class instance" ); }
+    if( NULL == myHelper )
+    {
+        MB_SET_ERR( MB_FAILURE, "Failed to get NCHelper class instance" );
+    }
 
     // Initialize mesh values
     rval = myHelper->init_mesh_vals();MB_CHK_SET_ERR( rval, "Trouble initializing mesh values" );
@@ -103,7 +112,7 @@ ErrorCode ReadNC::load_file( const char* file_name, const EntityHandle* file_set
     Tag convTagsCreated = 0;
     int def_val         = 0;
     rval                = mbImpl->tag_get_handle( "__CONV_TAGS_CREATED", 1, MB_TYPE_INTEGER, convTagsCreated,
-                                   MB_TAG_SPARSE | MB_TAG_CREAT, &def_val );MB_CHK_SET_ERR( rval, "Trouble getting _CONV_TAGS_CREATED tag" );
+                                                  MB_TAG_SPARSE | MB_TAG_CREAT, &def_val );MB_CHK_SET_ERR( rval, "Trouble getting _CONV_TAGS_CREATED tag" );
     int create_conv_tags_flag = 0;
     rval                      = mbImpl->tag_get_data( convTagsCreated, &tmp_set, 1, &create_conv_tags_flag );
     // The first read to the file set
@@ -170,7 +179,7 @@ ErrorCode ReadNC::load_file( const char* file_name, const EntityHandle* file_set
         Tag part_tag = myPcomm->partition_tag();
         int dum_rank = myPcomm->proc_config().proc_rank();
         // the tmp_set is the file_set
-        rval         = mbImpl->tag_set_data( part_tag, &tmp_set, 1, &dum_rank );MB_CHK_SET_ERR( rval, "Trouble writing partition tag name on partition set" );
+        rval = mbImpl->tag_set_data( part_tag, &tmp_set, 1, &dum_rank );MB_CHK_SET_ERR( rval, "Trouble writing partition tag name on partition set" );
     }
 #endif
 
@@ -184,8 +193,10 @@ ErrorCode ReadNC::load_file( const char* file_name, const EntityHandle* file_set
     return MB_SUCCESS;
 }
 
-ErrorCode ReadNC::parse_options( const FileOptions& opts, std::vector< std::string >& var_names,
-                                 std::vector< int >& tstep_nums, std::vector< double >& tstep_vals )
+ErrorCode ReadNC::parse_options( const FileOptions& opts,
+                                 std::vector< std::string >& var_names,
+                                 std::vector< int >& tstep_nums,
+                                 std::vector< double >& tstep_vals )
 {
     int tmpval;
     if( MB_SUCCESS == opts.get_int_option( "DEBUG_IO", 1, tmpval ) )
@@ -243,13 +254,22 @@ ErrorCode ReadNC::parse_options( const FileOptions& opts, std::vector< std::stri
     }
 
     rval = opts.get_int_option( "GATHER_SET", 0, gatherSetRank );
-    if( MB_TYPE_OUT_OF_RANGE == rval ) { MB_SET_ERR( rval, "Invalid value for GATHER_SET option" ); }
+    if( MB_TYPE_OUT_OF_RANGE == rval )
+    {
+        MB_SET_ERR( rval, "Invalid value for GATHER_SET option" );
+    }
 
     rval = opts.get_int_option( "TIMESTEPBASE", 0, tStepBase );
-    if( MB_TYPE_OUT_OF_RANGE == rval ) { MB_SET_ERR( rval, "Invalid value for TIMESTEPBASE option" ); }
+    if( MB_TYPE_OUT_OF_RANGE == rval )
+    {
+        MB_SET_ERR( rval, "Invalid value for TIMESTEPBASE option" );
+    }
 
     rval = opts.get_int_option( "TRIVIAL_PARTITION_SHIFT", 1, trivialPartitionShift );
-    if( MB_TYPE_OUT_OF_RANGE == rval ) { MB_SET_ERR( rval, "Invalid value for TRIVIAL_PARTITION_SHIFT option" ); }
+    if( MB_TYPE_OUT_OF_RANGE == rval )
+    {
+        MB_SET_ERR( rval, "Invalid value for TRIVIAL_PARTITION_SHIFT option" );
+    }
 
 #ifdef MOAB_HAVE_MPI
     isParallel = ( opts.match_option( "PARALLEL", "READ_PART" ) != MB_ENTITY_NOT_FOUND );
@@ -262,15 +282,24 @@ ErrorCode ReadNC::parse_options( const FileOptions& opts, std::vector< std::stri
 
     int pcomm_no = 0;
     rval         = opts.get_int_option( "PARALLEL_COMM", pcomm_no );
-    if( MB_TYPE_OUT_OF_RANGE == rval ) { MB_SET_ERR( rval, "Invalid value for PARALLEL_COMM option" ); }
+    if( MB_TYPE_OUT_OF_RANGE == rval )
+    {
+        MB_SET_ERR( rval, "Invalid value for PARALLEL_COMM option" );
+    }
     myPcomm = ParallelComm::get_pcomm( mbImpl, pcomm_no );
-    if( 0 == myPcomm ) { myPcomm = new ParallelComm( mbImpl, MPI_COMM_WORLD ); }
+    if( 0 == myPcomm )
+    {
+        myPcomm = new ParallelComm( mbImpl, MPI_COMM_WORLD );
+    }
     const int rank = myPcomm->proc_config().proc_rank();
     dbgOut.set_rank( rank );
 
     int dum;
     rval = opts.match_option( "PARTITION_METHOD", ScdParData::PartitionMethodNames, dum );
-    if( MB_FAILURE == rval ) { MB_SET_ERR( rval, "Unknown partition method specified" ); }
+    if( MB_FAILURE == rval )
+    {
+        MB_SET_ERR( rval, "Unknown partition method specified" );
+    }
     else if( MB_ENTITY_NOT_FOUND == rval )
         partMethod = ScdParData::ALLJORKORI;
     else
@@ -420,7 +449,10 @@ ErrorCode ReadNC::get_variables()
     return MB_SUCCESS;
 }
 
-ErrorCode ReadNC::read_tag_values( const char*, const char*, const FileOptions&, std::vector< int >&,
+ErrorCode ReadNC::read_tag_values( const char*,
+                                   const char*,
+                                   const FileOptions&,
+                                   std::vector< int >&,
                                    const SubsetList* )
 {
     return MB_FAILURE;

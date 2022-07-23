@@ -88,8 +88,11 @@ class TypeSequenceManager
 
     iterator split_sequence( iterator i, EntityHandle h );  //!< split a sequence
 
-    void append_memory_use( EntityHandle first, EntityHandle last, const SequenceData* data,
-                            unsigned long long& entity_storage, unsigned long long& total_storage ) const;
+    void append_memory_use( EntityHandle first,
+                            EntityHandle last,
+                            const SequenceData* data,
+                            unsigned long long& entity_storage,
+                            unsigned long long& total_storage ) const;
 
     // check if sequence at passed iterator should be merged with
     // the subsequent sequence, and if so merge them retaining i.
@@ -242,7 +245,9 @@ class TypeSequenceManager
      * find_free_sequence() to find appropriate values for the
      * creation of a new EntitySequence.
      */
-    iterator find_free_handle( EntityHandle min_start_handle, EntityHandle max_end_handle, bool& append_out,
+    iterator find_free_handle( EntityHandle min_start_handle,
+                               EntityHandle max_end_handle,
+                               bool& append_out,
                                int values_per_ent = 0 );
 
     /**\brief Find block of free handles
@@ -270,8 +275,11 @@ class TypeSequenceManager
      *                         the existing EntitySequences using have a different
      *                         value than the passed one.
      */
-    EntityHandle find_free_sequence( EntityID num_entities, EntityHandle min_start_handle, EntityHandle max_end_handle,
-                                     SequenceData*& sequence_data_out, EntityID& sequence_data_size,
+    EntityHandle find_free_sequence( EntityID num_entities,
+                                     EntityHandle min_start_handle,
+                                     EntityHandle max_end_handle,
+                                     SequenceData*& sequence_data_out,
+                                     EntityID& sequence_data_size,
                                      int values_per_ent = 0 );
 
     /**\brief Check if block of handles is free.
@@ -281,7 +289,9 @@ class TypeSequenceManager
      * is contained within an unused portion of a SequenceData,
      * the SequenceData is returned.
      */
-    bool is_free_sequence( EntityHandle start_handle, EntityID num_entities, SequenceData*& sequence_data_out,
+    bool is_free_sequence( EntityHandle start_handle,
+                           EntityID num_entities,
+                           SequenceData*& sequence_data_out,
                            int values_per_ent = 0 );
 
     /**\brief Check if specific handle is free for allocation
@@ -320,8 +330,12 @@ class TypeSequenceManager
      *\param block_start Output: Smallest possible start handle for new sequence.
      *\param block_end   Output: Largest possible end handle for new sequence.
      */
-    ErrorCode is_free_handle( EntityHandle handle, iterator& seq_ptr_out, SequenceData*& data_ptr_out,
-                              EntityHandle& block_start, EntityHandle& block_end, int values_per_ent = 0 );
+    ErrorCode is_free_handle( EntityHandle handle,
+                              iterator& seq_ptr_out,
+                              SequenceData*& data_ptr_out,
+                              EntityHandle& block_start,
+                              EntityHandle& block_end,
+                              int values_per_ent = 0 );
 
     EntityHandle last_free_handle( EntityHandle after_this ) const;
 
@@ -341,7 +355,9 @@ class TypeSequenceManager
 
     void get_memory_use( unsigned long long& total_entity_storage, unsigned long long& total_storage ) const;
 
-    void get_memory_use( EntityHandle start, EntityHandle end, unsigned long long& total_entity_storage,
+    void get_memory_use( EntityHandle start,
+                         EntityHandle end,
+                         unsigned long long& total_entity_storage,
                          unsigned long long& total_amortized_storage ) const;
 
     unsigned long get_sequence_count() const
@@ -393,7 +409,10 @@ inline ErrorCode TypeSequenceManager::find( EntityHandle h, const EntitySequence
     }
 
     seq = lastReferenced;
-    if( h >= seq->start_handle() && h <= seq->end_handle() ) { return MB_SUCCESS; }
+    if( h >= seq->start_handle() && h <= seq->end_handle() )
+    {
+        return MB_SUCCESS;
+    }
 
     DummySequence ds( h );
     iterator i = sequenceSet.lower_bound( &ds );
@@ -416,7 +435,10 @@ inline ErrorCode TypeSequenceManager::find( EntityHandle h, EntitySequence*& seq
     }
 
     seq = lastReferenced;
-    if( h >= seq->start_handle() && h <= seq->end_handle() ) { return MB_SUCCESS; }
+    if( h >= seq->start_handle() && h <= seq->end_handle() )
+    {
+        return MB_SUCCESS;
+    }
 
     DummySequence ds( h );
     iterator i = sequenceSet.lower_bound( &ds );

@@ -66,7 +66,10 @@ class MESQUITE_EXPORT TargetCalculator
      *\param sample  The sample point in the element.
      *\param W_out   The resulting target matrix.
      */
-    virtual bool get_3D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 3 >& W_out,
+    virtual bool get_3D_target( PatchData& pd,
+                                size_t element,
+                                Sample sample,
+                                MsqMatrix< 3, 3 >& W_out,
                                 MsqError& err ) = 0;
 
     /**\brief Get a target matrix
@@ -76,7 +79,10 @@ class MESQUITE_EXPORT TargetCalculator
      *\param sample  The sample point in the element.
      *\param W_out   The resulting target matrix.
      */
-    virtual bool get_surface_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 3, 2 >& W_out,
+    virtual bool get_surface_target( PatchData& pd,
+                                     size_t element,
+                                     Sample sample,
+                                     MsqMatrix< 3, 2 >& W_out,
                                      MsqError& err ) = 0;
 
     /**\brief Get a target matrix
@@ -86,7 +92,10 @@ class MESQUITE_EXPORT TargetCalculator
      *\param sample  The sample point in the element.
      *\param W_out   The resulting target matrix.
      */
-    virtual bool get_2D_target( PatchData& pd, size_t element, Sample sample, MsqMatrix< 2, 2 >& W_out,
+    virtual bool get_2D_target( PatchData& pd,
+                                size_t element,
+                                Sample sample,
+                                MsqMatrix< 2, 2 >& W_out,
                                 MsqError& err ) = 0;
 
     /**\brief Use 3x2 W for surface elements if true, 2x2 W if false
@@ -111,8 +120,12 @@ class MESQUITE_EXPORT TargetCalculator
      *\param Delta   Output: the aspect ratio factor of W
      *\return bool   True if W can be factored, false otherwise.
      */
-    static bool factor_3D( const MsqMatrix< 3, 3 >& W, double& Lambda, MsqMatrix< 3, 3 >& V, MsqMatrix< 3, 3 >& Q,
-                           MsqMatrix< 3, 3 >& Delta, MsqError& err );
+    static bool factor_3D( const MsqMatrix< 3, 3 >& W,
+                           double& Lambda,
+                           MsqMatrix< 3, 3 >& V,
+                           MsqMatrix< 3, 3 >& Q,
+                           MsqMatrix< 3, 3 >& Delta,
+                           MsqError& err );
 
     /**\brief Factor some existing target or Jacobian matrix
      *
@@ -125,8 +138,12 @@ class MESQUITE_EXPORT TargetCalculator
      *\param Delta   Output: the aspect ratio factor of W
      *\return bool   True if W can be factored, false otherwise.
      */
-    static bool factor_surface( const MsqMatrix< 3, 2 >& W, double& Lambda, MsqMatrix< 3, 2 >& V, MsqMatrix< 2, 2 >& Q,
-                                MsqMatrix< 2, 2 >& Delta, MsqError& err );
+    static bool factor_surface( const MsqMatrix< 3, 2 >& W,
+                                double& Lambda,
+                                MsqMatrix< 3, 2 >& V,
+                                MsqMatrix< 2, 2 >& Q,
+                                MsqMatrix< 2, 2 >& Delta,
+                                MsqError& err );
 
     /**\brief Factor some existing target or Jacobian matrix
      *
@@ -139,8 +156,12 @@ class MESQUITE_EXPORT TargetCalculator
      *\param Delta   Output: the aspect ratio factor of W
      *\return bool   True if W can be factored, false otherwise.
      */
-    static bool factor_2D( const MsqMatrix< 2, 2 >& W, double& Lambda, MsqMatrix< 2, 2 >& V, MsqMatrix< 2, 2 >& Q,
-                           MsqMatrix< 2, 2 >& Delta, MsqError& err );
+    static bool factor_2D( const MsqMatrix< 2, 2 >& W,
+                           double& Lambda,
+                           MsqMatrix< 2, 2 >& V,
+                           MsqMatrix< 2, 2 >& Q,
+                           MsqMatrix< 2, 2 >& Delta,
+                           MsqError& err );
 
     /**\brief Get size component of W */
     static double size( const MsqMatrix< 3, 3 >& W );
@@ -186,19 +207,31 @@ class MESQUITE_EXPORT TargetCalculator
     static MsqMatrix< 3, 2 > new_orientation_2D( const MsqVector< 3 >& b1, const MsqVector< 3 >& b2 );
 
     /**\brief Get skew matrix for an ideally shaped element */
-    static void ideal_skew_3D( EntityTopology element_type, Sample s, const PatchData& pd, MsqMatrix< 3, 3 >& W,
+    static void ideal_skew_3D( EntityTopology element_type,
+                               Sample s,
+                               const PatchData& pd,
+                               MsqMatrix< 3, 3 >& W,
                                MsqError& err );
 
     /**\brief Get skew matrix for an ideally shaped element */
-    static void ideal_skew_2D( EntityTopology element_type, Sample s, const PatchData& pd, MsqMatrix< 2, 2 >& W,
+    static void ideal_skew_2D( EntityTopology element_type,
+                               Sample s,
+                               const PatchData& pd,
+                               MsqMatrix< 2, 2 >& W,
                                MsqError& err );
 
     /**\brief Get skew matrix for an ideally shaped element */
-    static void ideal_shape_3D( EntityTopology element_type, Sample s, const PatchData& pd, MsqMatrix< 3, 3 >& W,
+    static void ideal_shape_3D( EntityTopology element_type,
+                                Sample s,
+                                const PatchData& pd,
+                                MsqMatrix< 3, 3 >& W,
                                 MsqError& err );
 
     /**\brief Get skew matrix for an ideally shaped element */
-    static void ideal_shape_2D( EntityTopology element_type, Sample s, const PatchData& pd, MsqMatrix< 2, 2 >& W,
+    static void ideal_shape_2D( EntityTopology element_type,
+                                Sample s,
+                                const PatchData& pd,
+                                MsqMatrix< 2, 2 >& W,
                                 MsqError& err );
 
     /**\brief Create a new aspect ratio matrix
@@ -226,19 +259,35 @@ class MESQUITE_EXPORT TargetCalculator
 
     /**\brief Calculate the Jacobian given element vertex coordinates */
     static void jacobian_3D( PatchData& pd,  // for mapping function list
-                             EntityTopology element_type, int num_nodes, Sample location, const Vector3D* coords,
-                             MsqMatrix< 3, 3 >& W_out, MsqError& err );
+                             EntityTopology element_type,
+                             int num_nodes,
+                             Sample location,
+                             const Vector3D* coords,
+                             MsqMatrix< 3, 3 >& W_out,
+                             MsqError& err );
 
     /**\brief Calculate the Jacobian given element vertex coordinates */
     static void jacobian_2D( PatchData& pd,  // for mapping function list
-                             EntityTopology element_type, int num_nodes, Sample location, const Vector3D* coords,
-                             MsqMatrix< 3, 2 >& W_out, MsqError& err );
+                             EntityTopology element_type,
+                             int num_nodes,
+                             Sample location,
+                             const Vector3D* coords,
+                             MsqMatrix< 3, 2 >& W_out,
+                             MsqError& err );
 
-    static void get_refmesh_Jacobian_3D( ReferenceMeshInterface* ref_mesh, PatchData& active_mesh, size_t element_no,
-                                         Sample sample_no, MsqMatrix< 3, 3 >& W_out, MsqError& err );
+    static void get_refmesh_Jacobian_3D( ReferenceMeshInterface* ref_mesh,
+                                         PatchData& active_mesh,
+                                         size_t element_no,
+                                         Sample sample_no,
+                                         MsqMatrix< 3, 3 >& W_out,
+                                         MsqError& err );
 
-    static void get_refmesh_Jacobian_2D( ReferenceMeshInterface* ref_mesh, PatchData& active_mesh, size_t element_no,
-                                         Sample sample_no, MsqMatrix< 3, 2 >& W_out, MsqError& err );
+    static void get_refmesh_Jacobian_2D( ReferenceMeshInterface* ref_mesh,
+                                         PatchData& active_mesh,
+                                         size_t element_no,
+                                         Sample sample_no,
+                                         MsqMatrix< 3, 2 >& W_out,
+                                         MsqError& err );
 };
 
 }  // namespace MBMesquite

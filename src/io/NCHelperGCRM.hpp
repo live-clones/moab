@@ -59,7 +59,8 @@ class NCHelperGCRM : public UcdNCHelper
     ErrorCode create_local_edges( EntityHandle start_vertex );
 
     //! Create local cells with padding (pentagons are padded to hexagons)
-    ErrorCode create_padded_local_cells( const std::vector< int >& vertices_on_local_cells, EntityHandle start_vertex,
+    ErrorCode create_padded_local_cells( const std::vector< int >& vertices_on_local_cells,
+                                         EntityHandle start_vertex,
                                          Range& faces );
 
     //! Create gather set vertices

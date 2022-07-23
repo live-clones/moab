@@ -22,7 +22,10 @@ bool handle_test( EntityType type, EntityID id, int proc, bool should_fail )
 {
     int err             = 0;
     EntityHandle handle = CREATE_HANDLE( type, handleUtils.create_id( id, proc ), err );
-    if( should_fail ) { handle_test_assert( err ) return true; }
+    if( should_fail )
+    {
+        handle_test_assert( err ) return true;
+    }
     handle_test_assert( !err )
 
         EntityType type_from_handle = TYPE_FROM_HANDLE( handle );
@@ -131,7 +134,7 @@ int main()
         ++errors;
     }
     ++tests;
-    if( !handle_test( ( EntityType )( MBMAXTYPE + 1 ), 1, 0, true ) )
+    if( !handle_test( (EntityType)( MBMAXTYPE + 1 ), 1, 0, true ) )
     {
         cout << "Failed to catch type overflow" << endl;
         ++errors;

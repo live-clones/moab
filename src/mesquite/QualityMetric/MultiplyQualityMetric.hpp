@@ -87,19 +87,32 @@ class MultiplyQualityMetric : public QualityMetric
         return &metric2;
     }
 
-    virtual void get_evaluations( PatchData& pd, std::vector< size_t >& handles, bool free_vertices_only,
+    virtual void get_evaluations( PatchData& pd,
+                                  std::vector< size_t >& handles,
+                                  bool free_vertices_only,
                                   MsqError& err );
 
     virtual bool evaluate( PatchData& pd, size_t handle, double& value, MsqError& err );
 
-    virtual bool evaluate_with_indices( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
+    virtual bool evaluate_with_indices( PatchData& pd,
+                                        size_t handle,
+                                        double& value,
+                                        std::vector< size_t >& indices,
                                         MsqError& err );
 
-    virtual bool evaluate_with_gradient( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                         std::vector< Vector3D >& gradient, MsqError& err );
+    virtual bool evaluate_with_gradient( PatchData& pd,
+                                         size_t handle,
+                                         double& value,
+                                         std::vector< size_t >& indices,
+                                         std::vector< Vector3D >& gradient,
+                                         MsqError& err );
 
-    virtual bool evaluate_with_Hessian( PatchData& pd, size_t handle, double& value, std::vector< size_t >& indices,
-                                        std::vector< Vector3D >& gradient, std::vector< Matrix3D >& Hessian,
+    virtual bool evaluate_with_Hessian( PatchData& pd,
+                                        size_t handle,
+                                        double& value,
+                                        std::vector< size_t >& indices,
+                                        std::vector< Vector3D >& gradient,
+                                        std::vector< Matrix3D >& Hessian,
                                         MsqError& err );
 
   private:

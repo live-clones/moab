@@ -96,11 +96,21 @@ int main()
 
 void setup_mesh( Interface& mesh );
 
-Tag test_create_tag( Interface& mb, const char* name, int num_vals, TagType storage, DataType type, const void* defval,
+Tag test_create_tag( Interface& mb,
+                     const char* name,
+                     int num_vals,
+                     TagType storage,
+                     DataType type,
+                     const void* defval,
                      ErrorCode expect = MB_SUCCESS );
 
-Tag test_create_var_len_tag( Interface& mb, const char* name, TagType storage, DataType type, const void* defval,
-                             int defval_size, ErrorCode expect = MB_SUCCESS );
+Tag test_create_var_len_tag( Interface& mb,
+                             const char* name,
+                             TagType storage,
+                             DataType type,
+                             const void* defval,
+                             int defval_size,
+                             ErrorCode expect = MB_SUCCESS );
 
 enum SetMode
 {
@@ -109,18 +119,38 @@ enum SetMode
     ONE_VALUE
 };
 
-void test_get_set( const char* name, int vals_per_ent, TagType storage, DataType type, const void* some_values,
-                   int num_values, const void* default_value, SetMode set_by_pointer = NORMAL,
-                   bool get_by_pointer = false );
+void test_get_set( const char* name,
+                   int vals_per_ent,
+                   TagType storage,
+                   DataType type,
+                   const void* some_values,
+                   int num_values,
+                   const void* default_value,
+                   SetMode set_by_pointer = NORMAL,
+                   bool get_by_pointer    = false );
 
-void test_get_set_variable_length( const char* name, TagType storage, DataType type, const void** values,
-                                   const int* lengths, int num_values, const void* default_value,
+void test_get_set_variable_length( const char* name,
+                                   TagType storage,
+                                   DataType type,
+                                   const void** values,
+                                   const int* lengths,
+                                   int num_values,
+                                   const void* default_value,
                                    int default_value_length );
 
-void test_mesh_value( Interface& mb, const char* tag_name, unsigned tag_size, TagType tag_storage, DataType tag_type,
+void test_mesh_value( Interface& mb,
+                      const char* tag_name,
+                      unsigned tag_size,
+                      TagType tag_storage,
+                      DataType tag_type,
                       const void* value );
 
-Tag test_create_tag( Interface& mb, const char* name, int num_vals, TagType storage, DataType type, const void* defval,
+Tag test_create_tag( Interface& mb,
+                     const char* name,
+                     int num_vals,
+                     TagType storage,
+                     DataType type,
+                     const void* defval,
                      ErrorCode expect )
 {
     ErrorCode rval;
@@ -198,8 +228,13 @@ Tag test_create_tag( Interface& mb, const char* name, int num_vals, TagType stor
     return tag;
 }
 
-Tag test_create_var_len_tag( Interface& mb, const char* name, TagType storage, DataType type, const void* defval,
-                             int defval_size, ErrorCode expect )
+Tag test_create_var_len_tag( Interface& mb,
+                             const char* name,
+                             TagType storage,
+                             DataType type,
+                             const void* defval,
+                             int defval_size,
+                             ErrorCode expect )
 {
     ErrorCode rval;
     Tag tag;
@@ -323,8 +358,15 @@ static void concat_to_list( const void* concat, std::vector< const void* >& list
 }
 
 // test get/set of tag values
-void test_get_set( const char* name, int vals_per_ent, TagType storage, DataType type, const void* some_values,
-                   int num_values, const void* default_value, SetMode set_mode, bool get_by_pointer )
+void test_get_set( const char* name,
+                   int vals_per_ent,
+                   TagType storage,
+                   DataType type,
+                   const void* some_values,
+                   int num_values,
+                   const void* default_value,
+                   SetMode set_mode,
+                   bool get_by_pointer )
 {
     std::vector< unsigned char > data;
 
@@ -381,7 +423,7 @@ void test_get_set( const char* name, int vals_per_ent, TagType storage, DataType
         }
         else
         {
-            EntityHandle mid = ( EntityHandle )( i->first + ( i->second - i->first + 1 ) / 2 );
+            EntityHandle mid = (EntityHandle)( i->first + ( i->second - i->first + 1 ) / 2 );
             handle_list.push_back( mid );
             handle_range.insert( mid + 1, i->second );
         }
@@ -393,7 +435,10 @@ void test_get_set( const char* name, int vals_per_ent, TagType storage, DataType
     // try getting/setting single handle value
 
     std::vector< const void* > list( 1 );
-    if( set_mode == NORMAL ) { rval = mb.tag_set_data( tag, &one_handle, 1, some_values ); }
+    if( set_mode == NORMAL )
+    {
+        rval = mb.tag_set_data( tag, &one_handle, 1, some_values );
+    }
     else if( set_mode == POINTER )
     {
         list[0] = some_values;
@@ -430,7 +475,10 @@ void test_get_set( const char* name, int vals_per_ent, TagType storage, DataType
     {
         const int n = std::min( (int)handle_list.size() - i, step );
         list.resize( n );
-        if( set_mode == NORMAL ) { rval = mb.tag_set_data( tag, &handle_list[i], n, some_values ); }
+        if( set_mode == NORMAL )
+        {
+            rval = mb.tag_set_data( tag, &handle_list[i], n, some_values );
+        }
         else if( set_mode == POINTER )
         {
             concat_to_list( some_values, list, bytes );
@@ -529,7 +577,10 @@ void test_get_set( const char* name, int vals_per_ent, TagType storage, DataType
     // try getting unset values
 
     list.resize( entities.size() );
-    if( get_by_pointer ) { rval = mb.tag_get_by_ptr( tag, entities, &list[0] ); }
+    if( get_by_pointer )
+    {
+        rval = mb.tag_get_by_ptr( tag, entities, &list[0] );
+    }
     else
     {
         data.clear(), data.resize( entities.size() * bytes, '\001' );
@@ -995,7 +1046,11 @@ void test_get_by_tag_value_dense()
     CHECK( expected == results );
 }
 
-void test_mesh_value( Interface& mb, const char* tag_name, unsigned tag_size, TagType tag_storage, DataType tag_type,
+void test_mesh_value( Interface& mb,
+                      const char* tag_name,
+                      unsigned tag_size,
+                      TagType tag_storage,
+                      DataType tag_type,
                       const void* value )
 {
     // create  tag
@@ -1390,8 +1445,13 @@ void test_delete_bit_data()
     CHECK_EQUAL( defval, val );
 }
 
-void test_get_set_variable_length( const char* name, TagType storage, DataType type, const void** values,
-                                   const int* lengths, int num_values, const void* default_value,
+void test_get_set_variable_length( const char* name,
+                                   TagType storage,
+                                   DataType type,
+                                   const void** values,
+                                   const int* lengths,
+                                   int num_values,
+                                   const void* default_value,
                                    int default_value_length )
 {
     std::vector< const void* > data;
@@ -1430,7 +1490,7 @@ void test_get_set_variable_length( const char* name, TagType storage, DataType t
         }
         else
         {
-            EntityHandle mid = ( EntityHandle )( i->first + ( i->second - i->first + 1 ) / 2 );
+            EntityHandle mid = (EntityHandle)( i->first + ( i->second - i->first + 1 ) / 2 );
             handle_list.push_back( mid );
             handle_range.insert( mid + 1, i->second );
         }
@@ -1606,11 +1666,10 @@ void test_get_set_variable_length_sparse()
 
     const int ints[32]   = { 1,  2,  3,  4,  5,  6,  7,  8,  9,  10,  11,  12,  13,  14,  15,
                            -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15 };
-    const void* ivals[9] = {
-        ints, ints + 1, ints + 3, ints + 12, ints + 17, ints + 21, ints + 28, ints + 29, ints + 31
-    };
-    const int ilens[9]  = { 1, 2, 9, 5, 4, 7, 1, 2, 1 };
-    const int defvals[] = { 42, 5, 8, 74 };
+    const void* ivals[9] = { ints,      ints + 1,  ints + 3,  ints + 12, ints + 17,
+                             ints + 21, ints + 28, ints + 29, ints + 31 };
+    const int ilens[9]   = { 1, 2, 9, 5, 4, 7, 1, 2, 1 };
+    const int defvals[]  = { 42, 5, 8, 74 };
     test_get_set_variable_length( "vdef", MB_TAG_SPARSE, MB_TYPE_INTEGER, ivals, ilens, 9, defvals, 4 );
 }
 
@@ -1623,11 +1682,10 @@ void test_get_set_variable_length_dense()
 
     const int ints[32]   = { 1,  2,  3,  4,  5,  6,  7,  8,  9,  10,  11,  12,  13,  14,  15,
                            -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15 };
-    const void* ivals[9] = {
-        ints, ints + 1, ints + 3, ints + 12, ints + 17, ints + 21, ints + 28, ints + 29, ints + 31
-    };
-    const int ilens[9]  = { 1, 2, 9, 5, 4, 7, 1, 2, 1 };
-    const int defvals[] = { 42, 5, 8, 74 };
+    const void* ivals[9] = { ints,      ints + 1,  ints + 3,  ints + 12, ints + 17,
+                             ints + 21, ints + 28, ints + 29, ints + 31 };
+    const int ilens[9]   = { 1, 2, 9, 5, 4, 7, 1, 2, 1 };
+    const int defvals[]  = { 42, 5, 8, 74 };
     test_get_set_variable_length( "vdef", MB_TAG_DENSE, MB_TYPE_INTEGER, ivals, ilens, 9, defvals, 4 );
 }
 
@@ -1947,7 +2005,7 @@ void regression_tag_on_nonexistent_entity()
     EntityHandle set;
     rval = moab.create_meshset( 0, set );CHECK_ERR( rval );
 
-    handle = ( EntityHandle )( set + 1 );
+    handle = (EntityHandle)( set + 1 );
     handles.clear();
     handles.insert( handle );
 

@@ -85,8 +85,12 @@ MeshImpl::~MeshImpl()
     delete myTags;
 }
 
-MeshImpl::MeshImpl( int num_nodes, int num_elem, EntityTopology entity_topology, const bool* fixed,
-                    const double* coords, const int* connectivity )
+MeshImpl::MeshImpl( int num_nodes,
+                    int num_elem,
+                    EntityTopology entity_topology,
+                    const bool* fixed,
+                    const double* coords,
+                    const int* connectivity )
     : numCoords( 3 ), myMesh( new MeshImplData ), myTags( new MeshImplTags )
 {
     MsqError err;
@@ -120,8 +124,12 @@ MeshImpl::MeshImpl( int num_nodes, int num_elem, EntityTopology entity_topology,
     }
 }
 
-MeshImpl::MeshImpl( int num_nodes, int num_elem, const EntityTopology* element_topologies, const bool* fixed,
-                    const double* coords, const int* connectivity )
+MeshImpl::MeshImpl( int num_nodes,
+                    int num_elem,
+                    const EntityTopology* element_topologies,
+                    const bool* fixed,
+                    const double* coords,
+                    const int* connectivity )
     : numCoords( 3 ), myMesh( new MeshImplData ), myTags( new MeshImplTags )
 {
     MsqError err;
@@ -247,7 +255,9 @@ static bool is_side_boundary( MeshImplData* myMesh, size_t elem, unsigned side_d
     return boundary;
 }
 
-void MeshImpl::set_skin_flags( bool corner_fixed_flag, bool midnode_fixed_flag, bool midnode_slaved_flag,
+void MeshImpl::set_skin_flags( bool corner_fixed_flag,
+                               bool midnode_fixed_flag,
+                               bool midnode_slaved_flag,
                                MsqError& err )
 {
     // For each element, for each side of that element, check for
@@ -689,7 +699,10 @@ void MeshImpl::read_exodus( const char* in_filename, MsqError& err )
         EntityTopology elem_type;
         for( int j = 0; elem_type_str[j]; j++ )
             elem_type_str[j] = toupper( elem_type_str[j] );
-        if( !strncmp( elem_type_str, "TRI", 3 ) ) { elem_type = TRIANGLE; }
+        if( !strncmp( elem_type_str, "TRI", 3 ) )
+        {
+            elem_type = TRIANGLE;
+        }
         else if( !strncmp( elem_type_str, "QUA", 3 ) || !strncmp( elem_type_str, "SHE", 3 ) )
         {
             elem_type = QUADRILATERAL;
@@ -754,7 +767,10 @@ void MeshImpl::read_exodus( const char* in_filename, MsqError& err )
     if( num_fixed_nodes )
     {
         exo_err = ex_get_node_set( file_id, 111, arrptr( fixed_nodes ) );
-        if( exo_err < 0 ) { MSQ_SETERR( err )( "Error retrieving fixed nodes.", MsqError::PARSE_ERROR ); }
+        if( exo_err < 0 )
+        {
+            MSQ_SETERR( err )( "Error retrieving fixed nodes.", MsqError::PARSE_ERROR );
+        }
     }
 
     // See if this vertex is marked as a boundary vertex
@@ -1093,7 +1109,9 @@ ElementIterator* MeshImpl::element_iterator( MsqError& /*err*/ )
 // is fixed and cannot be moved.  Note that this is a read-only
 // property; this flag can't be modified by users of the
 // Mesh interface.
-void MeshImpl::vertices_get_fixed_flag( const VertexHandle vert_array[], std::vector< bool >& on_bnd, size_t num_vtx,
+void MeshImpl::vertices_get_fixed_flag( const VertexHandle vert_array[],
+                                        std::vector< bool >& on_bnd,
+                                        size_t num_vtx,
                                         MsqError& err )
 {
     on_bnd.resize( num_vtx );
@@ -1103,8 +1121,10 @@ void MeshImpl::vertices_get_fixed_flag( const VertexHandle vert_array[], std::ve
     }
 }
 
-void MeshImpl::vertices_set_fixed_flag( const VertexHandle vert_array[], const std::vector< bool >& on_bnd,
-                                        size_t num_vtx, MsqError& err )
+void MeshImpl::vertices_set_fixed_flag( const VertexHandle vert_array[],
+                                        const std::vector< bool >& on_bnd,
+                                        size_t num_vtx,
+                                        MsqError& err )
 {
     assert( on_bnd.size() >= num_vtx );
     for( size_t i = 0; i < num_vtx; ++i )
@@ -1112,7 +1132,9 @@ void MeshImpl::vertices_set_fixed_flag( const VertexHandle vert_array[], const s
         myMesh->fix_vertex( (size_t)vert_array[i], on_bnd[i], err );MSQ_ERRRTN( err );
     }
 }
-void MeshImpl::vertices_get_slaved_flag( const VertexHandle vert_array[], std::vector< bool >& flags, size_t num_vtx,
+void MeshImpl::vertices_get_slaved_flag( const VertexHandle vert_array[],
+                                         std::vector< bool >& flags,
+                                         size_t num_vtx,
                                          MsqError& err )
 {
     flags.resize( num_vtx );
@@ -1123,7 +1145,9 @@ void MeshImpl::vertices_get_slaved_flag( const VertexHandle vert_array[], std::v
 }
 
 // Get/set location of a vertex
-void MeshImpl::vertices_get_coordinates( const Mesh::VertexHandle vert_array[], MsqVertex* coordinates, size_t num_vtx,
+void MeshImpl::vertices_get_coordinates( const Mesh::VertexHandle vert_array[],
+                                         MsqVertex* coordinates,
+                                         size_t num_vtx,
                                          MsqError& err )
 {
     for( size_t i = 0; i < num_vtx; ++i )
@@ -1146,7 +1170,9 @@ void MeshImpl::vertex_set_byte( VertexHandle vertex, unsigned char byte, MsqErro
     vertices_set_byte( &vertex, &byte, 1, err );MSQ_CHKERR( err );
 }
 
-void MeshImpl::vertices_get_byte( const VertexHandle* vert_array, unsigned char* byte_array, size_t array_size,
+void MeshImpl::vertices_get_byte( const VertexHandle* vert_array,
+                                  unsigned char* byte_array,
+                                  size_t array_size,
                                   MsqError& err )
 {
     for( size_t i = 0; i < array_size; i++ )
@@ -1163,7 +1189,9 @@ void MeshImpl::vertex_get_byte( const VertexHandle vertex, unsigned char* byte, 
     vertices_get_byte( &vertex, byte, 1, err );MSQ_CHKERR( err );
 }
 
-void MeshImpl::vertices_set_byte( const VertexHandle* vertex, const unsigned char* byte_array, size_t array_size,
+void MeshImpl::vertices_set_byte( const VertexHandle* vertex,
+                                  const unsigned char* byte_array,
+                                  size_t array_size,
                                   MsqError& err )
 {
     for( size_t i = 0; i < array_size; i++ )
@@ -1185,8 +1213,10 @@ struct cast_handle
     }
 };
 
-void MeshImpl::vertices_get_attached_elements( const VertexHandle* vertices, size_t num_vertices,
-                                               std::vector< ElementHandle >& elements, std::vector< size_t >& offsets,
+void MeshImpl::vertices_get_attached_elements( const VertexHandle* vertices,
+                                               size_t num_vertices,
+                                               std::vector< ElementHandle >& elements,
+                                               std::vector< size_t >& offsets,
                                                MsqError& err )
 {
     elements.clear();
@@ -1206,8 +1236,10 @@ void MeshImpl::vertices_get_attached_elements( const VertexHandle* vertices, siz
     }
 }
 
-void MeshImpl::elements_get_attached_vertices( const ElementHandle* elements, size_t num_elems,
-                                               std::vector< VertexHandle >& vertices, std::vector< size_t >& offsets,
+void MeshImpl::elements_get_attached_vertices( const ElementHandle* elements,
+                                               size_t num_elems,
+                                               std::vector< VertexHandle >& vertices,
+                                               std::vector< size_t >& offsets,
                                                MsqError& err )
 {
     vertices.clear();
@@ -1229,8 +1261,10 @@ void MeshImpl::elements_get_attached_vertices( const ElementHandle* elements, si
 
 // Returns the topologies of the given entities.  The "entity_topologies"
 // array must be at least "num_elements" in size.
-void MeshImpl::elements_get_topologies( const ElementHandle* element_handle_array, EntityTopology* element_topologies,
-                                        size_t num_elements, MsqError& err )
+void MeshImpl::elements_get_topologies( const ElementHandle* element_handle_array,
+                                        EntityTopology* element_topologies,
+                                        size_t num_elements,
+                                        MsqError& err )
 {
     for( size_t i = 0; i < num_elements; i++ )
     {
@@ -1456,8 +1490,7 @@ void MeshImpl::tag_to_bool( const char* tag_name, std::vector< bool >& values, M
 void MeshImpl::vtk_read_dataset( FileTokenizer& tokens, MsqError& err )
 {
     const char* const data_type_names[] = {
-        "STRUCTURED_POINTS", "STRUCTURED_GRID", "UNSTRUCTURED_GRID", "POLYDATA", "RECTILINEAR_GRID", "FIELD", 0
-    };
+        "STRUCTURED_POINTS", "STRUCTURED_GRID", "UNSTRUCTURED_GRID", "POLYDATA", "RECTILINEAR_GRID", "FIELD", 0 };
     int datatype = tokens.match_token( data_type_names, err );MSQ_ERRRTN( err );
 
     // Ignore FIELD data at beginning of DATASET. As far as I (J.Kraftcheck)
@@ -1927,8 +1960,12 @@ void MeshImpl::vtk_create_structured_elems( const long* dims, MsqError& err )
             }
 }
 
-void* MeshImpl::vtk_read_field_data( FileTokenizer& tokens, size_t count, size_t num_fields,
-                                     const std::string& field_name, TagDescription& tag, MsqError& err )
+void* MeshImpl::vtk_read_field_data( FileTokenizer& tokens,
+                                     size_t count,
+                                     size_t num_fields,
+                                     const std::string& field_name,
+                                     TagDescription& tag,
+                                     MsqError& err )
 {
     tag.member = tokens.get_string( err );
     MSQ_ERRZERO( err );
@@ -2157,8 +2194,12 @@ void MeshImpl::vtk_store_cell_data( const void* data, TagDescription& tag, MsqEr
         myTags->set_element_data( tag_handle, element_handles.size(), arrptr( element_handles ), data, err );MSQ_ERRRTN( err );
 }
 
-void* MeshImpl::vtk_read_typed_data( FileTokenizer& tokens, int type, size_t per_elem, size_t num_elem,
-                                     TagDescription& tag, MsqError& err )
+void* MeshImpl::vtk_read_typed_data( FileTokenizer& tokens,
+                                     int type,
+                                     size_t per_elem,
+                                     size_t num_elem,
+                                     TagDescription& tag,
+                                     MsqError& err )
 {
     void* data_ptr;
     size_t count = per_elem * num_elem;
@@ -2389,7 +2430,10 @@ void* MeshImpl::vtk_read_tensor_attrib( FileTokenizer& tokens, long count, TagDe
     return result;
 }
 
-void MeshImpl::vtk_write_attrib_data( std::ostream& file, const TagDescription& desc, const void* data, size_t count,
+void MeshImpl::vtk_write_attrib_data( std::ostream& file,
+                                      const TagDescription& desc,
+                                      const void* data,
+                                      size_t count,
                                       MsqError& err ) const
 {
     // srkenno@sandia.gov: we now allow this type to be able to write e.g. GLOBAL_ID for parallel
@@ -2528,7 +2572,10 @@ void MeshImpl::vtk_write_attrib_data( std::ostream& file, const TagDescription& 
  *                               TAGS
  **************************************************************************/
 
-TagHandle MeshImpl::tag_create( const std::string& name, TagType type, unsigned length, const void* defval,
+TagHandle MeshImpl::tag_create( const std::string& name,
+                                TagType type,
+                                unsigned length,
+                                const void* defval,
                                 MsqError& err )
 {
     TagDescription::VtkType vtype;
@@ -2583,25 +2630,37 @@ void MeshImpl::tag_properties( TagHandle handle, std::string& name, TagType& typ
     length = (unsigned)( desc.size / MeshImplTags::size_from_tag_type( desc.type ) );
 }
 
-void MeshImpl::tag_set_element_data( TagHandle handle, size_t num_elems, const ElementHandle* elem_array,
-                                     const void* values, MsqError& err )
+void MeshImpl::tag_set_element_data( TagHandle handle,
+                                     size_t num_elems,
+                                     const ElementHandle* elem_array,
+                                     const void* values,
+                                     MsqError& err )
 {
     myTags->set_element_data( (size_t)handle, num_elems, (const size_t*)elem_array, values, err );MSQ_CHKERR( err );
 }
 
-void MeshImpl::tag_get_element_data( TagHandle handle, size_t num_elems, const ElementHandle* elem_array, void* values,
+void MeshImpl::tag_get_element_data( TagHandle handle,
+                                     size_t num_elems,
+                                     const ElementHandle* elem_array,
+                                     void* values,
                                      MsqError& err )
 {
     myTags->get_element_data( (size_t)handle, num_elems, (const size_t*)elem_array, values, err );MSQ_CHKERR( err );
 }
 
-void MeshImpl::tag_set_vertex_data( TagHandle handle, size_t num_elems, const VertexHandle* elem_array,
-                                    const void* values, MsqError& err )
+void MeshImpl::tag_set_vertex_data( TagHandle handle,
+                                    size_t num_elems,
+                                    const VertexHandle* elem_array,
+                                    const void* values,
+                                    MsqError& err )
 {
     myTags->set_vertex_data( (size_t)handle, num_elems, (const size_t*)elem_array, values, err );MSQ_CHKERR( err );
 }
 
-void MeshImpl::tag_get_vertex_data( TagHandle handle, size_t num_elems, const VertexHandle* elem_array, void* values,
+void MeshImpl::tag_get_vertex_data( TagHandle handle,
+                                    size_t num_elems,
+                                    const VertexHandle* elem_array,
+                                    void* values,
                                     MsqError& err )
 {
     myTags->get_vertex_data( (size_t)handle, num_elems, (const size_t*)elem_array, values, err );MSQ_CHKERR( err );

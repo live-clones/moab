@@ -12,90 +12,90 @@
 #include <vtkPointSet.h>
 #include <vtkPolyData.h>
 
-namespace smoab { namespace detail {
-
-//basic class that given a range of moab cells will convert them to a
-//vtk poly data. If given any high order cells will do a simple linearization
-//of the cells
-class LoadPoly
+namespace smoab
 {
-  moab::Interface* Interface;
-  smoab::detail::LinearCellConnectivity CellConn;
-  smoab::Range Points;
+namespace detail
+{
 
-public:
-  //----------------------------------------------------------------------------
-  //warning cells input to constructor is held by reference
-  LoadPoly(const smoab::Range& cells,
-           const smoab::Interface& interface):
-    Interface(interface.Moab),
-    CellConn(cells,interface.Moab),
-    Points()
+    //basic class that given a range of moab cells will convert them to a
+    //vtk poly data. If given any high order cells will do a simple linearization
+    //of the cells
+    class LoadPoly
     {
-    }
+        moab::Interface* Interface;
+        smoab::detail::LinearCellConnectivity CellConn;
+        smoab::Range Points;
 
-  const smoab::Range& moabPoints() const { return this->Points; }
+      public:
+        //----------------------------------------------------------------------------
+        //warning cells input to constructor is held by reference
+        LoadPoly( const smoab::Range& cells, const smoab::Interface& interface )
+            : Interface( interface.Moab ), CellConn( cells, interface.Moab ), Points()
+        {
+        }
 
-  //----------------------------------------------------------------------------
-  //todo: have support for using only a subsection of the input cells
-  void fill(vtkPolyData *dataSet)
-    {
-    //now that CellConn has all the cells properly stored, lets fixup
-    //the ids so that they start at zero and keep the same logical ordering
-    //as before.
-    vtkIdType numCells, connLen;
-    this->CellConn.compactIds(numCells,connLen);
-    this->addGridsTopology(dataSet,numCells,connLen);
-    this->addCoordinates(dataSet);
-    }
+        const smoab::Range& moabPoints() const
+        {
+            return this->Points;
+        }
 
-private:
-  //----------------------------------------------------------------------------
-  void addCoordinates(vtkPointSet *grid)
-    {
-    //this is sorta of hackish as moabPoints is only valid
-    //after compactIds has been called
-    this->CellConn.moabPoints(this->Points);
+        //----------------------------------------------------------------------------
+        //todo: have support for using only a subsection of the input cells
+        void fill( vtkPolyData* dataSet )
+        {
+            //now that CellConn has all the cells properly stored, lets fixup
+            //the ids so that they start at zero and keep the same logical ordering
+            //as before.
+            vtkIdType numCells, connLen;
+            this->CellConn.compactIds( numCells, connLen );
+            this->addGridsTopology( dataSet, numCells, connLen );
+            this->addCoordinates( dataSet );
+        }
 
-    //since the smoab::range are always unique and sorted
-    //we can use the more efficient coords_iterate
-    //call in moab, which returns moab internal allocated memory
-    vtkNew<vtkPoints> newPoints;
-    newPoints->SetDataTypeToDouble();
-    newPoints->SetNumberOfPoints(this->Points.size());
+      private:
+        //----------------------------------------------------------------------------
+        void addCoordinates( vtkPointSet* grid )
+        {
+            //this is sorta of hackish as moabPoints is only valid
+            //after compactIds has been called
+            this->CellConn.moabPoints( this->Points );
 
-    //need a pointer to the allocated vtkPoints memory so that we
-    //don't need to use an extra copy and we can bypass all vtk's check
-    //on out of bounds
-    double *rawPoints = static_cast<double*>(newPoints->GetVoidPointer(0));
-    this->Interface->get_coords(this->Points,rawPoints);
+            //since the smoab::range are always unique and sorted
+            //we can use the more efficient coords_iterate
+            //call in moab, which returns moab internal allocated memory
+            vtkNew< vtkPoints > newPoints;
+            newPoints->SetDataTypeToDouble();
+            newPoints->SetNumberOfPoints( this->Points.size() );
 
-    grid->SetPoints(newPoints.GetPointer());
-    }
+            //need a pointer to the allocated vtkPoints memory so that we
+            //don't need to use an extra copy and we can bypass all vtk's check
+            //on out of bounds
+            double* rawPoints = static_cast< double* >( newPoints->GetVoidPointer( 0 ) );
+            this->Interface->get_coords( this->Points, rawPoints );
 
-  //----------------------------------------------------------------------------
-  void addGridsTopology(vtkPolyData* data,
-                        vtkIdType numCells,
-                        vtkIdType numConnectivity) const
-    {
-    //correct the connectivity size to account for the vtk padding
-    const vtkIdType vtkConnectivity = numCells + numConnectivity;
+            grid->SetPoints( newPoints.GetPointer() );
+        }
 
-    vtkNew<vtkIdTypeArray> cellArray;
-    cellArray->SetNumberOfValues(vtkConnectivity);
+        //----------------------------------------------------------------------------
+        void addGridsTopology( vtkPolyData* data, vtkIdType numCells, vtkIdType numConnectivity ) const
+        {
+            //correct the connectivity size to account for the vtk padding
+            const vtkIdType vtkConnectivity = numCells + numConnectivity;
 
-    vtkIdType* rawArray = static_cast<vtkIdType*>(cellArray->GetVoidPointer(0));
-    this->CellConn.copyToVtkCellInfo(rawArray);
+            vtkNew< vtkIdTypeArray > cellArray;
+            cellArray->SetNumberOfValues( vtkConnectivity );
 
-    vtkNew<vtkCellArray> cells;
-    cells->SetCells(numCells,cellArray.GetPointer());
+            vtkIdType* rawArray = static_cast< vtkIdType* >( cellArray->GetVoidPointer( 0 ) );
+            this->CellConn.copyToVtkCellInfo( rawArray );
 
+            vtkNew< vtkCellArray > cells;
+            cells->SetCells( numCells, cellArray.GetPointer() );
 
-    data->SetPolys(cells.GetPointer());
-    }
-};
+            data->SetPolys( cells.GetPointer() );
+        }
+    };
 
+}  // namespace detail
+}  // namespace smoab
 
-} }
-
-#endif // __smoab_detail_LoadPoly_h
+#endif  // __smoab_detail_LoadPoly_h

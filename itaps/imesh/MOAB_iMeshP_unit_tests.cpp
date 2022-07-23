@@ -304,7 +304,9 @@ int create_mesh_in_memory( int rank, int size, iMesh_Instance imesh, iMeshP_Part
 /**\brief get unique identifier for each vertex */
 int vertex_tag( iMesh_Instance imesh, iBase_EntityHandle vertex, int& tag );
 
-int get_local_parts( iMesh_Instance instance, iMeshP_PartitionHandle prtn, std::vector< iMeshP_PartHandle >& handles,
+int get_local_parts( iMesh_Instance instance,
+                     iMeshP_PartitionHandle prtn,
+                     std::vector< iMeshP_PartHandle >& handles,
                      std::vector< iMeshP_Part >* ids = 0 )
 {
     iMeshP_PartHandle* arr = 0;
@@ -324,8 +326,11 @@ int get_local_parts( iMesh_Instance instance, iMeshP_PartitionHandle prtn, std::
     return iBase_SUCCESS;
 }
 
-static int get_entities( iMesh_Instance imesh, iBase_EntitySetHandle set, iBase_EntityType type,
-                         iMesh_EntityTopology topo, std::vector< iBase_EntityHandle >& entities )
+static int get_entities( iMesh_Instance imesh,
+                         iBase_EntitySetHandle set,
+                         iBase_EntityType type,
+                         iMesh_EntityTopology topo,
+                         std::vector< iBase_EntityHandle >& entities )
 {
     iBase_EntityHandle* array = 0;
     int junk = 0, size = 0, err;
@@ -340,7 +345,8 @@ static int get_entities( iMesh_Instance imesh, iBase_EntitySetHandle set, iBase_
     return err;
 }
 
-static int get_part_quads_and_verts( iMesh_Instance imesh, iMeshP_PartHandle part,
+static int get_part_quads_and_verts( iMesh_Instance imesh,
+                                     iMeshP_PartHandle part,
                                      std::vector< iBase_EntityHandle >& elems,
                                      std::vector< iBase_EntityHandle >& verts )
 {
@@ -399,11 +405,17 @@ int run_test( int ( *func )( iMesh_Instance, iMeshP_PartitionHandle, const PartM
     PartMap map;
 
 #ifdef MOAB_HAVE_HDF5
-    if( rank == 0 ) { ierr = create_mesh( FILENAME, size ); }
+    if( rank == 0 )
+    {
+        ierr = create_mesh( FILENAME, size );
+    }
     MPI_Bcast( &ierr, 1, MPI_INT, 0, MPI_COMM_WORLD );
     if( ierr )
     {
-        if( rank == 0 ) { std::cerr << "Failed to create input test file on root processor.  Aborting." << std::endl; }
+        if( rank == 0 )
+        {
+            std::cerr << "Failed to create input test file on root processor.  Aborting." << std::endl;
+        }
         abort();
     }
 
@@ -425,7 +437,10 @@ int run_test( int ( *func )( iMesh_Instance, iMeshP_PartitionHandle, const PartM
     MPI_Bcast( &ierr, 1, MPI_INT, 0, MPI_COMM_WORLD );
     if( ierr )
     {
-        if( rank == 0 ) { std::cerr << "Failed to create mesh.  Aborting." << std::endl; }
+        if( rank == 0 )
+        {
+            std::cerr << "Failed to create mesh.  Aborting." << std::endl;
+        }
         abort();
     }
 
@@ -661,7 +676,10 @@ int create_mesh( const char* filename, int num_parts )
 
     return 0;
 }
-int create_mesh_in_memory( int rank, int num_parts, iMesh_Instance imesh, iMeshP_PartitionHandle& partition,
+int create_mesh_in_memory( int rank,
+                           int num_parts,
+                           iMesh_Instance imesh,
+                           iMeshP_PartitionHandle& partition,
                            PartMap& map )
 {
     const char* tagname = "GLOBAL_ID";
@@ -1335,7 +1353,10 @@ int test_get_neighbors( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
             bad_length = true;
             break;
         }
-        if( count_arr[i] != (int)neighbors[i].size() ) { invalid.push_back( local_parts[i] ); }
+        if( count_arr[i] != (int)neighbors[i].size() )
+        {
+            invalid.push_back( local_parts[i] );
+        }
         else
         {
             std::vector< iMeshP_Part >::iterator e = j + count_arr[i];
@@ -1364,8 +1385,12 @@ int test_get_neighbors( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
 // Returns no vertices for non-adjacient parts and fails if both parts
 // are the same.
 // See create_mesh(..) for the assumed mesh.
-static int interface_verts( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, iMeshP_PartHandle local_part,
-                            iMeshP_Part other_part, const PartMap& map, std::vector< iBase_EntityHandle >& vtx_handles )
+static int interface_verts( iMesh_Instance imesh,
+                            iMeshP_PartitionHandle prtn,
+                            iMeshP_PartHandle local_part,
+                            iMeshP_Part other_part,
+                            const PartMap& map,
+                            std::vector< iBase_EntityHandle >& vtx_handles )
 {
     int ierr, rank;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank );
@@ -1706,7 +1731,10 @@ int test_part_boundary_iter( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, 
             // test single entity iterator
             iBase_EntityIterator siter;
             iMeshP_initPartBdryEntIter( imesh, prtn, local_handle, iBase_VERTEX, iMesh_POINT, other_id, &siter, &ierr );
-            if( ierr != iBase_SUCCESS ) { single_error.push_back( part_pair ); }
+            if( ierr != iBase_SUCCESS )
+            {
+                single_error.push_back( part_pair );
+            }
             else
             {
                 std::vector< iBase_EntityHandle > results;
@@ -2041,8 +2069,11 @@ int test_entity_owner( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const 
     return ierr;
 }
 
-static int get_part_boundary_verts( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const PartMap& map,
-                                    iMeshP_PartHandle part, std::vector< iBase_EntityHandle >& boundary )
+static int get_part_boundary_verts( iMesh_Instance imesh,
+                                    iMeshP_PartitionHandle prtn,
+                                    const PartMap& map,
+                                    iMeshP_PartHandle part,
+                                    std::vector< iBase_EntityHandle >& boundary )
 {
     int ierr, logical_id;
     ierr = map.part_from_coords( imesh, part, logical_id );CHKERR;
@@ -2377,7 +2408,7 @@ int test_entity_copies( iMesh_Instance imesh, iMeshP_PartitionHandle prtn, const
     for( size_t i = 0; i < global_data.size(); i += 3 )
     {
         int tag                   = (int)(size_t)global_data[i];
-        iMeshP_Part part          = ( iMeshP_Part )(size_t)global_data[i + 1];
+        iMeshP_Part part          = (iMeshP_Part)(size_t)global_data[i + 1];
         iBase_EntityHandle handle = global_data[i + 2];
         vtx_sharing[tag].parts.push_back( part );
         vtx_sharing[tag].handles.push_back( handle );
@@ -2503,7 +2534,8 @@ int get_boundary_vertices( iMesh_Instance imesh, std::vector< iBase_EntityHandle
     return iBase_SUCCESS;
 }
 
-int check_one_layer( iMesh_Instance imesh, iBase_EntityHandle vtx,
+int check_one_layer( iMesh_Instance imesh,
+                     iBase_EntityHandle vtx,
                      const std::vector< iBase_EntityHandle >& sorted_vertices )
 {
     int ierr;
@@ -2525,8 +2557,10 @@ int check_one_layer( iMesh_Instance imesh, iBase_EntityHandle vtx,
 
 // get number of adjacent quads to each vertex, both on the local
 // processor and in the entire mesh
-int get_num_adj_all( iMesh_Instance imesh, const std::vector< iBase_EntityHandle >& verts,
-                     std::vector< int >& num_local_adj, std::vector< int >& num_all_adj )
+int get_num_adj_all( iMesh_Instance imesh,
+                     const std::vector< iBase_EntityHandle >& verts,
+                     std::vector< int >& num_local_adj,
+                     std::vector< int >& num_all_adj )
 {
     int ierr, size;
     MPI_Comm_size( MPI_COMM_WORLD, &size );

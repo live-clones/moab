@@ -128,7 +128,9 @@ void IdealTargetTest::test_hex_center()
     do_test( HEXAHEDRON, Sample( 3, 0 ) );
 }
 
-void IdealTargetTest::get_calc_target( EntityTopology type, Sample location, MsqMatrix< 3, 3 >& w3,
+void IdealTargetTest::get_calc_target( EntityTopology type,
+                                       Sample location,
+                                       MsqMatrix< 3, 3 >& w3,
                                        MsqMatrix< 2, 2 >& w2 )
 {
     MsqPrintError err( std::cout );
@@ -150,7 +152,9 @@ void IdealTargetTest::get_calc_target( EntityTopology type, Sample location, Msq
     CPPUNIT_ASSERT( !MSQ_CHKERR( err ) );
 }
 
-void IdealTargetTest::get_ideal_target( EntityTopology type, Sample location, MsqMatrix< 3, 3 >& w3,
+void IdealTargetTest::get_ideal_target( EntityTopology type,
+                                        Sample location,
+                                        MsqMatrix< 3, 3 >& w3,
                                         MsqMatrix< 2, 2 >& w2 )
 {
     MsqPrintError err( std::cout );

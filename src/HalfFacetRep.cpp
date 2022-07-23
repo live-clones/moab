@@ -96,8 +96,7 @@ const HalfFacetRep::adj_matrix HalfFacetRep::adjMatrix[7] = {
     { { { 0, 0, 1, 1 }, { 0, 0, 0, 0 }, { 1, 0, 1, 1 }, { 1, 0, 1, 1 } } },
 
     // VOLUME_MIXED
-    { { { 0, 1, 1, 1 }, { 1, 1, 1, 1 }, { 1, 1, 1, 1 }, { 1, 1, 1, 1 } } }
-};
+    { { { 0, 1, 1, 1 }, { 1, 1, 1, 1 }, { 1, 1, 1, 1 }, { 1, 1, 1, 1 } } } };
 
 int HalfFacetRep::get_index_for_meshtype( MESHTYPE mesh_type )
 {
@@ -487,7 +486,8 @@ ErrorCode HalfFacetRep::print_tags( int dim )
  *      User interface for adjacency functions            *
  ********************************************************/
 
-ErrorCode HalfFacetRep::get_adjacencies( const EntityHandle source_entity, const unsigned int target_dimension,
+ErrorCode HalfFacetRep::get_adjacencies( const EntityHandle source_entity,
+                                         const unsigned int target_dimension,
                                          std::vector< EntityHandle >& target_entities )
 {
 
@@ -525,7 +525,9 @@ ErrorCode HalfFacetRep::get_adjacencies( const EntityHandle source_entity, const
     return MB_SUCCESS;
 }
 
-ErrorCode HalfFacetRep::get_up_adjacencies( EntityHandle ent, int out_dim, std::vector< EntityHandle >& adjents,
+ErrorCode HalfFacetRep::get_up_adjacencies( EntityHandle ent,
+                                            int out_dim,
+                                            std::vector< EntityHandle >& adjents,
                                             std::vector< int >* lids )
 {
     ErrorCode error;
@@ -724,14 +726,18 @@ ErrorCode HalfFacetRep::determine_incident_halfverts( Range& edges )
 
             HFacet hf        = v2hv[vidx];
             EntityHandle eid = fid_from_halfacet( hf, MBEDGE );
-            if( eid == 0 ) { v2hv[vidx] = create_halffacet( cur_eid, i ); }
+            if( eid == 0 )
+            {
+                v2hv[vidx] = create_halffacet( cur_eid, i );
+            }
         }
     }
 
     return MB_SUCCESS;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ErrorCode HalfFacetRep::get_up_adjacencies_1d( EntityHandle vid, std::vector< EntityHandle >& adjents,
+ErrorCode HalfFacetRep::get_up_adjacencies_1d( EntityHandle vid,
+                                               std::vector< EntityHandle >& adjents,
                                                std::vector< int >* lvids )
 {
     adjents.clear();
@@ -819,8 +825,7 @@ const HalfFacetRep::LocalMaps2D HalfFacetRep::lConnMap2D[2] = {
     // Triangle
     { 3, { 1, 2, 0 }, { 2, 0, 1 } },
     // Quad
-    { 4, { 1, 2, 3, 0 }, { 3, 0, 1, 2 } }
-};
+    { 4, { 1, 2, 3, 0 }, { 3, 0, 1, 2 } } };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ErrorCode HalfFacetRep::determine_sibling_halfedges( Range& faces )
@@ -1011,8 +1016,12 @@ ErrorCode HalfFacetRep::determine_incident_halfedges( Range& faces )
 }
 
 ///////////////////////////////////////////////////////////////////
-ErrorCode HalfFacetRep::mark_halfedges( EntityHandle vid, EntityHandle he_fid, int he_lid, Range& faces,
-                                        std::vector< char >& markHEdgs, HFacet& bnd_hf )
+ErrorCode HalfFacetRep::mark_halfedges( EntityHandle vid,
+                                        EntityHandle he_fid,
+                                        int he_lid,
+                                        Range& faces,
+                                        std::vector< char >& markHEdgs,
+                                        HFacet& bnd_hf )
 {
     ErrorCode error;
     EntityType ftype = mb->type_from_handle( he_fid );
@@ -1155,7 +1164,8 @@ ErrorCode HalfFacetRep::get_up_adjacencies_vert_2d( EntityHandle vid, std::vecto
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ErrorCode HalfFacetRep::get_up_adjacencies_2d( EntityHandle eid, std::vector< EntityHandle >& adjents,
+ErrorCode HalfFacetRep::get_up_adjacencies_2d( EntityHandle eid,
+                                               std::vector< EntityHandle >& adjents,
                                                std::vector< int >* leids )
 {
 
@@ -1178,8 +1188,11 @@ ErrorCode HalfFacetRep::get_up_adjacencies_2d( EntityHandle eid, std::vector< En
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ErrorCode HalfFacetRep::get_up_adjacencies_2d( EntityHandle fid, int leid, bool add_inent,
-                                               std::vector< EntityHandle >& adj_ents, std::vector< int >* adj_leids,
+ErrorCode HalfFacetRep::get_up_adjacencies_2d( EntityHandle fid,
+                                               int leid,
+                                               bool add_inent,
+                                               std::vector< EntityHandle >& adj_ents,
+                                               std::vector< int >* adj_leids,
                                                std::vector< int >* adj_orients )
 {
     // Given an implicit half-edge <fid, leid>, find the incident half-edges.
@@ -1376,7 +1389,10 @@ ErrorCode HalfFacetRep::gather_halfedges( EntityHandle vid, EntityHandle he_fid,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ErrorCode HalfFacetRep::another_halfedge( EntityHandle vid, EntityHandle he_fid, int he_lid, EntityHandle* he2_fid,
+ErrorCode HalfFacetRep::another_halfedge( EntityHandle vid,
+                                          EntityHandle he_fid,
+                                          int he_lid,
+                                          EntityHandle* he2_fid,
                                           int* he2_lid )
 {
     ErrorCode error;
@@ -1396,8 +1412,12 @@ ErrorCode HalfFacetRep::another_halfedge( EntityHandle vid, EntityHandle he_fid,
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool HalfFacetRep::collect_and_compare( const EntityHandle vid, const EntityHandle* edg_vert, int* qsize, int* count,
-                                        EntityHandle* he_fid, int* he_lid )
+bool HalfFacetRep::collect_and_compare( const EntityHandle vid,
+                                        const EntityHandle* edg_vert,
+                                        int* qsize,
+                                        int* count,
+                                        EntityHandle* he_fid,
+                                        int* he_lid )
 {
     ErrorCode error;
     EntityType ftype = mb->type_from_handle( *_faces.begin() );
@@ -1701,8 +1721,7 @@ const HalfFacetRep::LocalMaps3D HalfFacetRep::lConnMap3D[4] = {
         { -1, -1, -1, 7, 11, -1, 10, -1 } },
       { 4, 0, 2, 5, 7 },
       { 0, 6 },
-      { { 3, 1, 3, 4 }, { 3, 1, 3, 6 }, { 3, 1, 4, 6 }, { 3, 3, 6, 4 } } }
-};
+      { { 3, 1, 3, 4 }, { 3, 1, 3, 6 }, { 3, 1, 4, 6 }, { 3, 3, 6, 4 } } } };
 
 //////////////////////////////////////////////////////////////////////////////////
 ErrorCode HalfFacetRep::determine_sibling_halffaces( Range& cells )
@@ -1938,8 +1957,11 @@ ErrorCode HalfFacetRep::determine_border_vertices( Range& cells, Tag isborder )
 }
 
 /////////////////////////////////////////////////////////////////////////
-ErrorCode HalfFacetRep::add_cells_of_single_component( EntityHandle vid, EntityHandle curcid, int curlid,
-                                                       std::multimap< EntityHandle, EntityHandle >& comps, HFacet& hf )
+ErrorCode HalfFacetRep::add_cells_of_single_component( EntityHandle vid,
+                                                       EntityHandle curcid,
+                                                       int curlid,
+                                                       std::multimap< EntityHandle, EntityHandle >& comps,
+                                                       HFacet& hf )
 {
     ErrorCode error;
     EntityType ctype = mb->type_from_handle( curcid );
@@ -2020,7 +2042,8 @@ ErrorCode HalfFacetRep::add_cells_of_single_component( EntityHandle vid, EntityH
     return MB_SUCCESS;
 }
 
-bool HalfFacetRep::find_cell_in_component( EntityHandle vid, EntityHandle cell,
+bool HalfFacetRep::find_cell_in_component( EntityHandle vid,
+                                           EntityHandle cell,
                                            std::multimap< EntityHandle, EntityHandle >& comps )
 {
     bool found = false;
@@ -2139,7 +2162,8 @@ ErrorCode HalfFacetRep::get_up_adjacencies_vert_3d( EntityHandle vid, std::vecto
     return MB_SUCCESS;
 }
 
-ErrorCode HalfFacetRep::get_up_adjacencies_edg_3d( EntityHandle eid, std::vector< EntityHandle >& adjents,
+ErrorCode HalfFacetRep::get_up_adjacencies_edg_3d( EntityHandle eid,
+                                                   std::vector< EntityHandle >& adjents,
                                                    std::vector< int >* leids )
 {
     ErrorCode error;
@@ -2271,8 +2295,11 @@ ErrorCode HalfFacetRep::get_up_adjacencies_edg_3d( EntityHandle eid, std::vector
     return MB_SUCCESS;
 }
 
-ErrorCode HalfFacetRep::get_up_adjacencies_edg_3d( EntityHandle cid, int leid, std::vector< EntityHandle >& adjents,
-                                                   std::vector< int >* leids, std::vector< int >* adj_orients )
+ErrorCode HalfFacetRep::get_up_adjacencies_edg_3d( EntityHandle cid,
+                                                   int leid,
+                                                   std::vector< EntityHandle >& adjents,
+                                                   std::vector< int >* leids,
+                                                   std::vector< int >* adj_orients )
 {
     ErrorCode error;
     EntityType ctype = mb->type_from_handle( cid );
@@ -2425,8 +2452,10 @@ ErrorCode HalfFacetRep::get_up_adjacencies_edg_3d( EntityHandle cid, int leid, s
     return MB_SUCCESS;
 }
 
-ErrorCode HalfFacetRep::get_up_adjacencies_edg_3d_comp( EntityHandle cid, int leid,
-                                                        std::vector< EntityHandle >& adjents, std::vector< int >* leids,
+ErrorCode HalfFacetRep::get_up_adjacencies_edg_3d_comp( EntityHandle cid,
+                                                        int leid,
+                                                        std::vector< EntityHandle >& adjents,
+                                                        std::vector< int >* leids,
                                                         std::vector< int >* adj_orients )
 {
     ErrorCode error;
@@ -2570,7 +2599,8 @@ ErrorCode HalfFacetRep::get_up_adjacencies_edg_3d_comp( EntityHandle cid, int le
     return MB_SUCCESS;
 }
 
-ErrorCode HalfFacetRep::get_up_adjacencies_face_3d( EntityHandle fid, std::vector< EntityHandle >& adjents,
+ErrorCode HalfFacetRep::get_up_adjacencies_face_3d( EntityHandle fid,
+                                                    std::vector< EntityHandle >& adjents,
                                                     std::vector< int >* lfids )
 {
     ErrorCode error;
@@ -2587,7 +2617,9 @@ ErrorCode HalfFacetRep::get_up_adjacencies_face_3d( EntityHandle fid, std::vecto
     return MB_SUCCESS;
 }
 
-ErrorCode HalfFacetRep::get_up_adjacencies_face_3d( EntityHandle cid, int lfid, std::vector< EntityHandle >& adjents,
+ErrorCode HalfFacetRep::get_up_adjacencies_face_3d( EntityHandle cid,
+                                                    int lfid,
+                                                    std::vector< EntityHandle >& adjents,
                                                     std::vector< int >* lfids )
 {
 
@@ -2619,7 +2651,8 @@ ErrorCode HalfFacetRep::get_up_adjacencies_face_3d( EntityHandle cid, int lfid, 
     return MB_SUCCESS;
 }
 
-bool HalfFacetRep::find_matching_implicit_edge_in_cell( EntityHandle eid, std::vector< EntityHandle >& cid,
+bool HalfFacetRep::find_matching_implicit_edge_in_cell( EntityHandle eid,
+                                                        std::vector< EntityHandle >& cid,
                                                         std::vector< int >& leid )
 {
     ErrorCode error;
@@ -3102,7 +3135,10 @@ ErrorCode HalfFacetRep::find_total_edges_faces_3d( const Range& cells, int* nedg
     return MB_SUCCESS;
 }
 
-bool HalfFacetRep::find_match_in_array( EntityHandle ent, EntityHandle* ent_list, int count, bool get_index,
+bool HalfFacetRep::find_match_in_array( EntityHandle ent,
+                                        EntityHandle* ent_list,
+                                        int count,
+                                        bool get_index,
                                         int* index )
 {
     bool found = false;
@@ -3119,8 +3155,11 @@ bool HalfFacetRep::find_match_in_array( EntityHandle ent, EntityHandle* ent_list
     return found;
 }
 
-ErrorCode HalfFacetRep::get_half_facet_in_comp( EntityHandle cid, int leid, std::vector< EntityHandle >& ents,
-                                                std::vector< int >& lids, std::vector< int >& lfids )
+ErrorCode HalfFacetRep::get_half_facet_in_comp( EntityHandle cid,
+                                                int leid,
+                                                std::vector< EntityHandle >& ents,
+                                                std::vector< int >& lids,
+                                                std::vector< int >& lfids )
 {
     ErrorCode error;
     ents.clear();
@@ -3234,8 +3273,14 @@ ErrorCode HalfFacetRep::get_half_facet_in_comp( EntityHandle cid, int leid, std:
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-ErrorCode HalfFacetRep::resize_hf_maps( EntityHandle start_vert, int nverts, EntityHandle start_edge, int nedges,
-                                        EntityHandle start_face, int nfaces, EntityHandle start_cell, int ncells )
+ErrorCode HalfFacetRep::resize_hf_maps( EntityHandle start_vert,
+                                        int nverts,
+                                        EntityHandle start_edge,
+                                        int nedges,
+                                        EntityHandle start_face,
+                                        int nfaces,
+                                        EntityHandle start_cell,
+                                        int ncells )
 {
     int nwsz = 0, insz = 0;
     if( nedges )
@@ -3329,7 +3374,10 @@ bool HalfFacetRep::check_nonmanifold_vertices( EntityType type, EntityHandle vid
     return status;
 }
 
-ErrorCode HalfFacetRep::get_sibling_map( EntityType type, EntityHandle ent, EntityHandle* sib_entids, int* sib_lids,
+ErrorCode HalfFacetRep::get_sibling_map( EntityType type,
+                                         EntityHandle ent,
+                                         EntityHandle* sib_entids,
+                                         int* sib_lids,
                                          int num_halffacets )
 {
 
@@ -3377,7 +3425,10 @@ ErrorCode HalfFacetRep::get_sibling_map( EntityType type, EntityHandle ent, Enti
     return MB_SUCCESS;
 }
 
-ErrorCode HalfFacetRep::get_sibling_map( EntityType type, EntityHandle ent, int lid, EntityHandle& sib_entid,
+ErrorCode HalfFacetRep::get_sibling_map( EntityType type,
+                                         EntityHandle ent,
+                                         int lid,
+                                         EntityHandle& sib_entid,
                                          int& sib_lid )
 {
 
@@ -3408,7 +3459,10 @@ ErrorCode HalfFacetRep::get_sibling_map( EntityType type, EntityHandle ent, int 
     return MB_SUCCESS;
 }
 
-ErrorCode HalfFacetRep::set_sibling_map( EntityType type, EntityHandle ent, EntityHandle* set_entids, int* set_lids,
+ErrorCode HalfFacetRep::set_sibling_map( EntityType type,
+                                         EntityHandle ent,
+                                         EntityHandle* set_entids,
+                                         int* set_lids,
                                          int num_halffacets )
 {
 
@@ -3449,7 +3503,10 @@ ErrorCode HalfFacetRep::set_sibling_map( EntityType type, EntityHandle ent, Enti
     return MB_SUCCESS;
 }
 
-ErrorCode HalfFacetRep::set_sibling_map( EntityType type, EntityHandle ent, int lid, EntityHandle& set_entid,
+ErrorCode HalfFacetRep::set_sibling_map( EntityType type,
+                                         EntityHandle ent,
+                                         int lid,
+                                         EntityHandle& set_entid,
                                          int& set_lid )
 {
 
@@ -3475,7 +3532,9 @@ ErrorCode HalfFacetRep::set_sibling_map( EntityType type, EntityHandle ent, int 
     return MB_SUCCESS;
 }
 
-ErrorCode HalfFacetRep::get_incident_map( EntityType type, EntityHandle vid, std::vector< EntityHandle >& inci_entid,
+ErrorCode HalfFacetRep::get_incident_map( EntityType type,
+                                          EntityHandle vid,
+                                          std::vector< EntityHandle >& inci_entid,
                                           std::vector< int >& inci_lid )
 {
     inci_entid.clear();
@@ -3545,10 +3604,15 @@ ErrorCode HalfFacetRep::get_incident_map( EntityType type, EntityHandle vid, std
     return MB_SUCCESS;
 }
 
-ErrorCode HalfFacetRep::set_incident_map( EntityType type, EntityHandle vid, std::vector< EntityHandle >& set_entid,
+ErrorCode HalfFacetRep::set_incident_map( EntityType type,
+                                          EntityHandle vid,
+                                          std::vector< EntityHandle >& set_entid,
                                           std::vector< int >& set_lid )
 {
-    if( type == MBEDGE ) { v2hv[ID_FROM_HANDLE( vid ) - 1] = create_halffacet( set_entid[0], set_lid[0] ); }
+    if( type == MBEDGE )
+    {
+        v2hv[ID_FROM_HANDLE( vid ) - 1] = create_halffacet( set_entid[0], set_lid[0] );
+    }
     else if( type == MBTRI || type == MBQUAD )
     {
         if( set_entid.size() == 1 )
@@ -3570,7 +3634,10 @@ ErrorCode HalfFacetRep::set_incident_map( EntityType type, EntityHandle vid, std
         else
         {
             HFacet hf = v2hf[ID_FROM_HANDLE( vid ) - 1];
-            if( hf != 0 ) { v2hf[ID_FROM_HANDLE( vid ) - 1] = 0; }
+            if( hf != 0 )
+            {
+                v2hf[ID_FROM_HANDLE( vid ) - 1] = 0;
+            }
             for( int i = 0; i < (int)set_entid.size(); i++ )
             {
                 hf = create_halffacet( set_entid[i], set_lid[i] );
