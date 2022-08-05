@@ -1887,9 +1887,9 @@ ErrCode iMOAB_SetDoubleTagStorageWithGid( iMOAB_AppID pid,
         // send the data to the other processors:
         ( pco->proc_config().crystal_router() )->gs_transfer( 1, TLsend, 0 );
         TupleList TLreq;
-        TLreq.initialize( 2, 0, 0, 0, nbLocalVals );
+        TLreq.initialize( 2, 0, 0, 0, nents_to_be_set );
         TLreq.enableWriteAccess();
-        for( int i = 0; i < nbLocalVals; i++ )
+        for( int i = 0; i < nents_to_be_set; i++ )
         {
             // to proc, marker
             int marker             = gids[i];
