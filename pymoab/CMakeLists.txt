@@ -78,9 +78,10 @@ endif()
   SET(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/build")
 
   # python setuptools build/install local version of pymoab for testing
+  # add test install path to PYTHONPATH for compatibility with newer versions of pip/setuptools
   ADD_CUSTOM_TARGET(pymoab-local-install ALL
     COMMAND export CFLAGS='-w' &&
-    ${PYTHON_EXECUTABLE} -m pip install -e . --prefix ${CMAKE_CURRENT_BINARY_DIR}
+    PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:${PYTHONPATH} ${PYTHON_EXECUTABLE} -m pip install -e . --prefix ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS ${DEPS} MOAB)
 
   # move pymoab egg into the correct location for a --user setuptools install based on username
@@ -88,6 +89,5 @@ endif()
   SET(INSTALL_SCRIPT    "${CMAKE_CURRENT_BINARY_DIR}/install.sh")
   CONFIGURE_FILE(${INSTALL_SCRIPT_IN} ${INSTALL_SCRIPT})
   INSTALL(CODE "EXECUTE_PROCESS(COMMAND bash ${INSTALL_SCRIPT})")
-#  INSTALL(DIRECTORY ${PYMOAB_PREINSTALL_INSTALL_PATH} DESTINATION ${PYMOAB_INSTALL_PREFIX} )
 
 endif()
