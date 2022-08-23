@@ -81,7 +81,7 @@ endif()
   # add test install path to PYTHONPATH for compatibility with newer versions of pip/setuptools
   ADD_CUSTOM_TARGET(pymoab-local-install ALL
     COMMAND export CFLAGS='-w' &&
-    ${PYTHON_EXECUTABLE} -m pip install -e .
+    PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:${PYTHONPATH} ${PYTHON_EXECUTABLE} -m pip install -e . --prefix ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS ${DEPS} MOAB)
 
   # move pymoab egg into the correct location for a --user setuptools install based on username
