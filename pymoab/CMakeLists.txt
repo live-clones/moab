@@ -78,6 +78,7 @@ endif()
   SET(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/build")
 
   # python setuptools build/install local version of pymoab for testing
+  # add test install path to PYTHONPATH for compatibility with newer versions of pip/setuptools
   ADD_CUSTOM_TARGET(pymoab-local-install ALL
     COMMAND export CFLAGS='-w' &&
     ${PYTHON_EXECUTABLE} -m pip install -e .
