@@ -114,7 +114,7 @@ endif
 
 IMOAB_TESTS =
 if ENABLE_FORTRAN
-   IMOAB_TESTS += imoab_ptest imoab_ptest2 imoab_setwithGid
+   IMOAB_TESTS += imoab_ptest imoab_ptest2
 if HAVE_TEMPESTREMAP
 IMOAB_TESTS += imoab_coupler_fortran
 imoab_ptest_LDADD = $(LDADD) $(TEMPESTREMAP_LIBS) $(FCLIBS)
@@ -124,6 +124,10 @@ else
 imoab_ptest_LDADD = $(LDADD) $(FCLIBS)
 imoab_ptest2_LDADD = $(LDADD) $(FCLIBS)
 endif
+endif
+
+if HAVE_HDF5_PARALLEL
+ IMOAB_TESTS += imoab_setwithGid
 endif
 
 IMESH_TESTS =
