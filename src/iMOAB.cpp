@@ -3356,7 +3356,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join,
             appData& dataIntx      = context.appDatas[*pid_intx];
             EntityHandle cover_set = dataIntx.tempestData.remapper->GetMeshSet( Remapper::CoveringMesh );
             recvGraph1->set_cover_set( cover_set );
-            context.appDatas[*pid_migr].pgraph[*context_id] = recvGraph1;
+            context.appDatas[*pid_migr].pgraph[*context_id] = recvGraph1; // possible memory leak if context_id is same
         }
         for( std::map< int, std::set< int > >::iterator mit = idsFromProcs.begin(); mit != idsFromProcs.end(); mit++ )
         {
