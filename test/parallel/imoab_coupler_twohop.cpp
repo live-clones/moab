@@ -469,7 +469,7 @@ int main( int argc, char* argv[] )
 
     const char* bottomFields          = "a2oTbot:a2oUbot:a2oVbot";
     const char* bottomProjectedFields = "a2oTbot_proj:a2oUbot_proj:a2oVbot_proj";
-    const char* bottomProjectedFields2 = "a2oT2bot_src:a2oU2bot_src:a2oV2bot_src";
+    const char* bottomSourceFields2 = "a2oT2bot_src:a2oU2bot_src:a2oV2bot_src";
     const char* bottomProjectedFields3 = "a2oT2bot_proj:a2oU2bot_proj:a2oV2bot_proj";
 
     if( couComm != MPI_COMM_NULL )
@@ -484,7 +484,7 @@ int main( int argc, char* argv[] )
         CHECKIERR( ierr, "failed to define the field tag a2oTbot_proj" );
 #endif
 #ifdef ENABLE_ATMCPLOCN_COUPLING
-        ierr = iMOAB_DefineTagStorage( cplAtm2PID, bottomProjectedFields2, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
+        ierr = iMOAB_DefineTagStorage( cplAtm2PID, bottomSourceFields2, &tagTypes[0], &atmCompNDoFs, &tagIndex[0] );
         CHECKIERR( ierr, "failed to define the field tag a2oT2bot_proj" );
         ierr = iMOAB_DefineTagStorage( cplOcnPID, bottomProjectedFields3, &tagTypes[1], &ocnCompNDoFs, &tagIndex[1] );
         CHECKIERR( ierr, "failed to define the field tag a2oT2bot_proj" );
@@ -545,7 +545,7 @@ int main( int argc, char* argv[] )
             for( int k = 0; k < storLeng; k++ )
                 vals[k] = 0.;
 
-            ierr = iMOAB_SetDoubleTagStorage( cplAtm2PID, bottomProjectedFields2, &storLeng, &eetype, &vals[0] );
+            ierr = iMOAB_SetDoubleTagStorage( cplAtm2PID, bottomSourceFields2, &storLeng, &eetype, &vals[0] );
             CHECKIERR( ierr, "cannot make tag nul" )
             // set the tag to 0
         }
@@ -722,7 +722,8 @@ int main( int argc, char* argv[] )
             CHECKIERR( ierr, "cannot send tag values" )
 
             // receive on atm on coupler pes, that was redistributed according to coverage
-            ierr = iMOAB_ReceiveElementTag( cplAtm2PID, bottomProjectedFields2, &couComm, &atm2ocnid );
+            // receive in the coverage mesh, basically
+            ierr = iMOAB_ReceiveElementTag( cplAtm2OcnPID, bottomSourceFields2, &couComm, &cplatm2 );
             CHECKIERR( ierr, "cannot receive tag values" )
         }
         POP_TIMER( MPI_COMM_WORLD, rankInGlobalComm )
@@ -730,17 +731,18 @@ int main( int argc, char* argv[] )
         // we can now free the sender buffers
         if( couComm != MPI_COMM_NULL )
         {
-            ierr = iMOAB_FreeSenderBuffers( cmpAtmPID, &cplocn );  // context is for ocean
+            ierr = iMOAB_FreeSenderBuffers( cplAtm2PID, &atm2ocnid );  // context is intx external id
             CHECKIERR( ierr, "cannot free buffers used to resend atm tag towards the coverage mesh" )
         }
 // #ifdef VERBOSE
-        if( couComm != MPI_COMM_NULL && 1 == n )
+        // we should not write this one, is should be the same as recvAtm2CoupFull above
+      /*  if( couComm != MPI_COMM_NULL && 1 == n )
         {  // write only for n==1 case
             char outputFileRecvd[] = "recvAtm2CoupOcnCtx.h5m";
             ierr                   = iMOAB_WriteMesh( cplAtm2PID, outputFileRecvd, fileWriteOptions );
             CHECKIERR( ierr, "could not write recvAtmCoupLnd.h5m to disk" )
         }
-// #endif
+// #endif*/
 
         if( couComm != MPI_COMM_NULL )
         {
@@ -748,7 +750,7 @@ int main( int argc, char* argv[] )
                on the source mesh and get the projection on the target mesh */
             PUSH_TIMER( "Apply Scalar projection weights" )
             ierr = iMOAB_ApplyScalarProjectionWeights( cplAtm2OcnPID, weights_identifiers[0].c_str(),
-                                                       bottomProjectedFields2, bottomProjectedFields3 );
+                                                       bottomSourceFields2, bottomProjectedFields3 );
             CHECKIERR( ierr, "failed to compute projection weight application" );
             POP_TIMER( couComm, rankInCouComm )
             if( 1 == n )  // write only for n==1 case
