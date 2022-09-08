@@ -2805,13 +2805,13 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1,
     ErrorCode rval = MB_SUCCESS;
     int localRank = 0, numProcs = 1;
 
-    appData& sData = context.appDatas[*pid1];
-    appData& tData = context.appDatas[*pid2];
+    bool isFortran = false;
+    if (*pid1>=0) isFortran = isFortran || context.appDatas[*pid1].is_fortran;
+    if (*pid2>=0) isFortran = isFortran || context.appDatas[*pid2].is_fortran;
 
-    MPI_Comm global =
-        ( ( sData.is_fortran || tData.is_fortran ) ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( join ) ) : *join );
-    MPI_Group srcGroup = ( sData.is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( group1 ) ) : *group1 );
-    MPI_Group tgtGroup = ( tData.is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( group2 ) ) : *group2 );
+    MPI_Comm global = ( isFortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( join ) ) : *join );
+    MPI_Group srcGroup = ( isFortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( group1 ) ) : *group1 );
+    MPI_Group tgtGroup = ( isFortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( group2 ) ) : *group2 );
 
     MPI_Comm_rank( global, &localRank );
     MPI_Comm_size( global, &numProcs );
@@ -2824,8 +2824,8 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1,
     if( *pid2 >= 0 ) cgraph_rev = new ParCommGraph( global, tgtGroup, srcGroup, *comp2, *comp1 );
     // we should search if we have another pcomm with the same comp ids in the list already
     // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
-    if( *pid1 >= 0 ) sData.pgraph[*comp2] = cgraph;      // the context will be the other comp
-    if( *pid2 >= 0 ) tData.pgraph[*comp1] = cgraph_rev;  // from 2 to 1
+    if( *pid1 >= 0 ) context.appDatas[*pid1].pgraph[*comp2] = cgraph;      // the context will be the other comp
+    if( *pid2 >= 0 ) context.appDatas[*pid2].pgraph[*comp1] = cgraph_rev;  // from 2 to 1
     // each model has a list of global ids that will need to be sent by gs to rendezvous the other
     // model on the joint comm
     TupleList TLcomp1;
