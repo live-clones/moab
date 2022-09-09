@@ -1534,18 +1534,12 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid,
     for( size_t i = 0; i < tagNames.size(); i++ )
     {
         rval = context.MBI->tag_get_handle( tagNames[i].c_str(), *components_per_entity, tagDataType, tagHandle,
-                                            tagType, defaultVal );
-
-        if( MB_TAG_NOT_FOUND == rval )
-        {
-            rval = context.MBI->tag_get_handle( tagNames[i].c_str(), *components_per_entity, tagDataType, tagHandle,
-                                                tagType | MB_TAG_CREAT, defaultVal );
-        }
+                                            tagType | MB_TAG_EXCL | MB_TAG_CREAT, defaultVal );
 
         if( MB_ALREADY_ALLOCATED == rval )
         {
             std::map< std::string, Tag >& mTags        = data.tagMap;
-            std::map< std::string, Tag >::iterator mit = mTags.find( tag_name );
+            std::map< std::string, Tag >::iterator mit = mTags.find( tagNames[i].c_str() );
 
             if( mit == mTags.end() )
             {
