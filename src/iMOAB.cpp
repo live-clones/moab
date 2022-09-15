@@ -1534,18 +1534,12 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid,
     for( size_t i = 0; i < tagNames.size(); i++ )
     {
         rval = context.MBI->tag_get_handle( tagNames[i].c_str(), *components_per_entity, tagDataType, tagHandle,
-                                            tagType, defaultVal );
-
-        if( MB_TAG_NOT_FOUND == rval )
-        {
-            rval = context.MBI->tag_get_handle( tagNames[i].c_str(), *components_per_entity, tagDataType, tagHandle,
-                                                tagType | MB_TAG_CREAT, defaultVal );
-        }
+                                            tagType | MB_TAG_EXCL | MB_TAG_CREAT, defaultVal );
 
         if( MB_ALREADY_ALLOCATED == rval )
         {
             std::map< std::string, Tag >& mTags        = data.tagMap;
-            std::map< std::string, Tag >::iterator mit = mTags.find( tag_name );
+            std::map< std::string, Tag >::iterator mit = mTags.find( tagNames[i].c_str() );
 
             if( mit == mTags.end() )
             {
@@ -2805,13 +2799,13 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1,
     ErrorCode rval = MB_SUCCESS;
     int localRank = 0, numProcs = 1;
 
-    appData& sData = context.appDatas[*pid1];
-    appData& tData = context.appDatas[*pid2];
+    bool isFortran = false;
+    if (*pid1>=0) isFortran = isFortran || context.appDatas[*pid1].is_fortran;
+    if (*pid2>=0) isFortran = isFortran || context.appDatas[*pid2].is_fortran;
 
-    MPI_Comm global =
-        ( ( sData.is_fortran || tData.is_fortran ) ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( join ) ) : *join );
-    MPI_Group srcGroup = ( sData.is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( group1 ) ) : *group1 );
-    MPI_Group tgtGroup = ( tData.is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( group2 ) ) : *group2 );
+    MPI_Comm global = ( isFortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( join ) ) : *join );
+    MPI_Group srcGroup = ( isFortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( group1 ) ) : *group1 );
+    MPI_Group tgtGroup = ( isFortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( group2 ) ) : *group2 );
 
     MPI_Comm_rank( global, &localRank );
     MPI_Comm_size( global, &numProcs );
@@ -2824,8 +2818,8 @@ ErrCode iMOAB_ComputeCommGraph( iMOAB_AppID pid1,
     if( *pid2 >= 0 ) cgraph_rev = new ParCommGraph( global, tgtGroup, srcGroup, *comp2, *comp1 );
     // we should search if we have another pcomm with the same comp ids in the list already
     // sort of check existing comm graphs in the map context.appDatas[*pid].pgraph
-    if( *pid1 >= 0 ) sData.pgraph[*comp2] = cgraph;      // the context will be the other comp
-    if( *pid2 >= 0 ) tData.pgraph[*comp1] = cgraph_rev;  // from 2 to 1
+    if( *pid1 >= 0 ) context.appDatas[*pid1].pgraph[*comp2] = cgraph;      // the context will be the other comp
+    if( *pid2 >= 0 ) context.appDatas[*pid2].pgraph[*comp1] = cgraph_rev;  // from 2 to 1
     // each model has a list of global ids that will need to be sent by gs to rendezvous the other
     // model on the joint comm
     TupleList TLcomp1;
@@ -3582,14 +3576,17 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1,
     assert( jointcomm );
     assert( groupA );
     assert( groupB );
+    bool is_fortran = false;
+    if (*pid1 >=0) is_fortran = context.appDatas[*pid1].is_fortran || is_fortran;
+    if (*pid2 >=0) is_fortran = context.appDatas[*pid2].is_fortran || is_fortran;
+    if (*pid3 >=0) is_fortran = context.appDatas[*pid3].is_fortran || is_fortran;
 
     MPI_Comm joint_communicator =
-        ( context.appDatas[*pid1].is_fortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( jointcomm ) )
-                                             : *jointcomm );
+        ( is_fortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( jointcomm ) ) : *jointcomm );
     MPI_Group group_first =
-        ( context.appDatas[*pid1].is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( groupA ) ) : *groupA );
+        ( is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( groupA ) ) : *groupA );
     MPI_Group group_second =
-        ( context.appDatas[*pid1].is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( groupB ) ) : *groupB );
+        ( is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( groupB ) ) : *groupB );
 
     ErrorCode rval = MB_SUCCESS;
     int localRank = 0, numProcs = 1;
