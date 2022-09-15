@@ -3576,14 +3576,17 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1,
     assert( jointcomm );
     assert( groupA );
     assert( groupB );
+    bool is_fortran = false;
+    if (*pid1 >=0) is_fortran = context.appDatas[*pid1].is_fortran || is_fortran;
+    if (*pid2 >=0) is_fortran = context.appDatas[*pid2].is_fortran || is_fortran;
+    if (*pid3 >=0) is_fortran = context.appDatas[*pid3].is_fortran || is_fortran;
 
     MPI_Comm joint_communicator =
-        ( context.appDatas[*pid1].is_fortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( jointcomm ) )
-                                             : *jointcomm );
+        ( is_fortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( jointcomm ) ) : *jointcomm );
     MPI_Group group_first =
-        ( context.appDatas[*pid1].is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( groupA ) ) : *groupA );
+        ( is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( groupA ) ) : *groupA );
     MPI_Group group_second =
-        ( context.appDatas[*pid1].is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( groupB ) ) : *groupB );
+        ( is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( groupB ) ) : *groupB );
 
     ErrorCode rval = MB_SUCCESS;
     int localRank = 0, numProcs = 1;
