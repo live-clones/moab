@@ -1530,6 +1530,7 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid,
 
     ErrorCode rval = moab::MB_SUCCESS;  // assume success already :)
     appData& data  = context.appDatas[*pid];
+    int already_defined_tags = 0;
 
     for( size_t i = 0; i < tagNames.size(); i++ )
     {
@@ -1550,6 +1551,7 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid,
                 data.tagList.push_back( tagHandle );
             }
             rval = MB_SUCCESS;
+            already_defined_tags++;
         }
         else if( MB_SUCCESS == rval )
         {
@@ -1563,6 +1565,14 @@ ErrCode iMOAB_DefineTagStorage( iMOAB_AppID pid,
         }
     }
     // we don't need default values anymore, avoid leaks
+    int rankHere  = 0;
+#ifdef MOAB_HAVE_MPI
+    ParallelComm* pco = context.pcomms[*pid];
+    rankHere          = pco->rank();
+#endif
+    if( !rankHere && already_defined_tags)
+        std::cout << " application with ID: " << *pid << " global id: " << data.global_id << " name: " << data.name
+                  << " has "  << already_defined_tags << " already defined tags out of " << tagNames.size() << " tags \n";
     delete[] defInt;
     delete[] defDouble;
     delete[] defHandle;
@@ -3857,6 +3867,16 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1,
         // on the receiving end, make sure they are not duplicated, by looking at the global id
         // if *type is 1, also send global_dofs tag in the element tuple
         rval = cgraph->form_tuples_to_migrate_mesh( context.MBI, TLv, TLc, *type, lenTagType1 );MB_CHK_ERR( rval );
+    }
+    else
+    {
+        // we still need to initialize the tuples with the right size
+        int size_tuple = 2 + ( ( *type != 1 ) ? 0 : lenTagType1 ) + 1 + 10;  // 10 is the max number of vertices in cell; kind of arbitrary
+        TLv.initialize( 2, 0, 0, 3, 0 ); // no vertices here, for sure
+        TLc.initialize( size_tuple, 0, 0, 0, 0 );  //
+        TLv.enableWriteAccess(); // to be able to receive stuff, even if nothing is here yet
+        TLc.enableWriteAccess(); //
+
     }
     pc.crystal_router()->gs_transfer( 1, TLv, 0 );  // communication towards coupler tasks, with mesh vertices
     if( *type != 2 ) pc.crystal_router()->gs_transfer( 1, TLc, 0 );  // those are cells
