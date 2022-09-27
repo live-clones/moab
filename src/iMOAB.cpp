@@ -1781,7 +1781,6 @@ ErrCode iMOAB_SetDoubleTagStorageWithGid( iMOAB_AppID pid,
     }
 
     int nents_to_be_set = (int)( *ents_to_set ).size();
-    int position        = 0;
 
     Tag gidTag = context.MBI->globalId_tag();
     std::vector< int > gids;
@@ -1827,7 +1826,7 @@ ErrCode iMOAB_SetDoubleTagStorageWithGid( iMOAB_AppID pid,
     bool serial = true;
 #ifdef MOAB_HAVE_MPI
     ParallelComm* pco = context.pcomms[*pid];
-    int num_procs     = pco->size();
+    unsigned num_procs     = pco->size();
     if( num_procs > 1 ) serial = false;
 #endif
 
@@ -1849,7 +1848,6 @@ ErrCode iMOAB_SetDoubleTagStorageWithGid( iMOAB_AppID pid,
                 indexInTagValues += ( nents_to_be_set - i ) * tagLengths[j];  // at the end of tag data
             }
         }
-        return MB_SUCCESS;
     }
 #ifdef MOAB_HAVE_MPI
     else  // it can be not serial only if pco->size() > 1, parallel
@@ -2001,10 +1999,9 @@ ErrCode iMOAB_SetDoubleTagStorageWithGid( iMOAB_AppID pid,
                 ptrVal += tagLengths[j];  // at the end of tag data per call
             }
         }
-
-        return MB_SUCCESS;
     }
 #endif
+    return MB_SUCCESS;
 }
 ErrCode iMOAB_GetDoubleTagStorage( iMOAB_AppID pid,
                                    const iMOAB_String tag_storage_names,
@@ -3870,12 +3867,15 @@ ErrCode iMOAB_MigrateMapMesh( iMOAB_AppID pid1,
     }
     else
     {
-        // we still need to initialize the tuples with the right size
-        int size_tuple = 2 + ( ( *type != 1 ) ? 0 : lenTagType1 ) + 1 + 10;  // 10 is the max number of vertices in cell; kind of arbitrary
         TLv.initialize( 2, 0, 0, 3, 0 ); // no vertices here, for sure
-        TLc.initialize( size_tuple, 0, 0, 0, 0 );  //
-        TLv.enableWriteAccess(); // to be able to receive stuff, even if nothing is here yet
-        TLc.enableWriteAccess(); //
+        TLv.enableWriteAccess(); // to be able to receive stuff, even if nothing is here yet, on this task
+        if (*type != 2) // for point cloud, we do not need to initialize TLc (for cells)
+        {
+            // we still need to initialize the tuples with the right size, as in form_tuples_to_migrate_mesh
+            int size_tuple = 2 + ( ( *type != 1 ) ? 0 : lenTagType1 ) + 1 + 10;  // 10 is the max number of vertices in cell; kind of arbitrary
+            TLc.initialize( size_tuple, 0, 0, 0, 0 );
+            TLc.enableWriteAccess();
+        }
 
     }
     pc.crystal_router()->gs_transfer( 1, TLv, 0 );  // communication towards coupler tasks, with mesh vertices

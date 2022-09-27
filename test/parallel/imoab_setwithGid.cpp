@@ -41,8 +41,6 @@ int main( int argc, char* argv[] )
     double timer_ops;
     std::string opName;
 
-    int repartitioner_scheme = 0;
-
     MPI_Init( &argc, &argv );
     MPI_Comm_rank( MPI_COMM_WORLD, &rankInGlobalComm );
     MPI_Comm_size( MPI_COMM_WORLD, &numProcesses );
