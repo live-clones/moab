@@ -127,6 +127,10 @@ imoab_ptest2_LDADD = $(LDADD) $(FCLIBS)
 endif
 endif
 
+if HAVE_HDF5_PARALLEL
+ IMOAB_TESTS += imoab_setwithGid
+endif
+
 IMESH_TESTS =
 if ENABLE_imesh
 if HAVE_HDF5_PARALLEL
@@ -190,6 +194,7 @@ imoab_apg2_ol_coupler_SOURCES = imoab_apg2_ol_coupler.cpp
 imoab_read_map_SOURCES = imoab_read_map.cpp
 imoab_map2_SOURCES = imoab_map2.cpp
 imoab_map_target_SOURCES = imoab_map_target.cpp
+imoab_setwithGid_SOURCES = imoab_setwithGid.cpp
 migrate_nontrivial_SOURCES = migrate_nontrivial.cpp
 ghost_thin_layers_SOURCES = ghost_thin_layers.cpp
 commgraph_test_SOURCES = commgraph_test.cpp
@@ -255,7 +260,7 @@ MOSTLYCLEANFILES = mhdf_ll.h5m \
                    fOcnOnCpl2.h5m recvOcn2.h5m  OcnWithProj2.h5m recvLnd2.h5m LndWithProj2.h5m \
                    LndWithProj3.h5m  fLndOnCpl3.h5m  OcnWithProj3.h5m  fOcnOnCpl3.h5m  recvLnd3.h5m  recvOcn3.h5m \
                    AtmPhysProj.h5m fAtm2OnCpl2.h5m recvOcnCpl.h5m \
-                   AtmPhysProj3.h5m fAtm3OnCpl.h5m recvLndCpl.h5m \
+                   AtmPhysProj3.h5m fAtm3OnCpl.h5m recvLndCpl.h5m  recvLnd4.h5m \
                    atm_ocn_map.nc file_set7rk_0.h5m file_set7rk_1.h5m \
                    atmcov_withdata_1.h5m atmcov_withdata_0.h5m CoupOcn.h5m ocntgt_1.h5m ocntgt_0.h5m atmcov_0.h5m atmcov_1.h5m \
                    OcnWithProjF.h5m OcnOnCplF.h5m AtmOnCplF.h5m atm_ocn_map_f.nc fOcnOnCpl4.h5m \

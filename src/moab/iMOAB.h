@@ -760,6 +760,30 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid,
                                    double* tag_storage_data );
 
 /**
+ * \brief Store the specified values in a MOAB double Tag, for given ids.
+ *
+ * \note <B>Operations:</B> Collective
+ *
+ * \param[in]  pid (iMOAB_AppID)                       The unique pointer to the application ID.
+ * \param[in]  tag_storage_name (iMOAB_String)         The tag names, separated, to store the data.
+ * \param[in]  num_tag_storage_length (int*)           The size of total tag storage data (e.g., num_visible_vertices*components_per_entity
+ *                                                     or num_visible_elements*components_per_entity*num_tags).
+ * \param[in]  entity_type (int*)                      Type=0 for vertices, and Type=1 for primary elements.
+ * \param[in]  tag_storage_data (double*)              The array data of type <I>double</I> to replace the internal tag memory;
+ *                                                     The data is assumed to be permuted over the local set of visible
+ *                                                     entities (either vertices or elements). unrolled by tags
+ *                                                     in parallel, might be different order, or different entities on the task
+ * \param[in]  globalIds                               global ids of the cells to be set;
+ * \return ErrCode                                     The error code indicating success or failure.
+ */
+
+ErrCode iMOAB_SetDoubleTagStorageWithGid( iMOAB_AppID pid,
+                                          const iMOAB_String tag_storage_names,
+                                          int* num_tag_storage_length,
+                                          int* entity_type,
+                                          double* tag_storage_data,
+                                          int* globalIds );
+/**
  * \brief Retrieve the specified values in a MOAB double Tag.
  *
  * \note <B>Operations:</B> Collective
