@@ -780,7 +780,7 @@ ErrCode iMOAB_SetDoubleTagStorage( iMOAB_AppID pid,
 ErrCode iMOAB_SetDoubleTagStorageWithGid( iMOAB_AppID pid,
                                           const iMOAB_String tag_storage_names,
                                           int* num_tag_storage_length,
-                                          int* ent_type,
+                                          int* entity_type,
                                           double* tag_storage_data,
                                           int* globalIds );
 /**
