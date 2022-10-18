@@ -54,7 +54,7 @@ int moab::TempestOnlineMap::rearrange_arrays_by_dofs( const std::vector< unsigne
                                                       DataArray2D< double >& dVertexLat,
                                                       std::vector< int >& masks,
                                                       unsigned& N,  // will have the local, after
-                                                      int nv,
+                                                      int & nv,
                                                       int& maxdof )
 {
     // first decide maxdof, for partitioning
