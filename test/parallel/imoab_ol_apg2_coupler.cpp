@@ -671,13 +671,13 @@ int main( int argc, char* argv[] )
         {
             // as always, use nonblocking sends
             // this is for projection to atm, from ocean:
-            ierr = iMOAB_SendElementTag( cmpOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &cplatm );
+            ierr = iMOAB_SendElementTag( cmpOcnPID, "T_proj:u_proj:v_proj", &ocnCouComm, &cplatm );
             CHECKIERR( ierr, "cannot send tag values" )
         }
         if( couComm != MPI_COMM_NULL )
         {
             // receive on ocn on coupler pes, that was redistributed according to coverage
-            ierr = iMOAB_ReceiveElementTag( cplOcnPID, "T_proj;u_proj;v_proj;", &ocnCouComm, &cplatm );
+            ierr = iMOAB_ReceiveElementTag( cplOcnPID, "T_proj:u_proj:v_proj", &ocnCouComm, &cplatm );
             CHECKIERR( ierr, "cannot receive tag values" )
         }
 
@@ -701,8 +701,8 @@ int main( int argc, char* argv[] )
         MPI_Barrier( MPI_COMM_WORLD );
         if( couComm != MPI_COMM_NULL )
         {
-            const char* concat_fieldname  = "T_proj;u_proj;v_proj;";
-            const char* concat_fieldnameT = "T_proj2;u_proj2;v_proj2;";
+            const char* concat_fieldname  = "T_proj:u_proj:v_proj";
+            const char* concat_fieldnameT = "T_proj2:u_proj2:v_proj2";
 
             /* We have the remapping weights now. Let us apply the weights onto the tag we defined
                on the source mesh and get the projection on the target mesh */
@@ -727,7 +727,7 @@ int main( int argc, char* argv[] )
         if( couComm != MPI_COMM_NULL )
         {
             context_id = cmpatm;
-            ierr = iMOAB_SendElementTag( cplAtmPID, "T_proj2;u_proj2;v_proj2;", &atmCouComm, &context_id );
+            ierr = iMOAB_SendElementTag( cplAtmPID, "T_proj2:u_proj2:v_proj2", &atmCouComm, &context_id );
             CHECKIERR( ierr, "cannot send tag values back to atm pes " )
         }
 
@@ -735,7 +735,7 @@ int main( int argc, char* argv[] )
         if( atmComm != MPI_COMM_NULL )
         {
             context_id = cplatm;
-            ierr = iMOAB_ReceiveElementTag( cmpAtmPID, "T_proj2;u_proj2;v_proj2;", &atmCouComm, &context_id );
+            ierr = iMOAB_ReceiveElementTag( cmpAtmPID, "T_proj2:u_proj2:v_proj2", &atmCouComm, &context_id );
             CHECKIERR( ierr, "cannot receive tag values from atm mesh on coupler pes" )
         }
 
@@ -763,13 +763,13 @@ int main( int argc, char* argv[] )
         {
             // as always, use nonblocking sends
             // this is for projection to atm, from ocean:
-            ierr = iMOAB_SendElementTag( cmpLndPID, "T_proj;u_proj;v_proj;", &lndCouComm, &cplatm );
+            ierr = iMOAB_SendElementTag( cmpLndPID, "T_proj:u_proj:v_proj", &lndCouComm, &cplatm );
             CHECKIERR( ierr, "cannot send tag values" )
         }
         if( couComm != MPI_COMM_NULL )
         {
             // receive on lnd on coupler pes, that was redistributed according to coverage
-            ierr = iMOAB_ReceiveElementTag( cplLndPID, "T_proj;u_proj;v_proj;", &lndCouComm, &cplatm );
+            ierr = iMOAB_ReceiveElementTag( cplLndPID, "T_proj:u_proj:v_proj", &lndCouComm, &cplatm );
             CHECKIERR( ierr, "cannot receive tag values" )
         }
 
@@ -783,8 +783,8 @@ int main( int argc, char* argv[] )
 
         if( couComm != MPI_COMM_NULL )
         {
-            const char* concat_fieldname  = "T_proj;u_proj;v_proj;";
-            const char* concat_fieldnameT = "T_proj3;u_proj3;v_proj3;";
+            const char* concat_fieldname  = "T_proj:u_proj:v_proj";
+            const char* concat_fieldnameT = "T_proj3:u_proj3:v_proj3";
 
             /* We have the remapping weights now. Let us apply the weights onto the tag we defined
                on the source mesh and get the projection on the target mesh */
@@ -808,7 +808,7 @@ int main( int argc, char* argv[] )
         if( couComm != MPI_COMM_NULL )
         {
             context_id = cmpatm;
-            ierr = iMOAB_SendElementTag( cplAtmPID, "T_proj3;u_proj3;v_proj3;", &atmCouComm, &context_id );
+            ierr = iMOAB_SendElementTag( cplAtmPID, "T_proj3:u_proj3:v_proj3", &atmCouComm, &context_id );
             CHECKIERR( ierr, "cannot send tag values back to atm pes " )
         }
 
@@ -816,7 +816,7 @@ int main( int argc, char* argv[] )
         if( atmComm != MPI_COMM_NULL )
         {
             context_id = cplatm;
-            ierr = iMOAB_ReceiveElementTag( cmpAtmPID, "T_proj3;u_proj3;v_proj3;", &atmCouComm, &context_id );
+            ierr = iMOAB_ReceiveElementTag( cmpAtmPID, "T_proj3:u_proj3:v_proj3", &atmCouComm, &context_id );
             CHECKIERR( ierr, "cannot receive tag values from atm mesh on coupler pes" )
         }
 
