@@ -207,8 +207,8 @@ void test_intx_in_parallel_elem_based()
     std::stringstream outf;
     outf << "intersect" << rank << ".h5m";
     rval                = mb.write_file( outf.str().c_str(), 0, 0, &outputSet, 1 );
-    double intx_area    = areaAdaptor.area_on_sphere( &mb, outputSet, radius );
-    double arrival_area = areaAdaptor.area_on_sphere( &mb, euler_set, radius );
+    double intx_area    = areaAdaptor.area_on_sphere( &mb, outputSet, radius, rank );
+    double arrival_area = areaAdaptor.area_on_sphere( &mb, euler_set, radius, rank );
     std::cout << "On rank : " << rank << " arrival area: " << arrival_area << "  intersection area:" << intx_area
               << " rel error: " << fabs( ( intx_area - arrival_area ) / arrival_area ) << "\n";CHECK_ERR( rval );
 }
@@ -282,8 +282,8 @@ void test_intx_mpas()
     rval = mb.write_file( outf.str().c_str(), 0, 0, &outputSet, 1 );
 
     IntxAreaUtils areaAdaptor;
-    double intx_area    = areaAdaptor.area_on_sphere( &mb, outputSet, radius );
-    double arrival_area = areaAdaptor.area_on_sphere( &mb, euler_set, radius );
+    double intx_area    = areaAdaptor.area_on_sphere( &mb, outputSet, radius, rank );
+    double arrival_area = areaAdaptor.area_on_sphere( &mb, euler_set, radius, rank );
     std::cout << "On rank : " << rank << " arrival area: " << arrival_area << "  intersection area:" << intx_area
               << " rel error: " << fabs( ( intx_area - arrival_area ) / arrival_area ) << "\n";CHECK_ERR( rval );
 }

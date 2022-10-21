@@ -87,7 +87,6 @@ int main( int argc, char** argv )
     rval = mb.delete_entities( &sf1, 1 );
     if( MB_SUCCESS != rval ) return 1;
     mb.delete_entities( edges );
-    mb.write_file( output );
 
     if( delete_partition_sets )
     {
@@ -103,6 +102,7 @@ int main( int argc, char** argv )
             mb.tag_delete( par_tag );
         }
     }
+    mb.write_file( output );
 
     return 0;
 }

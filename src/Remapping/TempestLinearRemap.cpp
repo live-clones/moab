@@ -210,7 +210,13 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
         // if ( is_root ) Announce ( "Element %i / %i :: [%i, %i]", ixFirst,
         // m_meshInputCov->faces.size(), ixOverlapBegin, ixOverlapEnd );
 
-        if( nOverlapFaces == 0 ) continue;
+        if( nOverlapFaces == 0 )
+        {
+            {
+               std::cout <<"rank:" <<  rank << " " <<  m_remapper->GetGlobalID( Remapper::CoveringMesh, ixFirst) << "\n";
+            }
+            continue;
+        }
 
         // Build integration array
         DataArray2D< double > dIntArray;
@@ -305,7 +311,7 @@ void moab::TempestOnlineMap::copy_tempest_sparsemat_to_eigen3()
     {
         // std::cout << rank << ": rowsize = " <<  m_nTotDofs_Dest << ", colsize = " <<
         // m_nTotDofs_SrcCov << "\n";
-        // return;  // No need to allocate if either rows or cols size are zero
+        //return;  // No need to allocate if either rows or cols size are zero
     }
 
     /* Should the columns be the global size of the matrix ? */

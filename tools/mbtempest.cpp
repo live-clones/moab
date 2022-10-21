@@ -68,6 +68,7 @@ struct ToolContext
     bool fCheck;
     bool fVolumetric;
     bool fInverseDistanceMap;
+    int dumpTask;
     GenerateOfflineMapAlgorithmOptions mapOptions;
 
 #ifdef MOAB_HAVE_MPI
@@ -81,7 +82,8 @@ struct ToolContext
           blockSize( 5 ), outFilename( "outputFile.nc" ), intxFilename( "intxFile.h5m" ), baselineFile( "" ),
           meshType( moab::TempestRemapper::DEFAULT ), computeDual( false ), computeWeights( false ),
           verifyWeights( false ), enforceConvexity( false ), ensureMonotonicity( 0 ), rrmGrids( false ),
-          kdtreeSearch( true ), fCheck( n_procs > 1 ? false : true ), fVolumetric( false ), fInverseDistanceMap( false )
+          kdtreeSearch( true ), fCheck( n_procs > 1 ? false : true ), fVolumetric( false ), fInverseDistanceMap( false ),
+          dumpTask(-1)
     {
         inFilenames.resize( 2 );
         doftag_names.resize( 2 );
@@ -208,6 +210,8 @@ struct ToolContext
 
         opts.addOpt< void >( "nobubble", "do not use bubble on interior of spectral element nodes",
                              &mapOptions.fNoBubble );
+
+        opts.addOpt< int > ("export,x", "export files for task ", &dumpTask); // debugging option
 
         opts.addOpt< void >( "sparseconstraints", "do not use bubble on interior of spectral element nodes",
                              &mapOptions.fSparseConstraints );
@@ -486,11 +490,11 @@ int main( int argc, char* argv[] )
 
             double initial_sarea =
                 areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[0],
-                                            radius_src );  // use the target to compute the initial area
+                                            radius_src, proc_id );  // use the target to compute the initial area
             double initial_tarea =
                 areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[1],
-                                            radius_dest );  // use the target to compute the initial area
-            double intx_area = areaAdaptor.area_on_sphere( mbCore, intxset, radius_src );
+                                            radius_dest, proc_id );  // use the target to compute the initial area
+            double intx_area = areaAdaptor.area_on_sphere( mbCore, intxset, radius_src, proc_id );
 
             outputFormatter.printf( 0, "mesh areas: source = %12.10f, target = %12.10f, intersection = %12.10f \n",
                                     initial_sarea, initial_tarea, intx_area );
@@ -536,11 +540,11 @@ int main( int argc, char* argv[] )
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[0], 0, rintxverts );MB_CHK_ERR( rval );
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[0], 2, rintxelems );MB_CHK_ERR( rval );
             rval = moab::IntxUtils::fix_degenerate_quads( mbCore, runCtx->meshsets[0] );MB_CHK_ERR( rval );
+            rval = areaAdaptor.positive_orientation( mbCore, runCtx->meshsets[0], radius_src, proc_id );MB_CHK_ERR( rval );
             if( runCtx->enforceConvexity )
             {
                 rval = moab::IntxUtils::enforce_convexity( mbCore, runCtx->meshsets[0], proc_id );MB_CHK_ERR( rval );
             }
-            rval = areaAdaptor.positive_orientation( mbCore, runCtx->meshsets[0], radius_src );MB_CHK_ERR( rval );
             if( !proc_id )
                 outputFormatter.printf( 0, "The source set contains %lu vertices and %lu elements \n",
                                         rintxverts.size(), rintxelems.size() );
@@ -549,11 +553,12 @@ int main( int argc, char* argv[] )
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[1], 0, bintxverts );MB_CHK_ERR( rval );
             rval = mbCore->get_entities_by_dimension( runCtx->meshsets[1], 2, bintxelems );MB_CHK_ERR( rval );
             rval = moab::IntxUtils::fix_degenerate_quads( mbCore, runCtx->meshsets[1] );MB_CHK_ERR( rval );
+            rval = areaAdaptor.positive_orientation( mbCore, runCtx->meshsets[1], radius_dest, proc_id );MB_CHK_ERR( rval );
             if( runCtx->enforceConvexity )
             {
                 rval = moab::IntxUtils::enforce_convexity( mbCore, runCtx->meshsets[1], proc_id );MB_CHK_ERR( rval );
             }
-            rval = areaAdaptor.positive_orientation( mbCore, runCtx->meshsets[1], radius_dest );MB_CHK_ERR( rval );
+
             if( !proc_id )
                 outputFormatter.printf( 0, "The target set contains %lu vertices and %lu elements \n",
                                         bintxverts.size(), bintxelems.size() );
@@ -564,21 +569,42 @@ int main( int argc, char* argv[] )
         runCtx->timer_push( "construct covering set for intersection" );
         rval = remapper.ConstructCoveringSet( epsrel, 1.0, 1.0, boxeps, runCtx->rrmGrids );MB_CHK_ERR( rval );
         runCtx->timer_pop();
-
+        if (runCtx->dumpTask == proc_id)
+        {
+            moab::EntityHandle covSet = remapper.GetMeshSet( moab::Remapper::CoveringMesh );
+            sstr.str( "" );
+            sstr << "InitialCoverage_" << proc_id << ".h5m";
+            rval = mbCore->write_file( sstr.str().c_str(), NULL, NULL, &covSet, 1 );MB_CHK_ERR( rval );
+        }
         // Compute intersections with MOAB with either the Kd-tree or the advancing front algorithm
         runCtx->timer_push( "setup and compute mesh intersections" );
         rval = remapper.ComputeOverlapMesh( runCtx->kdtreeSearch, false );MB_CHK_ERR( rval );
         runCtx->timer_pop();
 
+        if (runCtx->dumpTask == proc_id)
+        {
+            moab::EntityHandle tgtSet = remapper.GetMeshSet( moab::Remapper::TargetMesh );
+            moab::EntityHandle covSet = remapper.GetMeshSet( moab::Remapper::CoveringMesh );
+            moab::EntityHandle intxSet = remapper.GetMeshSet( moab::Remapper::OverlapMesh );
+            sstr.str( "" );
+            sstr << "Target_" << proc_id << ".h5m";
+            rval = mbCore->write_file( sstr.str().c_str(), NULL, NULL, &tgtSet, 1 );MB_CHK_ERR( rval );
+            sstr.str( "" );
+            sstr << "Coverage_" << proc_id << ".h5m";
+            rval = mbCore->write_file( sstr.str().c_str(), NULL, NULL, &covSet, 1 );MB_CHK_ERR( rval );
+            sstr.str( "" );
+            sstr << "Intersect_" << proc_id << ".h5m";
+            rval = mbCore->write_file( sstr.str().c_str(), NULL, NULL, &intxSet, 1 );MB_CHK_ERR( rval );
+        }
         // print some diagnostic checks to see if the overlap grid resolved the input meshes
         // correctly
         {
             double local_areas[3],
                 global_areas[3];  // Array for Initial area, and through Method 1 and Method 2
             // local_areas[0] = area_on_sphere_lHuiller ( mbCore, runCtx->meshsets[1], radius_src );
-            local_areas[0] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[0], radius_src );
-            local_areas[1] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[1], radius_dest );
-            local_areas[2] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[2], radius_src );
+            local_areas[0] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[0], radius_src, proc_id );
+            local_areas[1] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[1], radius_dest, proc_id );
+            local_areas[2] = areaAdaptor.area_on_sphere( mbCore, runCtx->meshsets[2], radius_src, proc_id );
 
 #ifdef MOAB_HAVE_MPI
             MPI_Allreduce( &local_areas[0], &global_areas[0], 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );

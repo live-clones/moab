@@ -585,22 +585,22 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
     // Allocate for the overlap mesh
     if( !m_overlap ) m_overlap = new Mesh();
 
-    size_t n_overlap_entitites = m_overlap_entities.size();
+    size_t n_overlap_entities = m_overlap_entities.size();
 
-    std::vector< std::pair< int, int > > sorted_overlap_order( n_overlap_entitites );
+    std::vector< std::pair< int, int > > sorted_overlap_order( n_overlap_entities );
     {
         Tag srcParentTag, tgtParentTag;
         rval = m_interface->tag_get_handle( "SourceParent", srcParentTag );MB_CHK_ERR( rval );
         rval = m_interface->tag_get_handle( "TargetParent", tgtParentTag );MB_CHK_ERR( rval );
         // Overlap mesh: resize the source and target connection arrays
-        m_overlap->vecTargetFaceIx.resize( n_overlap_entitites );
-        m_overlap->vecSourceFaceIx.resize( n_overlap_entitites );
+        m_overlap->vecTargetFaceIx.resize( n_overlap_entities );
+        m_overlap->vecSourceFaceIx.resize( n_overlap_entities );
 
         // Overlap mesh: resize the source and target connection arrays
-        std::vector< int > rbids_src( n_overlap_entitites ), rbids_tgt( n_overlap_entitites );
+        std::vector< int > rbids_src( n_overlap_entities ), rbids_tgt( n_overlap_entities );
         rval = m_interface->tag_get_data( srcParentTag, m_overlap_entities, &rbids_src[0] );MB_CHK_ERR( rval );
         rval = m_interface->tag_get_data( tgtParentTag, m_overlap_entities, &rbids_tgt[0] );MB_CHK_ERR( rval );
-        for( size_t ix = 0; ix < n_overlap_entitites; ++ix )
+        for( size_t ix = 0; ix < n_overlap_entities; ++ix )
         {
             sorted_overlap_order[ix].first =
                 ( gid_to_lid_covsrc.size() ? gid_to_lid_covsrc[rbids_src[ix]] : rbids_src[ix] );
@@ -614,11 +614,11 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
         if( is_parallel && size > 1 )
         {
             Tag ghostTag;
-            ghFlags.resize( n_overlap_entitites );
+            ghFlags.resize( n_overlap_entities );
             rval = m_interface->tag_get_handle( "ORIG_PROC", ghostTag );MB_CHK_ERR( rval );
             rval = m_interface->tag_get_data( ghostTag, m_overlap_entities, &ghFlags[0] );MB_CHK_ERR( rval );
         }
-        for( unsigned ie = 0; ie < n_overlap_entitites; ++ie )
+        for( unsigned ie = 0; ie < n_overlap_entities; ++ie )
         {
             int ix = sorted_overlap_order[ie].second;  // original index of the element
             m_overlap->vecSourceFaceIx[ie] =
@@ -632,7 +632,7 @@ ErrorCode TempestRemapper::convert_overlap_mesh_sorted_by_source()
     }
 
     FaceVector& faces = m_overlap->faces;
-    faces.resize( n_overlap_entitites );
+    faces.resize( n_overlap_entities );
 
     Range verts;
     // let us now get the vertices from all the elements
@@ -1287,13 +1287,25 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
         if( is_parallel || rrmgrids )
         {
 #ifdef VERBOSE
+
             std::stringstream ffc, fft, ffo;
-            ffc << "cover_" << rank << ".h5m";
-            fft << "target_" << rank << ".h5m";
-            ffo << "intx_" << rank << ".h5m";
+            ffc << "cover_" << size << "_" << rank << ".h5m";
+            fft << "target_" << size << "_" << rank << ".h5m";
+            ffo << "intx_" << size << "_" << rank << ".h5m";
             rval = m_interface->write_mesh( ffc.str().c_str(), &m_covering_source_set, 1 );MB_CHK_ERR( rval );
             rval = m_interface->write_mesh( fft.str().c_str(), &m_target_set, 1 );MB_CHK_ERR( rval );
             rval = m_interface->write_mesh( ffo.str().c_str(), &m_overlap_set, 1 );MB_CHK_ERR( rval );
+
+            // write the intx mesh, only in serial
+            std::ostringstream opts;
+            opts << "PARALLEL=WRITE_PART";
+            std::ostringstream file_name;
+            file_name << "intx_gl_" << size << ".h5m";
+            if( size == 1 )
+            {
+                rval = m_interface->write_file( file_name.str().c_str(), 0, opts.str().c_str(), &m_overlap_set, 1 );MB_CHK_ERR( rval );
+            }
+
 #endif
             // because we do not want to work with elements in coverage set that do not participate
             // in intersection, remove them from the coverage set we will not delete them yet, just
@@ -1312,7 +1324,7 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                     loc_gid_to_lid_covsrc[gids[ie]] = ie;
                 }
 
-                Range intxCov;
+                std::set< EntityHandle > intxCov;
                 Range intxCells;
                 Tag srcParentTag;
                 rval = m_interface->tag_get_handle( "SourceParent", srcParentTag );MB_CHK_ERR( rval );
@@ -1328,8 +1340,10 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
                     intxCov.insert( covEnts[loc_gid_to_lid_covsrc[blueParent]] );
                 }
 
-                Range notNeededCovCells = moab::subtract( covEnts, intxCov );
                 // remove now from coverage set the cells that are not needed
+                Range intxCovRange;
+		        std::copy( intxCov.rbegin(), intxCov.rend(), range_inserter( intxCovRange ) );
+		        Range notNeededCovCells = moab::subtract( covEnts, intxCovRange );
                 rval = m_interface->remove_entities( m_covering_source_set, notNeededCovCells );MB_CHK_ERR( rval );
                 covEnts = moab::subtract( covEnts, notNeededCovCells );
 #ifdef VERBOSE
@@ -1366,14 +1380,13 @@ ErrorCode TempestRemapper::ComputeOverlapMesh( bool kdtree_search, bool use_temp
         {
             IntxAreaUtils areaAdaptor;
             rval = IntxUtils::fix_degenerate_quads( m_interface, m_overlap_set );MB_CHK_ERR( rval );
-            rval = areaAdaptor.positive_orientation( m_interface, m_overlap_set, 1.0 /*radius*/ );MB_CHK_ERR( rval );
+            rval = areaAdaptor.positive_orientation( m_interface, m_overlap_set, 1.0 /*radius*/, rank );MB_CHK_ERR( rval );
         }
 
         // Now let us re-convert the MOAB mesh back to Tempest representation
         rval = this->ComputeGlobalLocalMaps();MB_CHK_ERR( rval );
 
         rval = this->convert_overlap_mesh_sorted_by_source();MB_CHK_ERR( rval );
-
         // free the memory
         delete mbintx;
     }
@@ -1534,9 +1547,9 @@ ErrorCode TempestRemapper::augment_overlap_set()
     else
         globalMaxEdges = maxEdges;
 
-#ifdef VERBOSE
+    //#ifdef VERBOSE
     if( is_root ) std::cout << "maximum number of edges for polygons to send is " << globalMaxEdges << "\n";
-#endif
+        //#endif
 
 #ifdef VERBOSE
     EntityHandle tmpSet2;
@@ -1986,6 +1999,10 @@ ErrorCode TempestRemapper::augment_overlap_set()
     // add the new polygons to the overlap set
     // these will be ghosted, so will participate in conservation only
     rval = m_interface->add_entities( m_overlap_set, newPolygons );MB_CHK_ERR( rval );
+    if( !rank )
+    {
+        std::cout << "Augmenting: add " << newPolygons.size() << " polygons on root task \n";
+    }
     return MB_SUCCESS;
 }
 

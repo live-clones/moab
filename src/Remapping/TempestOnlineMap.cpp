@@ -974,15 +974,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
                     // Reorder overlap mesh
                     m_meshOverlap->ExchangeFirstAndSecondMesh();
                 }
-                // else
-                // {   // No correspondence found
-                //     _EXCEPTION4 ( "Invalid overlap mesh:\n"
-                //                   "    No correspondence found with input and output meshes (%i,%i)
-                //                   vs (%i,%i)", m_meshInputCov->faces.size(),
-                //                   m_meshOutput->faces.size(), ixSourceFaceMax, ixTargetFaceMax );
-                // }
             }
-
             // Calculate Face areas
             if( is_root ) dbgprint.printf( 0, "Calculating overlap mesh Face areas\n" );
             double dTotalAreaOverlap_loc = m_meshOverlap->CalculateFaceAreas( false );

@@ -61,6 +61,7 @@ int run_test( ErrorCode ( *func )( const char* ), const char* func_name, const c
 ErrorCode migrate_graph( const char* filename );
 ErrorCode migrate_geom( const char* filename );
 ErrorCode migrate_trivial( const char* filename );
+ErrorCode migrate_to_empty_part( const char* filename );
 
 // some global variables, used by all tests
 int rank, size, ierr;
@@ -141,7 +142,8 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
 #ifdef GRAPH_INFO
         int is_sender = 1;
         int context   = compid2;
-        iMOAB_DumpCommGraph( pid1, &context, &is_sender, "MigrateS" );
+        int verbose = 0;
+        iMOAB_DumpCommGraph( pid1, &context, &is_sender, &verbose, "MigrateS" );
 #endif
     }
 
@@ -156,7 +158,8 @@ ErrorCode migrate_smart( const char* filename, const char* outfile, int partMeth
 #ifdef GRAPH_INFO
         int is_sender = 0;
         int context   = compid1;
-        iMOAB_DumpCommGraph( pid2, &context, &is_sender, "MigrateR" );
+        int verbose = 0;
+        iMOAB_DumpCommGraph( pid2, &context, &is_sender, &verbose, "MigrateR" );
 #endif
     }
 
@@ -204,6 +207,11 @@ ErrorCode migrate_trivial( const char* filename )
     return migrate_smart( filename, "migrate_trivial.h5m", 0 );
 }
 
+ErrorCode migrate_to_empty_part( const char* filename )
+{
+    return migrate_smart( filename, "migrate_trivial.h5m", 6 );
+}
+
 int main( int argc, char* argv[] )
 {
     MPI_Init( &argc, &argv );
@@ -245,9 +253,14 @@ int main( int argc, char* argv[] )
 
     int num_errors = 0;
 
-    if( 0 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_trivial, filename.c_str() );
+
     if( 3 == typeTest || 1 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_graph, filename.c_str() );
     if( 3 == typeTest || 2 == typeTest ) num_errors += RUN_TEST_ARG2( migrate_geom, filename.c_str() );
+    if (2 != typeTest)
+    {
+        num_errors += RUN_TEST_ARG2( migrate_to_empty_part, filename.c_str() );
+        num_errors += RUN_TEST_ARG2( migrate_trivial, filename.c_str() );
+    }
 
     if( rank == 0 )
     {

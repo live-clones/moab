@@ -893,17 +893,22 @@ ErrCode iMOAB_GetGlobalInfo( iMOAB_AppID pid, int* num_global_verts, int* num_gl
 #ifdef MOAB_HAVE_MPI
 
 /**
- * \brief migrate (send) a set of elements from a group of tasks (senders) to another group of tasks (receivers)
- *
- * \note <B>Operations:</B>  Collective on sender group
- *
- * \param[in]  pid (iMOAB_AppID)                  The unique pointer to the application ID of the sender mesh.
- * \param[in]  joint_communicator (MPI_Comm)      The joint communicator that overlaps both the sender and receiver groups.
- * \param[in]  receivingGroup (MPI_Group *)       Receiving group information.
- * \param[in]  rcompid  (int*)                    External id of application that receives the mesh
- * \param[in]  method (int*)                      Partitioning ethod to use when sending the mesh;
- *                                                0=trivial, 1=Zoltan Graph (PHG), 2=Zoltan Geometric (RCB).
- * \return ErrCode                                The error code indicating success or failure.
+  \brief migrate (send) a set of elements from a group of tasks (senders) to another group of tasks (receivers)
+  <B>Operations:</B>  Collective on sender group
+
+   \param[in]  pid (iMOAB_AppID)                      The unique pointer to the application ID source mesh
+   \param[in]  join (MPI_Comm)                        communicator that overlaps both groups
+   \param[in]  receivingGroup (MPI_Group *)           receiving group
+   \param[in]  rcompid  (int*)                        external id of application that receives the mesh
+   \param[in]  method (int*)                          method of partitioning
+             0 trivial partitioning
+             1 graph partitioning with ZOLTAN PHG
+             2 geometric partitioning with ZOLTAN RCB
+             3 geometric partitioning with ZOLTAN RCB in gnomonic space
+             4 geometric partitioning with ZOLTAN RCB, in gnomonic space, and with storing of the cuts in a buffer
+                        on receiver root PE, which should be the coupler root PE
+             5 geometric partitioning with ZOLTAN RCB, with cuts restored from a buffer from the receiver root PE
+                  (5 implies that some partitioning was called in advance with method 4)
  */
 ErrCode iMOAB_SendMesh( iMOAB_AppID pid,
                         MPI_Comm* joint_communicator,
@@ -970,11 +975,25 @@ ErrCode iMOAB_SendElementTag( iMOAB_AppID pid,
  *                                                    intersection context (typically target); -1 if this refers to
  *                                                    the original migration of meshes (internal detail).
  * \return ErrCode                                    The error code indicating success or failure.
- */
+*/
+
 ErrCode iMOAB_ReceiveElementTag( iMOAB_AppID pid,
                                  const iMOAB_String tag_storage_name,
                                  MPI_Comm* joint_communicator,
                                  int* context_id );
+
+
+/**
+  \brief
+  <B>Operations:</B> Collective over the sender and receiver  and joint comm
+  Only root of the receiver and root of the sender actually move data, which is zoltan buffer
+
+   \param[in]  cmpGrp (MPI_Group*)                     sender group
+   \param[in]  couGrp (MPI_Group*)                     receiver group
+   \param[in]  joint  (MPI_Comm*)                      joint communicator
+   \param[in]  is_fortran (int *)                      * = 1 in case of fortran call
+ */
+ErrCode iMOAB_RetrieveZBuffer(  MPI_Group*  cmpGrp,  MPI_Group* couGrp,  MPI_Comm* joint, int * is_fortran );
 
 /**
  * \brief Compute a communication graph between 2 iMOAB applications, based on ID matching of key data.
@@ -1030,20 +1049,6 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* joint_communicator,
                              int* src_id,
                              int* migr_id,
                              int* context_id );
-
-/**
- * \brief Dump info about communication graph.
- *
- * \note <B>Operations:</B> Collective per sender or receiver group
- *
- * \param[in] pid  (iMOAB_AppID)          The unique pointer to the application ID.
- * \param[in] context_id  (int*)          The context_id names are separated by a semi-colon (";");
- *                                        This is similar to the specifications in tag migration.
- * \param[in] is_sender (int*)            Specify whether it is called from sender or receiver side.
- * \param[in] prefix  (iMOAB_String)      The prefix for file names in order to differentiate different stages.
- * \return ErrCode                        The error code indicating success or failure.
- */
-ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, const iMOAB_String prefix );
 
 /**
  * \brief merge vertices in an explicit, parallel mesh; it will also reassign global IDs on vertices,
@@ -1237,12 +1242,25 @@ ErrCode iMOAB_ComputeScalarProjectionWeights(
  * \param[in] target_solution_tag_name   (iMOAB_String)     list of tag names corresponding to participating degrees-of-freedom for the target discretization;
  *                                                          names are separated by ";", the same way as for tag migration.
  * \return ErrCode                                          The error code indicating success or failure.
-*/
+ */
 ErrCode iMOAB_ApplyScalarProjectionWeights(
     iMOAB_AppID pid_intersection,
     const iMOAB_String solution_weights_identifier, /* "scalar", "flux", "custom" */
     const iMOAB_String source_solution_tag_name,
     const iMOAB_String target_solution_tag_name );
+
+/**
+  \brief Dump info about communication graph.
+  <B>Operations:</B> Collective per sender or receiver group
+
+  \param[in] pid  (iMOAB_AppID)                            The unique pointer to the application ID
+  \param[in] context_id  (int*)                            context id 
+  \param[in] is_sender (int*)                              is it called from sender or receiver side
+  \param[in] verbose (int*)                                level of verbosity
+  \param[in] prefix  (iMOAB_String)                        prefix for file names; to differentiate stages
+*/
+ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, int * verbose, const iMOAB_String prefix );
+
 
 #endif /* #ifdef MOAB_HAVE_TEMPESTREMAP */
 

@@ -44,16 +44,18 @@ int main( int argc, char* argv[] )
     ;MB_CHK_ERR( rval );
     // skip the test for 32 bit builds, CHECK_ARRAYS_EQUAL macro is not working correctly
 #ifndef MOAB_FORCE_32_BIT_HANDLES
-    // check first cell position
-    Range cells;
-    rval = mb->get_entities_by_dimension( outSet, 2, cells );MB_CHK_ERR( rval );
-    EntityHandle firstCell = cells[0];
-    double coords[3];
-    rval = mb->get_coords( &firstCell, 1, coords );MB_CHK_ERR( rval );
-    // check position
-    double values[3] = { -0.78867513420303437, 0.78867513420303437, 0 };
-    CHECK_ARRAYS_EQUAL( coords, 3, values, 3 );
+    if (argc == 1) // regular test; skip if we project a different input file
+    {
+        // check first cell position
+        Range cells;
+        rval = mb->get_entities_by_dimension(outSet, 2, cells);MB_CHK_ERR( rval );
+        EntityHandle firstCell = cells[0];
+        double coords[3];
+        rval  = mb->get_coords(&firstCell, 1, coords); MB_CHK_ERR( rval );
+        // check position
+        double values[3]={-0.78867513420303437, 0.78867513420303437, 0};
+        CHECK_ARRAYS_EQUAL(coords, 3, values, 3);
+    }
 #endif
-
     return 0;
 }

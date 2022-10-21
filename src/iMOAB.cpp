@@ -95,6 +95,7 @@ struct appData
 #ifdef MOAB_HAVE_TEMPESTREMAP
     TempestMapAppData tempestData;
 #endif
+
 };
 
 struct GlobalContext
@@ -114,7 +115,18 @@ struct GlobalContext
 
 #ifdef MOAB_HAVE_MPI
     std::vector< ParallelComm* > pcomms;  // created in order of applications, one moab::ParallelComm for each
+
+#ifdef MOAB_HAVE_ZOLTAN
+    // this data structure exists only on the root PE of the coupler
+    // it will store the buffer with the RCB cuts from which the Zoltan zz structure can be de-serialized,
+    // to be used in the partitioning
+    //
+    std::vector<char> uniqueZoltanBuffer;
 #endif
+
+#endif
+
+
 
     std::vector< appData > appDatas;  // the same order as pcomms
     int globalrank, worldprocs;
@@ -806,6 +818,9 @@ ErrCode iMOAB_UpdateMeshInfo( iMOAB_AppID pid )
             {
                 // no elements of dimension 1 or 2 or 3; it could happen for point clouds
                 data.dimension = 0;
+                if (data.all_verts.size() == 0)
+                    data.dimension = -1; // nothing on this
+
             }
         }
     }
@@ -2410,6 +2425,7 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGro
     // how to distribute local elements to receiving tasks?
     // trivial partition: compute first the total number of elements need to be sent
     Range owned = context.appDatas[*pid].owned_elems;
+    std::vector<char> zoltanBuffer;
     if( owned.size() == 0 )
     {
         // must be vertices that we want to send then
@@ -2444,16 +2460,22 @@ ErrCode iMOAB_SendMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* receivingGro
         // to each sender
         rval = cgraph->compute_trivial_partition( number_elems_per_part );MB_CHK_ERR( rval );
 
-        rval = cgraph->send_graph( global );MB_CHK_ERR( rval );
+        // nothing in z buff, just to compile
+        rval = cgraph->send_graph( global, zoltanBuffer );MB_CHK_ERR( rval );
     }
+#ifdef MOAB_HAVE_ZOLTAN
     else  // *method != 0, so it is either graph or geometric, parallel
     {
-        // owned are the primary elements on this app
-        rval = cgraph->compute_partition( pco, owned, *method );MB_CHK_ERR( rval );
-
+        // it is assumed the method 4 was called in advance
+        if (*method == 5)
+        {
+            zoltanBuffer = context.uniqueZoltanBuffer;
+        }
+        rval = cgraph->compute_partition( pco, owned, *method, zoltanBuffer );MB_CHK_ERR( rval );
         // basically, send the graph to the receiver side, with unblocking send
-        rval = cgraph->send_graph_partition( pco, global );MB_CHK_ERR( rval );
+        rval = cgraph->send_graph_partition( pco, global, zoltanBuffer );MB_CHK_ERR( rval );
     }
+#endif   //  #ifdef MOAB_HAVE_ZOLTAN
     // pco is needed to pack, not for communication
     rval = cgraph->send_mesh_parts( global, pco, owned );MB_CHK_ERR( rval );
 
@@ -2496,15 +2518,20 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
     // first, receive from sender_rank 0, the communication graph (matrix), so each receiver
     // knows what data to expect
     std::vector< int > pack_array;
-    rval = cgraph->receive_comm_graph( global, pco, pack_array );MB_CHK_ERR( rval );
+    std::vector<char> zoltanBuff;
+    rval = cgraph->receive_comm_graph( global, pco, pack_array, zoltanBuff );MB_CHK_ERR( rval );
 
     // senders across for the current receiver
     int current_receiver = cgraph->receiver( receiver_rank );
-
+#ifdef MOAB_HAVE_ZOLTAN
+    if (zoltanBuff.size() > 0) // it could happen only on root of receiver; store it in a global context member
+        // the corresponding send it with method 4, for sure
+        context.uniqueZoltanBuffer = zoltanBuff;
+#endif
     std::vector< int > senders_local;
     size_t n = 0;
 
-    while( n < pack_array.size() )
+    while( n < pack_array.size() - 1 ) // now, the last int was already processed, if it has zoltan or not
     {
         if( current_receiver == pack_array[n] )
         {
@@ -2547,37 +2574,40 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
     rval = context.MBI->get_entities_by_handle( local_set, local_ents );MB_CHK_ERR( rval );
 
     // do not do merge if point cloud
-    if( !local_ents.all_of_type( MBVERTEX ) )
+    if (!local_ents.empty())
     {
-        if( (int)senders_local.size() >= 2 )  // need to remove duplicate vertices
-        // that might come from different senders
+        if( !local_ents.all_of_type( MBVERTEX ) )
         {
+            if( (int)senders_local.size() >= 2 )  // need to remove duplicate vertices
+            // that might come from different senders
+            {
 
-            Range local_verts = local_ents.subset_by_type( MBVERTEX );
-            Range local_elems = subtract( local_ents, local_verts );
+                Range local_verts = local_ents.subset_by_type( MBVERTEX );
+                Range local_elems = subtract( local_ents, local_verts );
 
-            // remove from local set the vertices
-            rval = context.MBI->remove_entities( local_set, local_verts );MB_CHK_ERR( rval );
-
-#ifdef VERBOSE
-            std::cout << "current_receiver " << current_receiver << " local verts: " << local_verts.size() << "\n";
-#endif
-            MergeMesh mm( context.MBI );
-
-            rval = mm.merge_using_integer_tag( local_verts, idtag );MB_CHK_ERR( rval );
-
-            Range new_verts;  // local elems are local entities without vertices
-            rval = context.MBI->get_connectivity( local_elems, new_verts );MB_CHK_ERR( rval );
+                // remove from local set the vertices
+                rval = context.MBI->remove_entities( local_set, local_verts );MB_CHK_ERR( rval );
 
 #ifdef VERBOSE
-            std::cout << "after merging: new verts: " << new_verts.size() << "\n";
+                std::cout << "current_receiver " << current_receiver << " local verts: " << local_verts.size() << "\n";
 #endif
-            rval = context.MBI->add_entities( local_set, new_verts );MB_CHK_ERR( rval );
+                MergeMesh mm( context.MBI );
+
+                rval = mm.merge_using_integer_tag( local_verts, idtag );MB_CHK_ERR( rval );
+
+                Range new_verts;  // local elems are local entities without vertices
+                rval = context.MBI->get_connectivity( local_elems, new_verts );MB_CHK_ERR( rval );
+
+#ifdef VERBOSE
+                std::cout << "after merging: new verts: " << new_verts.size() << "\n";
+#endif
+                rval = context.MBI->add_entities( local_set, new_verts );MB_CHK_ERR( rval );
+            }
         }
+        else
+            data.point_cloud = true;
     }
-    else
-        data.point_cloud = true;
-
+    // it could be point cloud empty ?
     if( !data.point_cloud )
     {
         // still need to resolve shared entities (in this case, vertices )
@@ -2622,8 +2652,62 @@ ErrCode iMOAB_ReceiveMesh( iMOAB_AppID pid, MPI_Comm* join, MPI_Group* sendingGr
     return moab::MB_SUCCESS;
 }
 
+// need to send the zoltan buffer from coupler root towards the component root
+ErrCode iMOAB_RetrieveZBuffer( MPI_Group*  cmpGrp,  MPI_Group* cplGrp,  MPI_Comm* joint, int * is_fortran )
+{
+    // need to use MPI_Group_translate_ranks to find the rank of sender root and the rank of receiver root,
+    // in the joint communicator
+    assert( cmpGrp != nullptr );
+    assert( cplGrp != nullptr );
+    assert( joint != nullptr );
+
+    MPI_Group cmpGroup =
+        ( *is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( cmpGrp ) ) : *cmpGrp );
+    MPI_Group cplGroup =
+        ( *is_fortran ? MPI_Group_f2c( *reinterpret_cast< MPI_Fint* >( cplGrp ) ) : *cplGrp );
+    MPI_Comm jointComm = ( *is_fortran ? MPI_Comm_f2c( *reinterpret_cast< MPI_Fint* >( joint ) ) : *joint );
+
+
+
+    int rootRank = 0;
+    int rankCompRoot = -1; // this will receive the buffer
+    int rankCouplerRoot = -1; // this will send the coupler
+    int rank, ierr;
+    MPI_Group global_grp;
+    MPI_Comm_group( jointComm, &global_grp );
+    MPI_Group_translate_ranks( cmpGroup, 1, &rootRank, global_grp, &rankCompRoot );
+    MPI_Group_translate_ranks( cplGroup, 1, &rootRank, global_grp, &rankCouplerRoot );
+    MPI_Comm_rank( jointComm, &rank );
+    MPI_Group_free( &global_grp ); // we do not need the global group anymore
+#ifdef MOAB_HAVE_ZOLTAN
+    // send from root of coupler, towards the root of component
+    if ( rankCouplerRoot != rankCompRoot ) // we do not send / receive if we do not have to; it is a blocking send/recv
+    {
+        if (rank == rankCouplerRoot)
+        {
+            // do a send of context.uniqueZoltanBuffer, towards the rankCompRoot
+            ierr = MPI_Send( &context.uniqueZoltanBuffer[0], (int)context.uniqueZoltanBuffer.size(), MPI_CHAR, rankCompRoot, 123, jointComm);CHK_MPI_ERR( ierr );
+        }
+        if (rank == rankCompRoot)
+        {
+            // first a probe, then a MPI_Recv
+            MPI_Status status;
+            ierr = MPI_Probe( rankCouplerRoot, 123, jointComm, &status );CHK_MPI_ERR( ierr );
+            // get the count of data received from the MPI_Status structure
+            int size_buff;
+            ierr = MPI_Get_count( &status, MPI_CHAR, &size_buff );CHK_MPI_ERR( ierr );
+
+            context.uniqueZoltanBuffer.resize( size_buff );
+            ierr = MPI_Recv( &context.uniqueZoltanBuffer[0], size_buff, MPI_CHAR, rankCouplerRoot, 123, jointComm, &status );CHK_MPI_ERR( ierr );
+        }
+    }
+#endif
+    return moab::MB_SUCCESS;
+}
+
 ErrCode iMOAB_SendElementTag( iMOAB_AppID pid, const iMOAB_String tag_storage_name, MPI_Comm* join, int* context_id )
 {
+
     appData& data                               = context.appDatas[*pid];
     std::map< int, ParCommGraph* >::iterator mt = data.pgraph.find( *context_id );
     if( mt == data.pgraph.end() )
@@ -3288,7 +3372,8 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join,
             std::set< int >& setInts = idsFromProcs[origProc];
             setInts.insert( gidCell );
         }
-
+// questionable ??
+#if 0
         // if we have no intx cells, it means we are on point clouds; quick fix just use all cells
         // from coverage set
         if( cells.empty() )
@@ -3318,6 +3403,7 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join,
                 setInts.insert( gidCell );
             }
         }
+#endif // #if 0
 
 #ifdef VERBOSE
         std::ofstream dbfile;
@@ -3359,6 +3445,16 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join,
             recvGraph1->set_cover_set( cover_set );
             context.appDatas[*pid_migr].pgraph[*context_id] = recvGraph1; // possible memory leak if context_id is same
         }
+        // initial loop to see how much space we need for TLcovIDs
+        size_t nbIds = 0;
+        for( std::map< int, std::set< int > >::iterator mit = idsFromProcs.begin(); mit != idsFromProcs.end(); mit++ )
+        {
+            std::set< int >& idSet = mit->second;
+            nbIds += idSet.size();
+        }
+
+        TLcovIDs.resize(nbIds);
+
         for( std::map< int, std::set< int > >::iterator mit = idsFromProcs.begin(); mit != idsFromProcs.end(); mit++ )
         {
             int procToSendTo       = mit->first;
@@ -3366,9 +3462,9 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join,
             for( std::set< int >::iterator sit = idSet.begin(); sit != idSet.end(); sit++ )
             {
                 int n = TLcovIDs.get_n();
-                TLcovIDs.reserve();
                 TLcovIDs.vi_wr[2 * n]     = procToSendTo;  // send to processor
                 TLcovIDs.vi_wr[2 * n + 1] = *sit;          // global id needs index in the local_verts range
+                TLcovIDs.inc_n();
             }
         }
     }
@@ -3391,15 +3487,14 @@ ErrCode iMOAB_CoverageGraph( MPI_Comm* join,
     return moab::MB_SUCCESS;  // success
 }
 
-ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, const iMOAB_String prefix )
+ErrCode iMOAB_DumpCommGraph( iMOAB_AppID pid, int* context_id, int* is_sender, int * verbose, const iMOAB_String prefix )
 {
-    assert( prefix && strlen( prefix ) );
 
     ParCommGraph* cgraph = context.appDatas[*pid].pgraph[*context_id];
     std::string prefix_str( prefix );
 
     if( NULL != cgraph )
-        cgraph->dump_comm_information( prefix_str, *is_sender );
+        cgraph->dump_comm_information( prefix_str, *is_sender, *verbose );
     else
     {
         std::cout << " cannot find ParCommGraph on app with pid " << *pid << " name: " << context.appDatas[*pid].name
@@ -4014,7 +4109,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
         rval = context.MBI->get_entities_by_dimension( data_src.file_set, 0, rintxverts );MB_CHK_ERR( rval );
         rval = context.MBI->get_entities_by_dimension( data_src.file_set, data_src.dimension, rintxelems );MB_CHK_ERR( rval );
         rval = IntxUtils::fix_degenerate_quads( context.MBI, data_src.file_set );MB_CHK_ERR( rval );
-        rval = areaAdaptor.positive_orientation( context.MBI, data_src.file_set, defaultradius /*radius_source*/ );MB_CHK_ERR( rval );
+        rval = areaAdaptor.positive_orientation( context.MBI, data_src.file_set, defaultradius /*radius_source*/, rank );MB_CHK_ERR( rval );
         srctgt_areas[0] = areaAdaptor.area_on_sphere( context.MBI, data_src.file_set, defaultradius /*radius_source*/ );
 #ifdef VERBOSE
         if( is_root )
@@ -4026,7 +4121,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
         rval = context.MBI->get_entities_by_dimension( data_tgt.file_set, 0, bintxverts );MB_CHK_ERR( rval );
         rval = context.MBI->get_entities_by_dimension( data_tgt.file_set, data_tgt.dimension, bintxelems );MB_CHK_ERR( rval );
         rval = IntxUtils::fix_degenerate_quads( context.MBI, data_tgt.file_set );MB_CHK_ERR( rval );
-        rval = areaAdaptor.positive_orientation( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/ );MB_CHK_ERR( rval );
+        rval = areaAdaptor.positive_orientation( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/, rank );MB_CHK_ERR( rval );
         srctgt_areas[1] = areaAdaptor.area_on_sphere( context.MBI, data_tgt.file_set, defaultradius /*radius_target*/ );
 #ifdef VERBOSE
         if( is_root )
@@ -4056,6 +4151,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
     tdata.remapper->meshValidate     = true;
     tdata.remapper->constructEdgeMap = true;
 
+    tdata.remapper -> set_intx_name(data_intx.name);
     // Do not create new filesets; Use the sets from our respective applications
     tdata.remapper->initialize( false );
     tdata.remapper->GetMeshSet( moab::Remapper::SourceMesh )  = data_src.file_set;
@@ -4065,9 +4161,20 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
     rval = tdata.remapper->ConvertMeshToTempest( moab::Remapper::SourceMesh );MB_CHK_ERR( rval );
     rval = tdata.remapper->ConvertMeshToTempest( moab::Remapper::TargetMesh );MB_CHK_ERR( rval );
 
+#ifdef MOAB_HAVE_MPI
+    double t1;
+    if (is_root) t1 = MPI_Wtime();
+#endif
     // First, compute the covering source set.
     rval = tdata.remapper->ConstructCoveringSet( epsrel, 1.0, 1.0, boxeps, false );MB_CHK_ERR( rval );
-
+#ifdef MOAB_HAVE_MPI
+    double t2;
+    if (is_root)
+    {
+        t2 = MPI_Wtime();
+        std::cout << "[LOG] Time: coverage mesh:" << t2-t1 <<"\n";
+    }
+#endif
     // Next, compute intersections with MOAB.
     rval = tdata.remapper->ComputeOverlapMesh( use_kdtree_search, false );MB_CHK_ERR( rval );
 
@@ -4076,7 +4183,7 @@ ErrCode iMOAB_ComputeMeshIntersectionOnSphere( iMOAB_AppID pid_src, iMOAB_AppID 
     {
         double local_area,
             global_areas[3];  // Array for Initial area, and through Method 1 and Method 2
-        local_area = areaAdaptor.area_on_sphere( context.MBI, data_intx.file_set, radius_source );
+        local_area = areaAdaptor.area_on_sphere( context.MBI, data_intx.file_set, radius_source, rank );
 
         global_areas[0] = srctgt_areas_glb[0];
         global_areas[1] = srctgt_areas_glb[1];
@@ -4122,8 +4229,10 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
     appData& data_src  = context.appDatas[*pid_src];
     appData& data_tgt  = context.appDatas[*pid_tgt];
     appData& data_intx = context.appDatas[*pid_intx];
+    int rank = 0;
 #ifdef MOAB_HAVE_MPI
     ParallelComm* pco_intx = context.pcomms[*pid_intx];
+    rank = pco_intx->rank();
 #endif
 
     // Mesh intersection has already been computed; Return early.
@@ -4151,7 +4260,7 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
         rval = context.MBI->get_entities_by_dimension( data_src.file_set, 0, rintxverts );MB_CHK_ERR( rval );
         rval = context.MBI->get_entities_by_dimension( data_src.file_set, 2, rintxelems );MB_CHK_ERR( rval );
         rval = IntxUtils::fix_degenerate_quads( context.MBI, data_src.file_set );MB_CHK_ERR( rval );
-        rval = areaAdaptor.positive_orientation( context.MBI, data_src.file_set, radius_source );MB_CHK_ERR( rval );
+        rval = areaAdaptor.positive_orientation( context.MBI, data_src.file_set, radius_source, rank );MB_CHK_ERR( rval );
 #ifdef VERBOSE
         std::cout << "The red set contains " << rintxverts.size() << " vertices and " << rintxelems.size()
                   << " elements \n";
@@ -4161,7 +4270,7 @@ ErrCode iMOAB_ComputePointDoFIntersection( iMOAB_AppID pid_src, iMOAB_AppID pid_
         rval = context.MBI->get_entities_by_dimension( data_tgt.file_set, 0, bintxverts );MB_CHK_ERR( rval );
         rval = context.MBI->get_entities_by_dimension( data_tgt.file_set, 2, bintxelems );MB_CHK_ERR( rval );
         rval = IntxUtils::fix_degenerate_quads( context.MBI, data_tgt.file_set );MB_CHK_ERR( rval );
-        rval = areaAdaptor.positive_orientation( context.MBI, data_tgt.file_set, radius_target );MB_CHK_ERR( rval );
+        rval = areaAdaptor.positive_orientation( context.MBI, data_tgt.file_set, radius_target, rank );MB_CHK_ERR( rval );
 #ifdef VERBOSE
         std::cout << "The blue set contains " << bintxverts.size() << " vertices and " << bintxelems.size()
                   << " elements \n";

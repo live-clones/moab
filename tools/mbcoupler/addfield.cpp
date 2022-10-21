@@ -22,7 +22,7 @@ double physField( double x, double y, double z, double factor )
   out += 1e-1; // clamp
   out = 1/out;
     */
-    double out = factor * sqrt( x * x + y * y + z * z );
+    double out = factor * ( x * x + y +  z );
 
     return out;
 }
@@ -31,7 +31,7 @@ void putElementField( Interface* mbi, const char* tagname, double factor )
 {
     Range elems;
 
-    mbi->get_entities_by_dimension( 0, 3, elems );
+    mbi->get_entities_by_dimension( 0, 2, elems );
 
     const double defVal = 0.;
     Tag fieldTag;
@@ -146,10 +146,12 @@ int main( int argc, char** argv )
     double factor = 1.0;
     if( argc == 4 ) factor = atof( argv[3] );
 
-    putVertexField( mbi, "vertex_field", factor );
-    putElementField( mbi, "element_field", factor );
+    //putVertexField( mbi, "vertex_field", factor );
+    putElementField( mbi, "T_proj", factor );
+    putElementField( mbi, "u_proj", 2. );
+    putElementField( mbi, "v_proj", 3. );
     // putSpectralElementField(mbi, 2, 4, "spectral_element_field", factor);
-    putSpectralElementField( mbi, 2, 4, "a2oTAG", factor );
+    //putSpectralElementField( mbi, 2, 4, "a2oTAG", factor );
 
     ErrorCode result = mbi->write_mesh( argv[2] );
     if( MB_SUCCESS == result )

@@ -19,7 +19,7 @@
 #include <cassert>
 
 // #define ENABLE_DEBUG
-//#define CHECK_CONVEXITY
+#define CHECK_CONVEXITY
 namespace moab
 {
 
@@ -256,6 +256,7 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
     }
 #endif
 
+    IntxAreaUtils areaAdaptor;
     // get the edges for the target triangle; the extra points will be on those edges, saved as
     // lists (unordered)
 
@@ -471,10 +472,10 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
             int k1 = ( k + 1 ) % nP;
             int k2 = ( k1 + 1 ) % nP;
             double orientedArea =
-                area_spherical_triangle_lHuiller( &coords[3 * k], &coords[3 * k1], &coords[3 * k2], Rdest );
+                    areaAdaptor.area_spherical_triangle( &coords[3 * k], &coords[3 * k1], &coords[3 * k2], Rdest, my_rank );
             if( orientedArea < 0 )
             {
-                std::cout << " np before 1 , 2, current " << npBefore1 << " " << npBefore2 << " " << nP << "\n";
+                std::cout << " np before + current " << npBefore1 << " " << npBefore2 << " " << nP << "\n";
                 for( int i = 0; i < nP; i++ )
                 {
                     int nexti         = ( i + 1 ) % nP;
@@ -482,9 +483,11 @@ ErrorCode Intx2MeshOnSphere::findNodes( EntityHandle tgt, int nsTgt, EntityHandl
                     std::cout << " " << foundIds[i] << " edge en:" << lengthEdge << "\n";
                 }
                 std::cout << " old verts: " << oldNodes << " other intx:" << otherIntx << "\n";
-
-                std::cout << "rank:" << my_rank << " oriented area in 3d is negative: " << orientedArea << " k:" << k
-                          << " target, src:" << tgt << " " << src << " \n";
+                int sgid, tgid;
+                rval = mb->tag_get_data(gid, &src, 1, &sgid); MB_CHK_ERR( rval );
+                rval = mb->tag_get_data(gid, &tgt, 1, &tgid); MB_CHK_ERR( rval );
+                std::cout << "rank: " << my_rank << " oriented area in 3d is negative: " << orientedArea << " k:" << k
+                          << " target, src:" << tgid << " " << sgid << " \n";
             }
         }
 #endif
@@ -592,7 +595,7 @@ ErrorCode Intx2MeshOnSphere::update_tracer_data( EntityHandle out_set, Tag& tagE
         // source to target (so a deformed source corresponds to an arrival tgt)
         /// TODO: VSM: Its unclear whether we need the source or destination radius here.
         double radius = Rsrc;
-        double areap  = intxAreas.area_spherical_element( mb, poly, radius );
+        double areap  = intxAreas.area_spherical_element( mb, poly, radius, my_rank );
         check_intx_area += areap;
         // so the departure cell at time t (srcIndex) covers a portion of a tgtCell
         // that quantity will be transported to the tgtCell at time t+dt
