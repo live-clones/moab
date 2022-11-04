@@ -54,6 +54,7 @@ struct ToolContext
     std::vector< int > disc_orders;
     std::vector< std::string > disc_methods;
     std::vector< std::string > doftag_names;
+    std::string fvMethod;
     std::string outFilename;
     std::string intxFilename;
     std::string baselineFile;
@@ -67,7 +68,6 @@ struct ToolContext
     bool kdtreeSearch;
     bool fCheck;
     bool fVolumetric;
-    bool fInverseDistanceMap;
     GenerateOfflineMapAlgorithmOptions mapOptions;
 
 #ifdef MOAB_HAVE_MPI
@@ -78,10 +78,10 @@ struct ToolContext
     ToolContext( moab::Interface* icore )
         : mbcore( icore ), proc_id( 0 ), n_procs( 1 ), outputFormatter( std::cout, 0, 0 ),
 #endif
-          blockSize( 5 ), outFilename( "outputFile.nc" ), intxFilename( "intxFile.h5m" ), baselineFile( "" ),
+          blockSize( 5 ), fvMethod("none"), outFilename( "outputFile.nc" ), intxFilename( "intxFile.h5m" ), baselineFile( "" ),
           meshType( moab::TempestRemapper::DEFAULT ), computeDual( false ), computeWeights( false ),
           verifyWeights( false ), enforceConvexity( false ), ensureMonotonicity( 0 ), rrmGrids( false ),
-          kdtreeSearch( true ), fCheck( n_procs > 1 ? false : true ), fVolumetric( false ), fInverseDistanceMap( false )
+          kdtreeSearch( true ), fCheck( n_procs > 1 ? false : true ), fVolumetric(false)
     {
         inFilenames.resize( 2 );
         doftag_names.resize( 2 );
@@ -138,6 +138,7 @@ struct ToolContext
         int imeshType                  = 0;
         std::string expectedFName      = "output.exo";
         std::string expectedMethod     = "fv";
+        std::string expectedFVMethod   = "none";
         std::string expectedDofTagName = "GLOBAL_ID";
         int expectedOrder              = 1;
 
@@ -195,13 +196,13 @@ struct ToolContext
                              "when computing weights)",
                              &fVolumetric );
 
-        opts.addOpt< void >( "invdist",
-                             "Apply a inverse distance weight projection to compute the weights (relevant only "
-                             "when computing FV-FV weights)",
-                             &fInverseDistanceMap );
-
         opts.addOpt< int >( "monotonicity", "Ensure monotonicity in the weight generation. Options=[0,1,2,3]",
                             &ensureMonotonicity );
+
+        opts.addOpt< std::string >( "fvmethod",
+                                    "Sub-type method for FV-FV projections (invdist, delaunay, bilin, "
+                                    "intbilin, intbilingb, none. Default: none)",
+                                    &expectedFVMethod );
 
         opts.addOpt< void >( "enforce_convexity", "check convexity of input meshes to compute mesh intersections",
                              &enforceConvexity );
@@ -295,6 +296,13 @@ struct ToolContext
             mapOptions.fTargetConcave = false;
 
             mapOptions.strMethod = "";
+
+            if( expectedFVMethod != "none" )
+            {
+                mapOptions.strMethod += expectedFVMethod + ";";
+                // These FV projection methods are non-conservative; specify it explicitly
+                mapOptions.fNoConservation = true;
+            }
             switch( ensureMonotonicity )
             {
                 case 0:
@@ -314,7 +322,6 @@ struct ToolContext
 
             //assert( fVolumetric && fInverseDistanceMap == false );  // both options cannot be active
             if( fVolumetric ) mapOptions.strMethod += "volumetric;";
-            if( fInverseDistanceMap ) mapOptions.strMethod += "invdist;";
         }
 
         // clear temporary string name

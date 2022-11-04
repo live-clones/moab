@@ -20,6 +20,7 @@
 #include "GaussLobattoQuadrature.h"
 #include "SparseMatrix.h"
 #include "STLStringHelper.h"
+#include "LinearRemapFV.h"
 
 #include "moab/Remapping/TempestOnlineMap.hpp"
 #include "DebugOutput.hpp"
@@ -825,7 +826,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
 
         // Method flags
         std::string strMapAlgorithm( "" );
-        int nMonotoneType = ( mapOptions.fMonotone ) ? ( 1 ) : ( 0 );
+        int nMonotoneType    = ( mapOptions.fMonotone ) ? ( 1 ) : ( 0 );
 
         // Make an index of method arguments
         std::set< std::string > setMethodStrings;
@@ -845,6 +846,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
                 }
             }
         }
+
         for( auto it : setMethodStrings )
         {
             // Piecewise constant monotonicity
@@ -854,7 +856,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
                 {
                     _EXCEPTIONT( "Multiple monotonicity specifications found (--mono) or (--method \"mono#\")" );
                 }
-                if( ( m_eInputType == DiscretizationType_FV ) || ( m_eOutputType == DiscretizationType_FV ) )
+                if( ( m_eInputType == DiscretizationType_FV ) && ( m_eOutputType == DiscretizationType_FV ) )
                 {
                     _EXCEPTIONT( "--method \"mono2\" is only used when remapping to/from CGLL or DGLL grids" );
                 }
@@ -868,7 +870,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
                 {
                     _EXCEPTIONT( "Multiple monotonicity specifications found (--mono) or (--method \"mono#\")" );
                 }
-                if( ( m_eInputType == DiscretizationType_FV ) || ( m_eOutputType == DiscretizationType_FV ) )
+                if( ( m_eInputType == DiscretizationType_FV ) && ( m_eOutputType == DiscretizationType_FV ) )
                 {
                     _EXCEPTIONT( "--method \"mono3\" is only used when remapping to/from CGLL or DGLL grids" );
                 }
@@ -893,6 +895,53 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
                     _EXCEPTIONT( "--method \"invdist\" may only be used for FV->FV remapping" );
                 }
                 strMapAlgorithm = "invdist";
+
+                // Delaunay triangulation mapping
+            }
+            else if( it == "delaunay" )
+            {
+                if( ( m_eInputType != DiscretizationType_FV ) || ( m_eOutputType != DiscretizationType_FV ) )
+                {
+                    _EXCEPTIONT( "--method \"delaunay\" may only be used for FV->FV remapping" );
+                }
+                strMapAlgorithm = "delaunay";
+
+                // Bilinear
+            }
+            else if( it == "bilin" )
+            {
+                if( ( m_eInputType != DiscretizationType_FV ) || ( m_eOutputType != DiscretizationType_FV ) )
+                {
+                    _EXCEPTIONT( "--method \"bilin\" may only be used for FV->FV remapping" );
+                }
+                strMapAlgorithm = "fvbilin";
+
+                // Integrated bilinear (same as mono3 when source grid is CGLL/DGLL)
+            }
+            else if( it == "intbilin" )
+            {
+                if( m_eOutputType != DiscretizationType_FV )
+                {
+                    _EXCEPTIONT( "--method \"intbilin\" may only be used when mapping to FV." );
+                }
+                if( m_eInputType == DiscretizationType_FV )
+                {
+                    strMapAlgorithm = "fvintbilin";
+                }
+                else
+                {
+                    strMapAlgorithm = "mono3";
+                }
+
+                // Integrated bilinear with generalized Barycentric coordinates
+            }
+            else if( it == "intbilingb" )
+            {
+                if( ( m_eInputType != DiscretizationType_FV ) || ( m_eOutputType != DiscretizationType_FV ) )
+                {
+                    _EXCEPTIONT( "--method \"intbilingb\" may only be used for FV->FV remapping" );
+                }
+                strMapAlgorithm = "fvintbilingb";
             }
             else
             {
@@ -974,13 +1023,13 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
                     // Reorder overlap mesh
                     m_meshOverlap->ExchangeFirstAndSecondMesh();
                 }
-                // else
-                // {   // No correspondence found
-                //     _EXCEPTION4 ( "Invalid overlap mesh:\n"
-                //                   "    No correspondence found with input and output meshes (%i,%i)
-                //                   vs (%i,%i)", m_meshInputCov->faces.size(),
-                //                   m_meshOutput->faces.size(), ixSourceFaceMax, ixTargetFaceMax );
-                // }
+                else
+                {  // No correspondence found
+                    _EXCEPTION4( "Invalid overlap mesh:\n    No correspondence found with input and output meshes "
+                                 "(%i,%i) vs (%i,%i)",
+                                 m_meshInputCov->faces.size(), m_meshOutput->faces.size(), ixSourceFaceMax,
+                                 ixTargetFaceMax );
+                }
             }
 
             // Calculate Face areas
@@ -994,7 +1043,7 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             if( is_root ) dbgprint.printf( 0, "Overlap Mesh Area: %1.15e\n", dTotalAreaOverlap );
 
             // Correct areas to match the areas calculated in the overlap mesh
-            // if (fCorrectAreas)
+            // if (fCorrectAreas) // In MOAB-TempestRemap, we will always keep this to be true
             {
                 if( is_root ) dbgprint.printf( 0, "Correcting source/target areas to overlap mesh areas\n" );
                 DataArray1D< double > dSourceArea( m_meshInputCov->faces.size() );
@@ -1080,9 +1129,42 @@ moab::ErrorCode moab::TempestOnlineMap::GenerateRemappingWeights( std::string st
             // Finite volume input / Finite element output
             rval = this->SetDOFmapAssociation( eInputType, false, NULL, NULL, eOutputType, false, NULL );MB_CHK_ERR( rval );
 
-            // Construct remap
+            // Construct remap for FV-FV
             if( is_root ) dbgprint.printf( 0, "Calculating remap weights\n" );
-            LinearRemapFVtoFV_Tempest_MOAB( mapOptions.nPin );
+
+            // Construct OfflineMap
+            if( strMapAlgorithm == "invdist" )
+            {
+                AnnounceStartBlock( "Calculating offline map (invdist)" );
+                LinearRemapFVtoFVInvDist( *m_meshInputCov, *m_meshOutput, *m_meshOverlap, *this );
+            }
+            else if( strMapAlgorithm == "delaunay" )
+            {
+                AnnounceStartBlock( "Calculating offline map (delaunay)" );
+                LinearRemapTriangulation( *m_meshInputCov, *m_meshOutput, *m_meshOverlap, *this );
+            }
+            else if( strMapAlgorithm == "fvintbilin" )
+            {
+                AnnounceStartBlock( "Calculating offline map (intbilin)" );
+                LinearRemapIntegratedBilinear( *m_meshInputCov, *m_meshOutput, *m_meshOverlap, *this );
+            }
+            else if( strMapAlgorithm == "fvintbilingb" )
+            {
+                AnnounceStartBlock( "Calculating offline map (intbilingb)" );
+                LinearRemapIntegratedGeneralizedBarycentric( *m_meshInputCov, *m_meshOutput, *m_meshOverlap, *this );
+            }
+            else if( strMapAlgorithm == "fvbilin" )
+            {
+                AnnounceStartBlock( "Calculating offline map (bilin)" );
+                LinearRemapBilinear( *m_meshInputCov, *m_meshOutput, *m_meshOverlap, *this );
+            }
+            else
+            {
+                AnnounceStartBlock( "Calculating offline map (default)" );
+                LinearRemapFVtoFV( *m_meshInputCov, *m_meshOutput, *m_meshOverlap,
+                                   ( mapOptions.fMonotone ) ? ( 1 ) : ( mapOptions.nPin ), *this );
+                // LinearRemapFVtoFV_Tempest_MOAB( ( mapOptions.fMonotone ? 1 : mapOptions.nPin ) );
+            }
         }
         else if( eInputType == DiscretizationType_FV )
         {

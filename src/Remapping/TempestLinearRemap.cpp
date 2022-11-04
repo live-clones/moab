@@ -11,7 +11,7 @@
 #include "Announce.h"
 #include "DataArray3D.h"
 #include "FiniteElementTools.h"
-// #include "LinearRemapFV.h"
+#include "FiniteVolumeTools.h"
 #include "GaussLobattoQuadrature.h"
 #include "TriangularQuadrature.h"
 #include "MeshUtilitiesFuzzy.h"
@@ -37,20 +37,6 @@
 
 // #define VERBOSE
 
-extern void BuildIntegrationArray( const Mesh& m_meshInput,
-                                   const Mesh& m_meshOverlap,
-                                   const TriangularQuadratureRule& triquadrule,
-                                   int ixFirstFace,
-                                   int ixOverlapBegin,
-                                   int ixOverlapEnd,
-                                   int nOrder,
-                                   DataArray2D< double >& dIntArray );
-
-extern void InvertFitArray_Corrected( const DataArray1D< double >& dConstraint,
-                                      DataArray2D< double >& dFitArray,
-                                      DataArray1D< double >& dFitWeights,
-                                      DataArray2D< double >& dFitArrayPlus );
-
 /// <summary>
 ///     Face index and distance metric pair.
 /// </summary>
@@ -60,21 +46,6 @@ typedef std::pair< int, int > FaceDistancePair;
 ///     Vector storing adjacent Faces.
 /// </summary>
 typedef std::vector< FaceDistancePair > AdjacentFaceVector;
-
-extern void BuildFitArray( const Mesh& mesh,
-                           const TriangularQuadratureRule& triquadrule,
-                           int ixFirst,
-                           const AdjacentFaceVector& vecAdjFaces,
-                           int nOrder,
-                           int nFitWeightsExponent,
-                           const DataArray1D< double >& dConstraint,
-                           DataArray2D< double >& dFitArray,
-                           DataArray1D< double >& dFitWeights );
-
-extern void GetAdjacentFaceVectorByEdge( const Mesh& mesh,
-                                         int iFaceInitial,
-                                         int nRequiredFaceSetSize,
-                                         AdjacentFaceVector& vecFaces );
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -185,6 +156,9 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
     int ixOverlap                  = 0;
     const unsigned outputFrequency = ( m_meshInputCov->faces.size() / 10 ) + 1;
 
+    DataArray2D< double > dIntArray;
+    DataArray1D< double > dConstraint( nCoefficients );
+
     // Loop through all faces on m_meshInput
     for( size_t ixFirst = 0; ixFirst < m_meshInputCov->faces.size(); ixFirst++ )
     {
@@ -201,20 +175,14 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
         for( ; ixOverlapEnd < m_meshOverlap->faces.size(); ixOverlapEnd++ )
         {
             if( ixFirst - m_meshOverlap->vecSourceFaceIx[ixOverlapEnd] != 0 )
-            {
                 break;
-            }
         }
 
         unsigned nOverlapFaces = ixOverlapEnd - ixOverlapBegin;
-        // if ( is_root ) Announce ( "Element %i / %i :: [%i, %i]", ixFirst,
-        // m_meshInputCov->faces.size(), ixOverlapBegin, ixOverlapEnd );
 
         if( nOverlapFaces == 0 ) continue;
 
         // Build integration array
-        DataArray2D< double > dIntArray;
-
         BuildIntegrationArray( *m_meshInputCov, *m_meshOverlap, triquadrule, ixFirst, ixOverlapBegin, ixOverlapEnd,
                                nOrder, dIntArray );
 
@@ -228,10 +196,8 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
         int nAdjFaces = vecAdjFaces.size();
 
         // Determine the conservative constraint equation
-        DataArray1D< double > dConstraint( nCoefficients );
-
         double dFirstArea = m_meshInputCov->vecFaceArea[ixFirst];
-
+        dConstraint.Zero();
         for( int p = 0; p < nCoefficients; p++ )
         {
             for( unsigned j = 0; j < nOverlapFaces; j++ )
@@ -250,19 +216,33 @@ void moab::TempestOnlineMap::LinearRemapFVtoFV_Tempest_MOAB( int nOrder )
                        dFitArray, dFitWeights );
 
         // Compute the inverse fit array
-        InvertFitArray_Corrected( dConstraint, dFitArray, dFitWeights, dFitArrayPlus );
+        bool fSuccess = InvertFitArray_Corrected( dConstraint, dFitArray, dFitWeights, dFitArrayPlus );
 
         // Multiply integration array and fit array
         DataArray2D< double > dComposedArray( nAdjFaces, nOverlapFaces );
-
-        for( int i = 0; i < nAdjFaces; i++ )
+        if( fSuccess )
         {
-            for( unsigned j = 0; j < nOverlapFaces; j++ )
+            // Multiply integration array and inverse fit array
+            for( int i = 0; i < nAdjFaces; i++ )
             {
-                for( int k = 0; k < nCoefficients; k++ )
+                for( size_t j = 0; j < nOverlapFaces; j++ )
                 {
-                    dComposedArray[i][j] += dIntArray[k][j] * dFitArrayPlus[i][k];
+                    for( int k = 0; k < nCoefficients; k++ )
+                    {
+                        dComposedArray( i, j ) += dIntArray( k, j ) * dFitArrayPlus( i, k );
+                    }
                 }
+            }
+
+            // Unable to invert fit array, drop to 1st order.  In this case
+            // dFitArrayPlus(0,0) = 1 and all other entries are zero.
+        }
+        else
+        {
+            dComposedArray.Zero();
+            for( size_t j = 0; j < nOverlapFaces; j++ )
+            {
+                dComposedArray( 0, j ) += dIntArray( 0, j );
             }
         }
 
